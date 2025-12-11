@@ -138,7 +138,7 @@
 
     <script type="text/babel">
         // ★★★ 更新時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 05:00"; 
+        const BUILD_TIMESTAMP = "2025/12/12 05:20"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
@@ -548,9 +548,7 @@
             const sounds = useSound(isSoundOn);
             
             const [solutions, setSolutions] = useState([]);
-            // ★★★ CHANGE: Use an array for indices to handle ties ★★★
             const [bestLineIndices, setBestLineIndices] = useState([]);
-            // ★★★ CHANGE: Use an array for cell indices to handle ties ★★★
             const [suggestedCellIndices, setSuggestedCellIndices] = useState([]);
 
             const t = (key) => LOCALE[lang][key] || key;
@@ -564,7 +562,7 @@
             };
 
             const filledCount = board.filter(n => n !== null).length;
-            const isSelectionPhase = filledCount < 4; 
+            const isSelectionPhase = filledCount < 4 || isFullFillMode; 
             const showAnalysis = !isSelectionPhase || isFullFillMode;
 
             const availableNumbers = useMemo(() => {
@@ -605,10 +603,11 @@
                         if (isJackpot) lineStats[lineId].chance10k++;
                         if (isSecond) lineStats[lineId].chance3600++;
 
-                        if (isSelectionPhase && (isJackpot || isSecond)) {
+                        // 權重修正：僅在選擇階段累加
+                        if (isSelectionPhase) {
                             lineIndices.forEach(cellIdx => {
                                 if (board[cellIdx] === null) {
-                                    cellImpactScore[cellIdx] += isJackpot ? 10 : 1; 
+                                    cellImpactScore[cellIdx] += payout; 
                                 }
                             });
                         }
@@ -642,7 +641,8 @@
                     .filter(i => i !== -1);
                 setBestLineIndices(bestIndices);
 
-                if (isSelectionPhase && filledCount > 0) {
+                // ★★★ 修正點：只有在數字少於 4 個時才推薦揭開位置 (遊戲規則限制) ★★★
+                if (filledCount < 4 && filledCount > 0) {
                     let maxScore = -1;
                     // First pass: find max score
                     cellImpactScore.forEach((score, idx) => {
@@ -661,9 +661,9 @@
 
                     // Fallback logic
                     if (bestCells.length === 0) {
-                         const priority = [4, 0, 2, 6, 8, 1, 3, 5, 7];
-                         const fallback = priority.find(idx => board[idx] === null);
-                         if (fallback !== undefined) bestCells.push(fallback);
+                            const priority = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+                            const fallback = priority.find(idx => board[idx] === null);
+                            if (fallback !== undefined) bestCells.push(fallback);
                     }
 
                     setSuggestedCellIndices(bestCells);
@@ -757,7 +757,6 @@
 
             const GameCell = ({ idx }) => {
                 const cellValue = board[idx];
-                // ★★★ CHANGE: Check if idx is in the suggested list ★★★
                 const isSuggested = isSelectionPhase && suggestedCellIndices.includes(idx);
                 const isLocked = !isFullFillMode && (cellValue === null && filledCount >= 4);
 
