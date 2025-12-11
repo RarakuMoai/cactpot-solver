@@ -125,17 +125,16 @@
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
-        // ★★★ 時間更新 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 02:00"; 
+        // ★★★ 更新時間 ★★★
+        const BUILD_TIMESTAMP = "2025/12/12 02:15"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
         // --- 音效控制器 (Sound Controller) ---
-        // 使用 Web Audio API 避免依賴外部檔案
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
-            const playTone = (freq, type, duration, vol = 0.1) => {
+            const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
                 if (!enabled) return;
                 try {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -147,42 +146,39 @@
                     const gain = ctx.createGain();
 
                     osc.type = type;
-                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
                     
-                    gain.gain.setValueAtTime(vol, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+                    gain.gain.setValueAtTime(vol, ctx.currentTime + startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + startTime + duration);
 
                     osc.connect(gain);
                     gain.connect(ctx.destination);
 
-                    osc.start();
-                    osc.stop(ctx.currentTime + duration);
+                    osc.start(ctx.currentTime + startTime);
+                    osc.stop(ctx.currentTime + startTime + duration);
                 } catch (e) {
                     console.error("Audio error", e);
                 }
-            };
+            }, [enabled]);
 
             const sounds = useMemo(() => ({
-                click: () => playTone(800, 'sine', 0.1, 0.1),
-                select: () => playTone(1200, 'triangle', 0.15, 0.1),
-                clear: () => playTone(300, 'sawtooth', 0.2, 0.1),
-                reset: () => {
+                click: () => playTone(800, 'sine', 0.1, 0.1), // 基礎點擊
+                reset: () => { // 洗牌聲
                     if(!enabled) return;
-                    // 模擬洗牌聲
-                    setTimeout(() => playTone(400, 'square', 0.05, 0.05), 0);
-                    setTimeout(() => playTone(500, 'square', 0.05, 0.05), 50);
-                    setTimeout(() => playTone(600, 'square', 0.05, 0.05), 100);
+                    playTone(400, 'square', 0.05, 0.05, 0);
+                    playTone(500, 'square', 0.05, 0.05, 0.05);
+                    playTone(600, 'square', 0.05, 0.05, 0.1);
                 },
-                reveal: () => {
+                toggle: () => playTone(300, 'square', 0.1, 0.05), // 開關聲
+                cash: () => { // ★★★ 撒錢音效 ★★★
                     if(!enabled) return;
-                    // 魔法琶音 (C Major)
-                    playTone(523.25, 'sine', 0.3, 0.1); // C5
-                    setTimeout(() => playTone(659.25, 'sine', 0.3, 0.1), 50); // E5
-                    setTimeout(() => playTone(783.99, 'sine', 0.3, 0.1), 100); // G5
-                    setTimeout(() => playTone(1046.50, 'sine', 0.5, 0.1), 150); // C6
-                },
-                toggle: () => playTone(200, 'square', 0.05, 0.05)
-            }), [enabled]);
+                    // 高頻金屬音
+                    playTone(2000, 'sine', 0.4, 0.1, 0);
+                    playTone(2500, 'sine', 0.4, 0.1, 0.05);
+                    playTone(3000, 'sine', 0.5, 0.08, 0.1);
+                    playTone(4000, 'triangle', 0.2, 0.05, 0.15);
+                }
+            }), [enabled, playTone]);
 
             return sounds;
         };
@@ -421,7 +417,7 @@
                         <button
                         key={num}
                         disabled={isUsed}
-                        onClick={() => { playSound('select'); onSelect(num); }}
+                        onClick={() => { onSelect(num); /* No sound here as requested */ }}
                         className={`
                             h-16 w-16 rounded-full font-bold text-2xl flex items-center justify-center transition-all btn-3d mx-auto
                             ${num === currentValue 
@@ -436,7 +432,7 @@
                         </button>
                     );
                     })}
-                    <button onClick={() => { playSound('clear'); onSelect(null); }} className="btn-3d col-span-3 h-12 mt-3 font-bold text-white bg-gradient-to-b from-red-600 to-red-900 border-2 border-red-400 rounded-full flex items-center justify-center uppercase tracking-wider transition-transform shadow-lg">
+                    <button onClick={() => { onSelect(null); /* No sound here as requested */ }} className="btn-3d col-span-3 h-12 mt-3 font-bold text-white bg-gradient-to-b from-red-600 to-red-900 border-2 border-red-400 rounded-full flex items-center justify-center uppercase tracking-wider transition-transform shadow-lg">
                         {t('clear_cell')}
                     </button>
                 </div>
@@ -446,35 +442,41 @@
 
         // Main App
         function MiniCactpotSolver() {
-            const [lang, setLang] = useState('zh');
+            // --- 語言狀態管理 (記憶功能) ---
+            const [lang, setLang] = useState(() => {
+                return localStorage.getItem('cactpot_lang') || 'zh';
+            });
+
+            // 當語言改變時儲存到 localStorage
+            useEffect(() => {
+                localStorage.setItem('cactpot_lang', lang);
+                // 同步 PWA 標題
+                const currentTitle = LOCALE[lang]['app_title'];
+                document.title = currentTitle;
+                const metaTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+                if (metaTitle) metaTitle.setAttribute('content', currentTitle);
+            }, [lang]);
+
             const [board, setBoard] = useState(Array(9).fill(null));
             const [openSelectorIndex, setOpenSelectorIndex] = useState(null);
             const [isFullFillMode, setIsFullFillMode] = useState(false);
             const [showPayouts, setShowPayouts] = useState(false);
             
             // --- 音效狀態管理 (記憶功能) ---
-            const [isSoundOn, setIsSoundOn] = useState(true); // 預設開啟
-
-            useEffect(() => {
-                // 初始化讀取 LocalStorage
-                const savedSound = localStorage.getItem('cactpot_sound');
-                if (savedSound !== null) {
-                    setIsSoundOn(savedSound === 'true');
-                }
-            }, []);
+            const [isSoundOn, setIsSoundOn] = useState(() => {
+                const saved = localStorage.getItem('cactpot_sound');
+                return saved === null ? true : saved === 'true'; // 預設開啟，確保字串轉布林正確
+            });
 
             const toggleSound = () => {
-                const newState = !isSoundOn;
-                setIsSoundOn(newState);
-                localStorage.setItem('cactpot_sound', newState);
-                // 播放一個切換音效，如果切換成開的話
-                if (newState) {
-                    const tempSound = useSound(true); // 暫時取得音效
-                    // 這裡無法直接在 render 內呼叫 useSound hook 產生的函數，
-                    // 但因為 toggleSound 會觸發 re-render，下面的 playSound 會在下次點擊生效
-                }
+                setIsSoundOn(prev => {
+                    const newState = !prev;
+                    localStorage.setItem('cactpot_sound', newState);
+                    return newState;
+                });
             };
 
+            // 使用 hook 並傳入依賴
             const sounds = useSound(isSoundOn);
             
             const [solutions, setSolutions] = useState([]);
@@ -482,13 +484,6 @@
             const [suggestedCellIndex, setSuggestedCellIndex] = useState(null);
 
             const t = (key) => LOCALE[lang][key] || key;
-
-            useEffect(() => {
-                const currentTitle = t('app_title');
-                document.title = currentTitle;
-                const metaTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
-                if (metaTitle) metaTitle.setAttribute('content', currentTitle);
-            }, [lang]);
 
             const getLineName = (index) => {
                 if (index <= 2) return `${t('row')} ${index + 1}`;
@@ -592,10 +587,21 @@
             const handleSelect = (val) => {
                 const newBoard = [...board];
                 if (val !== null) {
-                const existingIdx = newBoard.indexOf(val);
-                if (existingIdx !== -1) newBoard[existingIdx] = null;
+                    const existingIdx = newBoard.indexOf(val);
+                    if (existingIdx !== -1) newBoard[existingIdx] = null;
                 }
-                if (openSelectorIndex !== null) newBoard[openSelectorIndex] = val;
+                
+                // 檢查是否是第 4 個數字 (即將變成 4 個)
+                if (openSelectorIndex !== null) {
+                    newBoard[openSelectorIndex] = val;
+                    const newFilledCount = newBoard.filter(n => n !== null).length;
+                    
+                    // 如果填入後剛好是 4 個，且原本不到 4 個，播放撒錢音效
+                    if (newFilledCount === 4 && filledCount < 4) {
+                        sounds.cash();
+                    }
+                }
+                
                 setBoard(newBoard);
                 setOpenSelectorIndex(null);
             };
@@ -656,8 +662,8 @@
                         disabled={isLocked}
                         onClick={() => {
                             if (!isLocked) {
-                                if (isSuggested && !cellValue) sounds.reveal(); // 播放揭示音效
-                                else sounds.click(); // 一般點擊
+                                if (isSuggested && !cellValue) sounds.reveal(); 
+                                else sounds.click(); 
                                 setOpenSelectorIndex(idx);
                             }
                         }}
@@ -717,7 +723,7 @@
                                 const arrow = LINE_ARROWS[sol.originalIndex];
                                 const isExpanded = expandedLine === sol.originalIndex;
                                 
-                                // ★★★ 顯示 720 以上的獎項 (Top 5) ★★★
+                                // 顯示 720 以上的獎項 (Top 5)
                                 const notablePrizes = sol.allProbs.filter(p => p.mgp >= 720).sort((a, b) => b.mgp - a.mgp);
 
                                 return (
@@ -801,12 +807,12 @@
                 
                 <AutoUpdateCheck />
 
-                {/* 音效開關 (左上角) */}
+                {/* 音效開關 (左上角) - 放大按鈕 */}
                 <button 
-                    onClick={() => { sounds.toggle(); toggleSound(); }}
-                    className="absolute top-4 left-4 z-40 flex items-center gap-1 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full px-3 py-1 shadow-md text-[#d4af37]/60 hover:text-white transition-all"
+                    onClick={toggleSound}
+                    className="absolute top-4 left-4 z-40 flex items-center justify-center w-12 h-12 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37]/60 hover:text-white transition-all active:scale-95"
                 >
-                    {isSoundOn ? <Volume2 className="w-4 h-4 text-[#d4af37]" /> : <VolumeX className="w-4 h-4 text-zinc-500" />}
+                    {isSoundOn ? <Volume2 className="w-6 h-6 text-[#d4af37]" /> : <VolumeX className="w-6 h-6 text-zinc-500" />}
                 </button>
 
                 {/* Language Switcher (右上角) */}
@@ -863,7 +869,6 @@
                 {/* 核心九宮格區域 */}
                 <div className="w-full max-w-[420px] casino-panel rounded-[40px] p-6 flex flex-col justify-center shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
                     <div className="grid grid-cols-[2.2rem_1fr_1fr_1fr_2.2rem] gap-1.5 md:gap-3 items-center justify-items-center w-full">
-                        {/* 指示器 */}
                         <Indicator lineId={6} arrow="↘" /> 
                         <Indicator lineId={3} arrow="⬇" /> 
                         <Indicator lineId={4} arrow="⬇" /> 
@@ -917,7 +922,7 @@
                     onSelect={handleSelect}
                     onClose={() => setOpenSelectorIndex(null)}
                     t={t}
-                    playSound={val => val === 'select' ? sounds.select() : (val === 'clear' ? sounds.clear() : sounds.click())}
+                    playSound={val => val === 'select' ? null : (val === 'clear' ? null : sounds.click())} // 靜音處理
                 />
                 
                 <PayoutTableModal 
