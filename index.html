@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mini Cactpot">
+    
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -14,71 +18,141 @@
     
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
 
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+
     <style>
+        /* --- 核心樣式設定 --- */
+        :root {
+            --gold-primary: #d4af37;
+            --gold-light: #fcd34d;
+            --gold-dark: #927215;
+            --casino-red: #4a0404;
+            --casino-black: #0f0f11;
+            --neon-glow: 0 0 10px rgba(255,0,0,0.5), 0 0 20px rgba(255,100,0,0.3), 0 0 30px rgba(255,0,200,0.3);
+        }
+
         body { 
             -webkit-tap-highlight-color: transparent; 
             font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; 
-            background-color: #1a0b2e;
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-            /* 賭場地毯紋路 */
+            background-color: var(--casino-black);
+            /* 背景：賭場紅地毯漸層 */
+            background-image: radial-gradient(circle at center top, #7f1d1d 0%, var(--casino-red) 40%, #000000 100%);
             background-size: 100% 100%;
+            background-attachment: fixed;
+            overscroll-behavior-y: none;
+            color: #fff;
         }
         
+        /* 遊戲標題字體 */
+        .font-game { font-family: 'Cinzel', serif; }
+
+        /* 賭場紋路疊加層 */
         .casino-pattern {
-            background-image: radial-gradient(#ffffff 1px, transparent 1px), radial-gradient(#ffffff 1px, transparent 1px);
-            background-position: 0 0, 25px 25px;
-            background-size: 50px 50px;
-            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l15 30-15 30-15-30z' fill='%23d4af37' fill-opacity='0.05'/%3E%3C/svg%3E");
+            background-size: 60px 60px;
+            opacity: 0.3;
+            mix-blend-mode: overlay;
         }
 
         .select-none { user-select: none; -webkit-user-select: none; }
         
-        /* 自定義捲軸 - 金色風格 */
+        /* 自定義捲軸 - 金色 */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #2d1b4e; }
-        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #fcd34d; }
+        ::-webkit-scrollbar-track { background: var(--casino-red); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, var(--gold-primary), var(--gold-dark)); border-radius: 3px; }
+
+        /* --- UI 元件樣式 --- */
 
         /* 3D 按鈕效果 */
         .btn-3d {
             transition: all 0.1s;
-            box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.5);
+            box-shadow: 0px 6px 0px 0px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2);
+            border-bottom: none; /* 使用 box-shadow 代替 border */
         }
         .btn-3d:active {
-            transform: translateY(4px);
-            box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.5);
+            transform: translateY(6px);
+            box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
         }
         
-        /* 金屬文字效果 */
+        /* 金色文字漸層 */
         .text-gold {
-            background: linear-gradient(to bottom, #fcd34d, #d4af37, #b45309);
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary), var(--gold-dark));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 2px 0px rgba(0,0,0,0.5));
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.8));
         }
 
-        .border-gold {
-            border-image: linear-gradient(to bottom, #fcd34d, #b45309) 1;
+        /* 賭場面板 (玻璃擬態 + 金邊) */
+        .casino-panel {
+            background: linear-gradient(135deg, rgba(74, 4, 4, 0.8), rgba(15, 15, 17, 0.9));
+            backdrop-filter: blur(8px);
+            border: 2px solid var(--gold-primary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(212, 175, 55, 0.1);
+            position: relative;
         }
+        /* 面板邊角裝飾 */
+        .casino-panel::after {
+            content: ''; position: absolute; inset: -4px; border: 1px solid var(--gold-light); border-radius: inherit; opacity: 0.3; pointer-events: none;
+        }
+
+        /* 圓形格子樣式 */
+        .circle-cell {
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #4a0404, #000);
+            border: 3px solid var(--gold-primary);
+            box-shadow: inset 0 0 20px rgba(0,0,0,1), 0 4px 10px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        /* 已填寫的金色格子 */
+        .circle-cell.filled {
+            background: radial-gradient(circle at 30% 30%, var(--gold-light), var(--gold-primary), #b45309);
+            border-color: var(--gold-light);
+            color: #451a03;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+            box-shadow: inset 0 0 10px rgba(255,255,0,0.5), 0 0 20px rgba(212, 175, 55, 0.6);
+        }
+        /* 推薦格子的霓虹光暈 (舞池感!) */
+        @keyframes rainbow-pulse {
+            0% { box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,165,0,0.5); }
+            25% { box-shadow: 0 0 20px rgba(255,255,0,0.8), 0 0 40px rgba(0,255,0,0.5); }
+            50% { box-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(0,0,255,0.5); }
+            75% { box-shadow: 0 0 20px rgba(128,0,128,0.8), 0 0 40px rgba(255,0,255,0.5); }
+            100% { box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,165,0,0.5); }
+        }
+        .circle-cell.suggested {
+            border-color: #fff;
+            animation: rainbow-pulse 3s linear infinite;
+            z-index: 10;
+        }
+
     </style>
 </head>
-<body class="text-white min-h-screen relative overflow-x-hidden">
+<body class="min-h-screen relative overflow-x-hidden font-sans">
 
     <div class="fixed inset-0 casino-pattern pointer-events-none z-0"></div>
 
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
-        // ★★★ 請在每次 GIT 更新代碼時，手動修改此處的時間 ★★★
-        const BUILD_DATE = "2024.12.12 00:35"; 
+        // ★★★ 更新時間以觸發使用者自動更新 ★★★
+        const BUILD_DATE = "2024.12.12 13:15 (Gold Saucer Style)"; 
 
         const { useState, useEffect, useMemo, useRef } = React;
+
+        // --- 自動更新機制 ---
+        const AutoUpdateCheck = () => {
+            useEffect(() => {
+                const savedVersion = localStorage.getItem('cactpot_version');
+                if (savedVersion !== BUILD_DATE) {
+                    localStorage.setItem('cactpot_version', BUILD_DATE);
+                    if (savedVersion) window.location.reload(true);
+                }
+            }, []);
+            return null;
+        };
 
         // --- Localization Dictionary ---
         const LOCALE = {
@@ -88,25 +162,26 @@
                 payout_title: "獎金一覽表",
                 close_hint: "點擊背景關閉",
                 select_num: "選擇數字",
-                clear_cell: "清除此格",
-                analysis_title: "全方案風險分析",
-                click_hint: "(點擊行查看詳細機率)",
+                clear_cell: "清除",
+                analysis_title: "全方案分析",
+                click_hint: "(點擊查看詳情)",
                 best_pick: "最佳推薦",
                 rank: "Rank",
                 guaranteed: "保底",
-                view_details: "查看詳細機率",
-                reset: "重置",
+                view_details: "詳細機率",
+                reset: "重置盤面",
                 payout_btn: "獎金表",
                 mode_on: "全填模式 (開啟)",
                 mode_off: "全填模式 (鎖定)",
                 filled_status: "已填寫 {n}/9 格",
-                reveal: "揭開",
+                reveal: "揭開!",
                 row: "橫排",
                 col: "直排",
                 diag: "對角",
                 label_10k: "1萬",
                 label_3600: "3千6",
-                ver: "版本"
+                ver: "版本",
+                force_update: "強制更新"
             },
             en: {
                 title: "Mini Cactpot Solver",
@@ -114,25 +189,26 @@
                 payout_title: "Payout Table",
                 close_hint: "Tap background to close",
                 select_num: "Select Number",
-                clear_cell: "Clear Cell",
+                clear_cell: "Clear",
                 analysis_title: "Risk Analysis",
                 click_hint: "(Tap row for details)",
                 best_pick: "Recommended",
                 rank: "Rank",
                 guaranteed: "Guaranteed",
                 view_details: "View Details",
-                reset: "Reset",
+                reset: "Reset Board",
                 payout_btn: "Payouts",
                 mode_on: "Edit Mode (ON)",
                 mode_off: "Edit Mode (Unlock)",
                 filled_status: "Filled {n}/9",
-                reveal: "Reveal",
+                reveal: "Reveal!",
                 row: "Row",
                 col: "Col",
                 diag: "Diag",
                 label_10k: "10k",
                 label_3600: "3.6k",
-                ver: "Version"
+                ver: "Version",
+                force_update: "Update"
             },
             ja: {
                 title: "ミニ・くじテンダー",
@@ -152,13 +228,14 @@
                 mode_on: "編集モード (ON)",
                 mode_off: "編集モード (解除)",
                 filled_status: "入力済み {n}/9",
-                reveal: "めくる",
+                reveal: "めくる!",
                 row: "横",
                 col: "縦",
                 diag: "斜め",
                 label_10k: "1万",
                 label_3600: "3600",
-                ver: "更新日"
+                ver: "更新日",
+                force_update: "更新"
             }
         };
 
@@ -171,6 +248,7 @@
         const BookOpen = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
         const X = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
         const Sparkles = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
+        const RotateCcw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
 
         // --- Logic Constants ---
         const PAYOUTS = {
@@ -215,25 +293,25 @@
             const RowItem = ({ sum, mgp }) => {
                 const isHigh = mgp >= 1800;
                 return (
-                    <div className={`flex justify-between items-center p-2 rounded-lg h-9 border-b ${isHigh ? 'bg-gradient-to-r from-yellow-900/60 to-transparent border-yellow-600/50' : 'bg-black/30 border-white/5'}`}>
-                        <span className="text-zinc-400 font-mono text-xs">{t('sum')} <span className="text-white font-bold">{sum}</span></span>
-                        <span className={`font-bold text-sm ${isHigh ? 'text-[#fcd34d] drop-shadow' : 'text-zinc-300'}`}>
-                            {mgp.toLocaleString()} <span className="text-[10px] text-zinc-500">MGP</span>
+                    <div className={`flex justify-between items-center p-2 rounded-lg h-9 border-b border-[#d4af37]/20 ${isHigh ? 'bg-[#d4af37]/20' : 'bg-black/20'}`}>
+                        <span className="text-zinc-400 font-mono text-xs">{t('sum')} <span className="text-[#fcd34d] font-bold">{sum}</span></span>
+                        <span className={`font-bold text-sm ${isHigh ? 'text-gold drop-shadow' : 'text-zinc-300'}`}>
+                            {mgp.toLocaleString()} <span className="text-[10px] text-[#d4af37]/70">MGP</span>
                         </span>
                     </div>
                 );
             };
 
             return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200" onClick={onClose}>
-                    <div onClick={(e) => e.stopPropagation()} className="bg-[#2d1b4e] border-2 border-[#d4af37] rounded-xl w-full max-w-sm flex flex-col relative shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden">
-                        <div className="p-4 border-b border-[#ffffff1a] flex items-center justify-between bg-black/40">
-                            <h3 className="text-[#fcd34d] font-bold text-lg flex items-center gap-2 drop-shadow-md">
-                                <Trophy className="w-5 h-5" /> {t('payout_title')}
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
+                    <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden">
+                        <div className="p-4 border-b border-[#d4af37]/30 flex items-center justify-between bg-black/30">
+                            <h3 className="text-gold font-bold text-lg flex items-center gap-2">
+                                <Trophy className="w-5 h-5 text-[#d4af37]" /> {t('payout_title')}
                             </h3>
-                            <button onClick={onClose} className="text-zinc-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"><X className="w-6 h-6"/></button>
+                            <button onClick={onClose} className="text-[#d4af37] hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"><X className="w-6 h-6"/></button>
                         </div>
-                        <div className="p-4 bg-[#2d1b4e]">
+                        <div className="p-4">
                             <div className="flex gap-4">
                                 <div className="flex-1 space-y-1.5">
                                     {leftCol.map(([sum, mgp]) => <RowItem key={sum} sum={sum} mgp={mgp} />)}
@@ -243,7 +321,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div className="p-3 text-center text-xs text-zinc-500 border-t border-[#ffffff1a] bg-black/40">
+                        <div className="p-3 text-center text-xs text-[#d4af37]/60 border-t border-[#d4af37]/30 bg-black/30">
                             {t('close_hint')}
                         </div>
                     </div>
@@ -254,9 +332,9 @@
         const NumberSelector = ({ isOpen, onSelect, usedNumbers, currentValue, onClose, t }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200" onClick={onClose}>
-                <div onClick={(e) => e.stopPropagation()} className="bg-[#1a0b2e] border-2 border-[#d4af37] rounded-2xl shadow-[0_0_30px_rgba(212,175,55,0.3)] p-4 w-full max-w-[320px] grid grid-cols-3 gap-3">
-                    <div className="col-span-3 text-center text-[#fcd34d] font-bold mb-2 uppercase tracking-widest text-sm drop-shadow">{t('select_num')}</div>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
+                <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-3xl p-5 w-full max-w-[320px] grid grid-cols-3 gap-3">
+                    <div className="col-span-3 text-center text-gold font-bold mb-3 uppercase tracking-widest text-sm">{t('select_num')}</div>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
                     const isUsed = usedNumbers.has(num) && num !== currentValue;
                     return (
@@ -265,12 +343,12 @@
                         disabled={isUsed}
                         onClick={() => onSelect(num)}
                         className={`
-                            h-14 rounded-xl font-bold text-2xl flex items-center justify-center transition-all btn-3d
+                            h-16 w-16 rounded-full font-bold text-2xl flex items-center justify-center transition-all btn-3d mx-auto
                             ${num === currentValue 
-                                ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white ring-2 ring-white/50 border-b-4 border-blue-900' 
+                                ? 'bg-gradient-to-b from-blue-500 to-blue-700 text-white border-2 border-blue-300 ring-2 ring-blue-500/50' 
                                 : isUsed 
-                                    ? 'bg-zinc-800 text-zinc-600 border-b-4 border-black cursor-not-allowed shadow-none translate-y-[4px]' 
-                                    : 'bg-gradient-to-br from-[#fcd34d] to-[#d4af37] text-black border-b-4 border-[#b45309] hover:brightness-110 active:border-b-0'
+                                    ? 'bg-zinc-800 text-zinc-600 border-2 border-zinc-700 cursor-not-allowed shadow-none translate-y-[6px]' 
+                                    : 'bg-gradient-to-b from-[#fcd34d] via-[#d4af37] to-[#b45309] text-[#451a03] border-2 border-[#fcd34d] hover:brightness-110'
                             }
                         `}
                         >
@@ -278,7 +356,9 @@
                         </button>
                     );
                     })}
-                    <button onClick={() => onSelect(null)} className="btn-3d col-span-3 h-10 mt-2 font-bold text-red-200 bg-gradient-to-r from-red-900 to-red-800 border-b-4 border-red-950 rounded-xl flex items-center justify-center uppercase tracking-wider active:border-b-0 transition-transform">{t('clear_cell')}</button>
+                    <button onClick={() => onSelect(null)} className="btn-3d col-span-3 h-12 mt-3 font-bold text-white bg-gradient-to-b from-red-600 to-red-900 border-2 border-red-400 rounded-full flex items-center justify-center uppercase tracking-wider transition-transform shadow-lg">
+                        {t('clear_cell')}
+                    </button>
                 </div>
                 </div>
             );
@@ -413,6 +493,12 @@
                 setOpenSelectorIndex(null);
             };
 
+            const handleForceUpdate = () => {
+                if(confirm("確定要重新整理網頁嗎？")) {
+                    window.location.reload(true);
+                }
+            }
+
             const Indicator = ({ lineId, arrow }) => {
                 if (!solutions[lineId]) return <div className="w-full h-full opacity-0"></div>;
                 const { ev, chance10k } = solutions[lineId];
@@ -422,25 +508,24 @@
                 return (
                 <div className={`flex items-center justify-center w-full h-full p-0.5`}>
                     <div className={`
-                    relative flex flex-col items-center justify-center w-[3rem] h-[3rem] rounded-full border-2 backdrop-blur-md transition-all duration-300 shadow-lg
+                    relative flex flex-col items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 shadow-md
                     ${isBest 
-                        ? 'bg-gradient-to-b from-green-700 to-green-900 border-green-400 text-white shadow-[0_0_15px_rgba(74,222,128,0.6)] z-10 scale-110' 
-                        : 'bg-black/50 border-[#ffffff1a] text-zinc-400'}
+                        ? 'bg-gradient-to-b from-green-600 to-green-800 border-green-400 text-white shadow-[0_0_15px_rgba(0,255,0,0.5)] z-10 scale-110' 
+                        : 'bg-black/60 border-[#d4af37]/30 text-[#d4af37]/70'}
                     `}>
-                    <span className={`text-[10px] md:text-xs font-bold leading-none flex items-center justify-center ${isBest ? 'text-white drop-shadow-md' : 'text-[#a1a1aa]'}`}>
-                        <span className={`mr-[1px] ${isBest ? 'text-yellow-300' : 'text-[#d4af37]'}`}>$</span>
+                    <span className={`text-[10px] font-bold leading-none flex items-center justify-center ${isBest ? 'text-white drop-shadow' : ''}`}>
                         {displayEv}
                     </span>
 
                     {chance10k > 0 && (
                         <div className="absolute -top-1 -right-1">
-                        <span className="flex h-2.5 w-2.5 relative">
+                        <span className="flex h-3 w-3 relative">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#fcd34d] border border-white"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-gradient-to-br from-yellow-300 to-yellow-600 border border-white shadow-sm"></span>
                         </span>
                         </div>
                     )}
-                    <div className={`text-xs mt-0.5 ${isBest ? 'text-white animate-pulse' : 'text-[#52525b]'}`}>
+                    <div className={`text-sm mt-0.5 ${isBest ? 'text-white animate-pulse drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]' : ''}`}>
                         {arrow}
                     </div>
                     </div>
@@ -448,6 +533,7 @@
                 );
             };
 
+            // ★★★ 圓形九宮格核心組件 ★★★
             const GameCell = ({ idx }) => {
                 const cellValue = board[idx];
                 const isSuggested = isSelectionPhase && idx === suggestedCellIndex;
@@ -458,31 +544,27 @@
                         disabled={isLocked}
                         onClick={() => setOpenSelectorIndex(idx)}
                         className={`
-                            relative w-full h-full aspect-square rounded-xl flex flex-col items-center justify-center text-4xl md:text-5xl font-bold transition-all duration-150 group
-                            border-2 shadow-inner overflow-hidden
-                            ${cellValue !== null 
-                                ? 'bg-gradient-to-br from-[#fef3c7] via-[#fcd34d] to-[#d97706] text-[#451a03] border-[#fcd34d] shadow-[inset_0_0_10px_rgba(180,83,9,0.4)]' 
-                                : isLocked
-                                    ? 'bg-[#0f0718] border-[#2d1b4e] cursor-not-allowed opacity-40'
-                                    : 'bg-[#2d1b4e]/80 hover:bg-[#3b2166] text-transparent border-[#4c1d95] active:scale-95'
-                            }
-                            ${isSuggested && !cellValue ? 'ring-2 ring-offset-2 ring-offset-[#1a0b2e] ring-[#f0abfc] shadow-[0_0_20px_rgba(240,171,252,0.6)] z-20' : ''}
+                            circle-cell w-20 h-20 flex flex-col items-center justify-center text-4xl md:text-5xl font-bold transition-all duration-200 group
+                            ${cellValue !== null ? 'filled' : ''}
+                            ${isLocked ? 'opacity-40 cursor-not-allowed bg-black/40 border-[#4a0404]' : 'hover:scale-105 hover:border-[#fcd34d] active:scale-95'}
+                            ${isSuggested && !cellValue ? 'suggested' : ''}
                         `}
                     >
-                        {/* 裝飾線條 */}
+                        {/* 內部紋理裝飾 */}
                         {!cellValue && !isLocked && (
-                            <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMSIvPgo8cGF0aCBkPSJNTAgMEw4IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg==')]"></div>
+                             <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxIiBmaWxsPSIjZDRhZjM3Ii8+PC9zdmc+')] bg-center"></div>
                         )}
 
                         {cellValue ? (
-                            <span className="drop-shadow-sm font-serif">{cellValue}</span>
+                            <span className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] font-game">{cellValue}</span>
                         ) : (
-                            !isLocked && <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center"><Sparkles className="w-4 h-4 text-white/20" /></div>
+                            !isLocked && <Sparkles className={`w-6 h-6 ${isSuggested ? 'text-white animate-pulse' : 'text-[#d4af37]/30'}`} />
                         )}
                         
+                        {/* 霓虹揭示按鈕 (舞池感) */}
                         {isSuggested && !cellValue && (
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg backdrop-blur-sm animate-pulse border border-white/20">
+                                <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] animate-bounce border border-white/50 tracking-wider">
                                     {t('reveal')}
                                 </div>
                             </div>
@@ -505,13 +587,13 @@
                 };
 
                 return (
-                    <div className="w-full max-w-[400px] mt-6 animate-in slide-in-from-bottom-4 fade-in duration-500">
-                        <div className="flex items-center gap-2 mb-2 px-1">
-                            <Sparkles className="w-4 h-4 text-[#d4af37]" />
-                            <h3 className="text-[#fcd34d] font-bold text-sm tracking-wider uppercase drop-shadow">{t('analysis_title')}</h3>
-                            <span className="text-[10px] text-zinc-400 ml-auto">{t('click_hint')}</span>
+                    <div className="w-full max-w-[400px] mt-8 animate-in slide-in-from-bottom-4 fade-in duration-500">
+                        <div className="flex items-center gap-2 mb-3 px-2">
+                            <Sparkles className="w-5 h-5 text-[#d4af37] animate-pulse" />
+                            <h3 className="text-gold font-bold text-base tracking-wider uppercase drop-shadow-sm">{t('analysis_title')}</h3>
+                            <span className="text-[10px] text-[#d4af37]/60 ml-auto">{t('click_hint')}</span>
                         </div>
-                        <div className="bg-[#2d1b4e]/60 backdrop-blur-md border border-[#ffffff1a] rounded-xl overflow-hidden divide-y divide-[#ffffff1a] shadow-xl">
+                        <div className="casino-panel rounded-2xl overflow-hidden divide-y divide-[#d4af37]/20">
                             {rankedSolutions.map((sol, rank) => {
                                 const isBest = sol.originalIndex === bestLineIndex;
                                 const name = getLineName(sol.originalIndex);
@@ -519,83 +601,67 @@
                                 const isExpanded = expandedLine === sol.originalIndex;
                                 
                                 const hasBigPrize = sol.chance10k > 0 || sol.chance3600 > 0;
-                                const isGuaranteed = sol.allProbs.length === 1 && Math.round(sol.allProbs[0].percent) === 100;
 
                                 return (
                                     <div key={sol.originalIndex} className="flex flex-col">
                                         <button 
                                             onClick={() => toggleExpand(sol.originalIndex)}
                                             className={`
-                                                w-full flex items-center justify-between p-3 transition-colors text-left
-                                                ${isBest ? 'bg-gradient-to-r from-green-900/40 to-transparent border-l-4 border-green-500' : 'hover:bg-white/5 border-l-4 border-transparent'}
-                                                ${isExpanded ? 'bg-black/20' : ''}
+                                                w-full flex items-center justify-between p-3 transition-all text-left border-l-4
+                                                ${isBest ? 'bg-gradient-to-r from-green-900/50 to-transparent border-green-500' : 'hover:bg-white/5 border-transparent'}
+                                                ${isExpanded ? 'bg-black/40' : ''}
                                             `}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-6 h-6 flex items-center justify-center rounded-full font-bold text-xs shadow-inner ${isBest ? 'bg-green-600 text-white' : 'bg-[#1a0b2e] text-zinc-500'}`}>
+                                                <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm shadow-inner border ${isBest ? 'bg-green-700 border-green-400 text-white shadow-[0_0_10px_rgba(0,255,0,0.3)]' : 'bg-black/40 border-[#d4af37]/20 text-[#d4af37]/60'}`}>
                                                     {arrow}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className={`text-sm font-bold ${isBest ? 'text-green-300 drop-shadow' : 'text-zinc-300'}`}>{name}</span>
-                                                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider">{isBest ? t('best_pick') : `${t('rank')} #${rank+1}`}</span>
+                                                    <span className={`text-sm font-bold ${isBest ? 'text-green-400 drop-shadow' : 'text-zinc-300'}`}>{name}</span>
+                                                    <span className="text-[10px] text-[#d4af37]/60 uppercase tracking-wider">{isBest ? t('best_pick') : `${t('rank')} #${rank+1}`}</span>
                                                 </div>
                                             </div>
                                             
                                             <div className="text-right flex flex-col items-end">
-                                                <span className={`font-bold font-mono text-sm ${isBest ? 'text-[#fcd34d]' : 'text-white'}`}>
+                                                <span className={`font-bold font-mono text-base ${isBest ? 'text-gold drop-shadow-sm' : 'text-zinc-300'}`}>
                                                     ${Math.floor(sol.ev).toLocaleString()}
                                                 </span>
-                                                <div className="flex gap-2 text-[10px] mt-0.5 items-center">
+                                                <div className="flex gap-2 text-[10px] mt-1 items-center">
                                                     {hasBigPrize ? (
                                                         <>
-                                                            <span className={sol.chance10k > 0 ? 'text-[#fcd34d] font-bold' : 'text-zinc-600'}>
-                                                                {t('label_10k')}: {sol.chance10k.toFixed(0)}%
-                                                            </span>
-                                                            <span className={sol.chance3600 > 0 ? 'text-blue-300' : 'text-zinc-600'}>
-                                                                {t('label_3600')}: {sol.chance3600.toFixed(0)}%
-                                                            </span>
+                                                            {sol.chance10k > 0 && <span className="text-[#fcd34d] font-bold drop-shadow-[0_0_5px_rgba(255,215,0,0.5)]">{t('label_10k')} {sol.chance10k.toFixed(0)}%</span>}
+                                                            {sol.chance3600 > 0 && <span className="text-blue-400 drop-shadow-[0_0_5px_rgba(0,100,255,0.5)]">{t('label_3600')} {sol.chance3600.toFixed(0)}%</span>}
                                                         </>
-                                                    ) : isGuaranteed ? (
-                                                        <span className="text-zinc-500">
-                                                            {t('guaranteed')}: {sol.allProbs[0].mgp}
-                                                        </span>
                                                     ) : (
-                                                        <span className="text-zinc-600">{t('view_details')}</span>
+                                                        <span className="text-[#d4af37]/50">{t('view_details')}</span>
                                                     )}
-                                                    <ChevronDown className={`w-3 h-3 text-zinc-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}/>
+                                                    <ChevronDown className={`w-3 h-3 text-[#d4af37]/50 transition-transform ${isExpanded ? 'rotate-180' : ''}`}/>
                                                 </div>
                                             </div>
                                         </button>
 
                                         {/* Expanded Details */}
                                         {isExpanded && (
-                                            <div className="bg-black/30 p-3 shadow-inner border-t border-[#ffffff1a] animate-in slide-in-from-top-2 duration-200">
+                                            <div className="bg-black/40 p-3 shadow-inner border-t border-[#d4af37]/20 animate-in slide-in-from-top-2 duration-200">
                                                 <div className="grid grid-cols-3 gap-2">
                                                     {sol.allProbs.map((prob) => {
                                                         const isJackpot = prob.mgp === 10000;
                                                         const isSecond = prob.mgp === 3600;
-                                                        const isHigh = prob.mgp >= 1000 && prob.mgp < 3600;
                                                         
-                                                        let bgClass = "bg-[#1a0b2e] border-[#ffffff1a]";
-                                                        let textClass = "text-zinc-400";
+                                                        let bgClass = "bg-black/30 border-[#d4af37]/10 text-[#d4af37]/70";
 
                                                         if (isJackpot) {
-                                                            bgClass = "bg-gradient-to-br from-yellow-900/60 to-yellow-600/30 border-yellow-500/50";
-                                                            textClass = "text-[#fcd34d]";
+                                                            bgClass = "bg-gradient-to-br from-[#fcd34d]/20 to-transparent border-[#fcd34d]/50 text-gold drop-shadow-sm";
                                                         } else if (isSecond) {
-                                                            bgClass = "bg-blue-900/30 border-blue-500/30";
-                                                            textClass = "text-blue-200";
-                                                        } else if (isHigh) {
-                                                            bgClass = "bg-purple-900/30 border-purple-500/30";
-                                                            textClass = "text-purple-200";
+                                                            bgClass = "bg-blue-900/20 border-blue-500/30 text-blue-300";
                                                         }
 
                                                         return (
-                                                            <div key={prob.mgp} className={`flex flex-col items-center justify-center p-1.5 rounded border ${bgClass}`}>
-                                                                <span className={`text-[10px] font-bold ${textClass}`}>
+                                                            <div key={prob.mgp} className={`flex flex-col items-center justify-center p-2 rounded-lg border ${bgClass} shadow-sm`}>
+                                                                <span className="text-xs font-bold">
                                                                     {prob.mgp.toLocaleString()}
                                                                 </span>
-                                                                <span className="text-xs font-mono text-white/70">
+                                                                <span className="text-[10px] font-mono opacity-80">
                                                                     {prob.percent.toFixed(0)}%
                                                                 </span>
                                                             </div>
@@ -613,15 +679,17 @@
             };
 
             return (
-                <div className="min-h-screen flex flex-col items-center justify-center py-6 px-2 font-sans overflow-x-hidden pb-20 relative">
+                <div className="min-h-screen flex flex-col items-center justify-start pt-8 pb-20 px-4 relative">
                 
+                <AutoUpdateCheck />
+
                 {/* Language Switcher */}
-                <div className="absolute top-4 right-4 z-40 flex bg-black/40 backdrop-blur-md border border-[#ffffff1a] rounded-full p-1 shadow-lg">
+                <div className="absolute top-4 right-4 z-40 flex bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full p-1 shadow-md">
                     {['zh', 'en', 'ja'].map(l => (
                         <button 
                             key={l}
                             onClick={() => setLang(l)}
-                            className={`px-3 py-1 rounded-full text-xs font-bold uppercase transition-all ${lang === l ? 'bg-[#d4af37] text-black shadow' : 'text-zinc-400 hover:text-white'}`}
+                            className={`px-3 py-1 rounded-full text-xs font-bold uppercase transition-all ${lang === l ? 'bg-[#d4af37] text-black shadow-sm' : 'text-[#d4af37]/60 hover:text-white'}`}
                         >
                             {l === 'zh' ? '繁' : l === 'ja' ? '日' : l}
                         </button>
@@ -629,59 +697,62 @@
                 </div>
 
                 {/* Header */}
-                <div className="w-full max-w-md mb-2 text-center relative shrink-0 mt-8">
-                    {/* 背景光暈 */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-purple-500/20 blur-[60px] rounded-full pointer-events-none mix-blend-screen"></div>
-                    <div className="relative flex flex-col items-center gap-2">
-                        <div className="flex items-center gap-3">
-                        <Trophy className="w-6 h-6 text-[#fcd34d] drop-shadow-[0_0_5px_rgba(252,211,77,0.8)]" />
-                        <h1 className="text-gold text-3xl md:text-4xl font-serif font-extrabold tracking-widest drop-shadow-lg">
+                <div className="w-full max-w-md mb-6 text-center relative shrink-0">
+                    {/* 頂部裝飾光暈 */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-red-600/30 blur-[80px] rounded-full pointer-events-none mix-blend-screen"></div>
+                    <div className="relative flex flex-col items-center gap-3">
+                        <Trophy className="w-8 h-8 text-[#d4af37] drop-shadow-[0_0_10px_rgba(212,175,55,0.8)]" />
+                        <h1 className="text-gold text-3xl md:text-5xl font-game font-extrabold tracking-widest drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] leading-tight">
                             {t('title')}
                         </h1>
-                        <Trophy className="w-6 h-6 text-[#fcd34d] drop-shadow-[0_0_5px_rgba(252,211,77,0.8)]" />
+                        {/* 裝飾線條 */}
+                        <div className="flex items-center gap-2 opacity-80">
+                            <div className="h-[2px] w-16 bg-gradient-to-r from-transparent to-[#d4af37]"></div>
+                            <div className="w-2 h-2 rotated-45 bg-[#d4af37] transform rotate-45"></div>
+                            <div className="h-[2px] w-16 bg-gradient-to-l from-transparent to-[#d4af37]"></div>
                         </div>
-                        <div className="h-[2px] w-32 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent opacity-80"></div>
                     </div>
                 </div>
 
-                {/* --- CONTROLS AT TOP (Arcade Buttons) --- */}
-                <div className="mb-1 flex flex-col w-full max-w-[320px] gap-3 shrink-0 relative z-20">
-                    <div className="flex gap-2">
+                {/* --- 頂部控制區 (賭場按鈕風格) --- */}
+                <div className="mb-6 flex flex-col w-full max-w-[340px] gap-4 shrink-0 relative z-20">
+                    <div className="flex gap-3">
                         <button 
                             onClick={handleReset}
-                            className="flex-1 py-3 btn-3d bg-gradient-to-br from-red-600 to-red-800 border-b-4 border-red-950 rounded-xl text-white font-bold tracking-wider flex items-center justify-center gap-2 active:border-b-0"
+                            className="flex-1 py-4 btn-3d bg-gradient-to-b from-[#7f1d1d] to-[#4a0404] border-2 border-[#991b1b] rounded-2xl text-red-100 font-bold tracking-wider flex items-center justify-center gap-2 shadow-lg group"
                         >
-                            <RefreshCw className="w-4 h-4" /> {t('reset')}
+                            <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" /> {t('reset')}
                         </button>
                         <button 
                             onClick={() => setShowPayouts(true)}
-                            className="flex-1 py-3 btn-3d bg-gradient-to-br from-[#fcd34d] to-[#d4af37] border-b-4 border-[#b45309] rounded-xl text-black font-bold tracking-wider flex items-center justify-center gap-2 active:border-b-0"
+                            className="flex-1 py-4 btn-3d bg-gradient-to-b from-[#fcd34d] to-[#b45309] border-2 border-[#fcd34d] rounded-2xl text-[#451a03] font-bold tracking-wider flex items-center justify-center gap-2 shadow-lg group"
                         >
-                            <BookOpen className="w-4 h-4" /> {t('payout_btn')}
+                            <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" /> {t('payout_btn')}
                         </button>
                     </div>
 
                     <button 
                         onClick={() => setIsFullFillMode(!isFullFillMode)}
                         className={`
-                            w-full py-3 btn-3d rounded-xl font-bold tracking-wider flex items-center justify-center gap-2 border-b-4 active:border-b-0
+                            w-full py-3 btn-3d rounded-2xl font-bold tracking-wider flex items-center justify-center gap-2 border-2 shadow-lg transition-all
                             ${isFullFillMode 
-                                ? 'bg-gradient-to-br from-blue-600 to-blue-800 border-blue-950 text-white' 
-                                : 'bg-zinc-800 border-black text-zinc-400 hover:text-zinc-200'}
+                                ? 'bg-gradient-to-b from-blue-600 to-blue-900 border-blue-400 text-blue-100' 
+                                : 'bg-zinc-800/80 border-zinc-600 text-zinc-400 hover:text-zinc-200'}
                         `}
                     >
-                        {isFullFillMode ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                        {isFullFillMode ? <Unlock className="w-5 h-5 drop-shadow-[0_0_5px_rgba(59,130,246,0.8)]" /> : <Lock className="w-5 h-5" />}
                         {isFullFillMode ? t('mode_on') : t('mode_off')}
                     </button>
 
-                    <div className="text-center text-[#fcd34d] text-xs mt-1 font-mono font-bold drop-shadow">
-                        {t('filled_status').replace('{n}', filledCount)}
+                    <div className="text-center text-[#d4af37] text-sm mt-1 font-game font-bold drop-shadow-sm">
+                        --- {t('filled_status').replace('{n}', filledCount)} ---
                     </div>
                 </div>
 
-                {/* Grid */}
-                <div className="w-full max-w-[400px] aspect-[4/5] flex flex-col justify-center shrink-0">
-                    <div className="grid grid-cols-[3.5rem_1fr_1fr_1fr_3.5rem] gap-2 items-center justify-items-center w-full">
+                {/* 核心九宮格區域 */}
+                <div className="w-full max-w-[420px] casino-panel rounded-[40px] p-6 flex flex-col justify-center shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
+                    <div className="grid grid-cols-[3rem_1fr_1fr_1fr_3rem] gap-3 items-center justify-items-center w-full">
+                        {/* 指示器 (現在也是圓形了) */}
                         <Indicator lineId={6} arrow="↘" /> 
                         <Indicator lineId={3} arrow="⬇" /> 
                         <Indicator lineId={4} arrow="⬇" /> 
@@ -699,13 +770,20 @@
                     </div>
                 </div>
                 
-                {/* Analysis Table */}
+                {/* 分析列表 */}
                 <AnalysisList />
 
-                <div className="mt-8 text-zinc-500 text-[10px] font-mono">
-                    {t('ver')}: {BUILD_DATE}
+                {/* 底部資訊 */}
+                <div className="mt-12 flex flex-col items-center gap-3 pb-8 opacity-60 hover:opacity-100 transition-opacity">
+                    <div className="text-[#d4af37] text-xs font-mono">
+                        {t('ver')}: {BUILD_DATE}
+                    </div>
+                    <button onClick={handleForceUpdate} className="text-xs text-[#d4af37] underline flex items-center gap-1 hover:text-white">
+                         <RotateCcw className="w-3 h-3" /> {t('force_update')}
+                    </button>
                 </div>
 
+                {/* Modals */}
                 <NumberSelector 
                     isOpen={openSelectorIndex !== null}
                     currentValue={openSelectorIndex !== null ? board[openSelectorIndex] : null}
