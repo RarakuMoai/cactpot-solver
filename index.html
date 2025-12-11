@@ -18,21 +18,65 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
 
     <style>
-        body { -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", "Microsoft JhengHei", sans-serif; }
+        body { 
+            -webkit-tap-highlight-color: transparent; 
+            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; 
+            background-color: #1a0b2e;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            /* 賭場地毯紋路 */
+            background-size: 100% 100%;
+        }
+        
+        .casino-pattern {
+            background-image: radial-gradient(#ffffff 1px, transparent 1px), radial-gradient(#ffffff 1px, transparent 1px);
+            background-position: 0 0, 25px 25px;
+            background-size: 50px 50px;
+            opacity: 0.05;
+        }
+
         .select-none { user-select: none; -webkit-user-select: none; }
+        
+        /* 自定義捲軸 - 金色風格 */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #18181b; }
-        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+        ::-webkit-scrollbar-track { background: #2d1b4e; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #fcd34d; }
+
+        /* 3D 按鈕效果 */
+        .btn-3d {
+            transition: all 0.1s;
+            box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.5);
+        }
+        .btn-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.5);
+        }
+        
+        /* 金屬文字效果 */
+        .text-gold {
+            background: linear-gradient(to bottom, #fcd34d, #d4af37, #b45309);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 2px 0px rgba(0,0,0,0.5));
+        }
+
+        .border-gold {
+            border-image: linear-gradient(to bottom, #fcd34d, #b45309) 1;
+        }
     </style>
 </head>
-<body class="bg-[#0f0f11] select-none">
+<body class="text-white min-h-screen relative overflow-x-hidden">
 
-    <div id="root"></div>
+    <div class="fixed inset-0 casino-pattern pointer-events-none z-0"></div>
+
+    <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
         // ★★★ 請在每次 GIT 更新代碼時，手動修改此處的時間 ★★★
-        const BUILD_DATE = "2024.12.12 00:21"; 
+        const BUILD_DATE = "2024.12.12 00:35"; 
 
         const { useState, useEffect, useMemo, useRef } = React;
 
@@ -53,8 +97,8 @@
                 view_details: "查看詳細機率",
                 reset: "重置",
                 payout_btn: "獎金表",
-                mode_on: "全填模式 (已開啟)",
-                mode_off: "全填模式 (解除限制)",
+                mode_on: "全填模式 (開啟)",
+                mode_off: "全填模式 (鎖定)",
                 filled_status: "已填寫 {n}/9 格",
                 reveal: "揭開",
                 row: "橫排",
@@ -62,7 +106,7 @@
                 diag: "對角",
                 label_10k: "1萬",
                 label_3600: "3千6",
-                ver: "版本日期"
+                ver: "版本"
             },
             en: {
                 title: "Mini Cactpot Solver",
@@ -126,6 +170,7 @@
         const Lock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
         const BookOpen = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
         const X = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
+        const Sparkles = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
 
         // --- Logic Constants ---
         const PAYOUTS = {
@@ -170,25 +215,25 @@
             const RowItem = ({ sum, mgp }) => {
                 const isHigh = mgp >= 1800;
                 return (
-                    <div className={`flex justify-between items-center p-2 rounded h-9 ${isHigh ? 'bg-gradient-to-r from-yellow-900/40 to-transparent border border-yellow-700/50' : 'bg-zinc-800/50 border border-zinc-700'}`}>
+                    <div className={`flex justify-between items-center p-2 rounded-lg h-9 border-b ${isHigh ? 'bg-gradient-to-r from-yellow-900/60 to-transparent border-yellow-600/50' : 'bg-black/30 border-white/5'}`}>
                         <span className="text-zinc-400 font-mono text-xs">{t('sum')} <span className="text-white font-bold">{sum}</span></span>
-                        <span className={`font-bold text-sm ${isHigh ? 'text-[#d4af37]' : 'text-zinc-300'}`}>
-                            ${mgp.toLocaleString()}
+                        <span className={`font-bold text-sm ${isHigh ? 'text-[#fcd34d] drop-shadow' : 'text-zinc-300'}`}>
+                            {mgp.toLocaleString()} <span className="text-[10px] text-zinc-500">MGP</span>
                         </span>
                     </div>
                 );
             };
 
             return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
-                    <div onClick={(e) => e.stopPropagation()} className="bg-[#23232a] border border-[#d4af37] rounded-xl w-full max-w-sm flex flex-col relative shadow-2xl overflow-hidden">
-                        <div className="p-4 border-b border-[#3f3f46] flex items-center justify-between bg-[#18181b]">
-                            <h3 className="text-[#d4af37] font-bold text-lg flex items-center gap-2">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200" onClick={onClose}>
+                    <div onClick={(e) => e.stopPropagation()} className="bg-[#2d1b4e] border-2 border-[#d4af37] rounded-xl w-full max-w-sm flex flex-col relative shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden">
+                        <div className="p-4 border-b border-[#ffffff1a] flex items-center justify-between bg-black/40">
+                            <h3 className="text-[#fcd34d] font-bold text-lg flex items-center gap-2 drop-shadow-md">
                                 <Trophy className="w-5 h-5" /> {t('payout_title')}
                             </h3>
-                            <button onClick={onClose} className="text-zinc-500 hover:text-white p-1"><X className="w-6 h-6"/></button>
+                            <button onClick={onClose} className="text-zinc-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"><X className="w-6 h-6"/></button>
                         </div>
-                        <div className="p-4 bg-[#23232a]">
+                        <div className="p-4 bg-[#2d1b4e]">
                             <div className="flex gap-4">
                                 <div className="flex-1 space-y-1.5">
                                     {leftCol.map(([sum, mgp]) => <RowItem key={sum} sum={sum} mgp={mgp} />)}
@@ -198,7 +243,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div className="p-3 text-center text-xs text-zinc-500 border-t border-[#3f3f46] bg-[#18181b]">
+                        <div className="p-3 text-center text-xs text-zinc-500 border-t border-[#ffffff1a] bg-black/40">
                             {t('close_hint')}
                         </div>
                     </div>
@@ -209,9 +254,9 @@
         const NumberSelector = ({ isOpen, onSelect, usedNumbers, currentValue, onClose, t }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
-                <div onClick={(e) => e.stopPropagation()} className="bg-[#2e2e35] border-2 border-[#d4af37] rounded-xl shadow-2xl p-4 w-full max-w-[320px] grid grid-cols-3 gap-3">
-                    <div className="col-span-3 text-center text-[#d4af37] font-bold mb-2 uppercase tracking-widest text-sm">{t('select_num')}</div>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200" onClick={onClose}>
+                <div onClick={(e) => e.stopPropagation()} className="bg-[#1a0b2e] border-2 border-[#d4af37] rounded-2xl shadow-[0_0_30px_rgba(212,175,55,0.3)] p-4 w-full max-w-[320px] grid grid-cols-3 gap-3">
+                    <div className="col-span-3 text-center text-[#fcd34d] font-bold mb-2 uppercase tracking-widest text-sm drop-shadow">{t('select_num')}</div>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
                     const isUsed = usedNumbers.has(num) && num !== currentValue;
                     return (
@@ -219,13 +264,21 @@
                         key={num}
                         disabled={isUsed}
                         onClick={() => onSelect(num)}
-                        className={`h-14 rounded-lg font-bold text-2xl flex items-center justify-center transition-all ${num === currentValue ? 'bg-blue-600 text-white ring-2 ring-white/50' : isUsed ? 'bg-gray-800 text-gray-600' : 'bg-[#4a4a55] text-[#e2e2e2] hover:bg-[#d4af37] hover:text-black active:scale-95'}`}
+                        className={`
+                            h-14 rounded-xl font-bold text-2xl flex items-center justify-center transition-all btn-3d
+                            ${num === currentValue 
+                                ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white ring-2 ring-white/50 border-b-4 border-blue-900' 
+                                : isUsed 
+                                    ? 'bg-zinc-800 text-zinc-600 border-b-4 border-black cursor-not-allowed shadow-none translate-y-[4px]' 
+                                    : 'bg-gradient-to-br from-[#fcd34d] to-[#d4af37] text-black border-b-4 border-[#b45309] hover:brightness-110 active:border-b-0'
+                            }
+                        `}
                         >
                         {num}
                         </button>
                     );
                     })}
-                    <button onClick={() => onSelect(null)} className="col-span-3 h-10 mt-2 font-bold text-red-300 bg-red-900/30 border border-red-800 rounded-lg flex items-center justify-center uppercase tracking-wider active:scale-95 transition-transform">{t('clear_cell')}</button>
+                    <button onClick={() => onSelect(null)} className="btn-3d col-span-3 h-10 mt-2 font-bold text-red-200 bg-gradient-to-r from-red-900 to-red-800 border-b-4 border-red-950 rounded-xl flex items-center justify-center uppercase tracking-wider active:border-b-0 transition-transform">{t('clear_cell')}</button>
                 </div>
                 </div>
             );
@@ -369,21 +422,21 @@
                 return (
                 <div className={`flex items-center justify-center w-full h-full p-0.5`}>
                     <div className={`
-                    relative flex flex-col items-center justify-center w-[3rem] h-[3rem] rounded-lg border backdrop-blur-md transition-all duration-300
+                    relative flex flex-col items-center justify-center w-[3rem] h-[3rem] rounded-full border-2 backdrop-blur-md transition-all duration-300 shadow-lg
                     ${isBest 
-                        ? 'bg-gradient-to-b from-green-800 to-green-950 border-green-500 text-white shadow-[0_0_10px_rgba(74,222,128,0.4)] z-10 scale-105' 
-                        : 'bg-[#27272a] border-[#3f3f46] text-[#71717a] opacity-80'}
+                        ? 'bg-gradient-to-b from-green-700 to-green-900 border-green-400 text-white shadow-[0_0_15px_rgba(74,222,128,0.6)] z-10 scale-110' 
+                        : 'bg-black/50 border-[#ffffff1a] text-zinc-400'}
                     `}>
-                    <span className={`text-[10px] md:text-xs font-bold leading-none flex items-center justify-center ${isBest ? 'text-white' : 'text-[#a1a1aa]'}`}>
+                    <span className={`text-[10px] md:text-xs font-bold leading-none flex items-center justify-center ${isBest ? 'text-white drop-shadow-md' : 'text-[#a1a1aa]'}`}>
                         <span className={`mr-[1px] ${isBest ? 'text-yellow-300' : 'text-[#d4af37]'}`}>$</span>
                         {displayEv}
                     </span>
 
                     {chance10k > 0 && (
                         <div className="absolute -top-1 -right-1">
-                        <span className="flex h-2 w-2 relative">
+                        <span className="flex h-2.5 w-2.5 relative">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#fcd34d] border border-white"></span>
                         </span>
                         </div>
                     )}
@@ -406,25 +459,30 @@
                         onClick={() => setOpenSelectorIndex(idx)}
                         className={`
                             relative w-full h-full aspect-square rounded-xl flex flex-col items-center justify-center text-4xl md:text-5xl font-bold transition-all duration-150 group
-                            border-[3px] 
+                            border-2 shadow-inner overflow-hidden
                             ${cellValue !== null 
-                                ? 'bg-gradient-to-br from-[#f3eacb] to-[#cba955] text-[#2a2a32] border-[#f2e6c2] shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]' 
+                                ? 'bg-gradient-to-br from-[#fef3c7] via-[#fcd34d] to-[#d97706] text-[#451a03] border-[#fcd34d] shadow-[inset_0_0_10px_rgba(180,83,9,0.4)]' 
                                 : isLocked
-                                    ? 'bg-[#18181b] border-[#27272a] cursor-not-allowed opacity-30'
-                                    : 'bg-[#27272a] text-transparent border-[#3f3f46] active:bg-[#33333d]'
+                                    ? 'bg-[#0f0718] border-[#2d1b4e] cursor-not-allowed opacity-40'
+                                    : 'bg-[#2d1b4e]/80 hover:bg-[#3b2166] text-transparent border-[#4c1d95] active:scale-95'
                             }
-                            ${isSuggested ? 'ring-4 ring-blue-500/80 z-20 shadow-[0_0_25px_rgba(59,130,246,0.6)]' : ''}
+                            ${isSuggested && !cellValue ? 'ring-2 ring-offset-2 ring-offset-[#1a0b2e] ring-[#f0abfc] shadow-[0_0_20px_rgba(240,171,252,0.6)] z-20' : ''}
                         `}
                     >
+                        {/* 裝飾線條 */}
+                        {!cellValue && !isLocked && (
+                            <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMSIvPgo8cGF0aCBkPSJNTAgMEw4IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg==')]"></div>
+                        )}
+
                         {cellValue ? (
                             <span className="drop-shadow-sm font-serif">{cellValue}</span>
                         ) : (
-                            !isLocked && <ChevronDown className="w-5 h-5 text-[#52525b] opacity-50" />
+                            !isLocked && <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center"><Sparkles className="w-4 h-4 text-white/20" /></div>
                         )}
                         
                         {isSuggested && !cellValue && (
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <div className="bg-blue-600/90 text-white text-[10px] px-2 py-1 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
+                                <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg backdrop-blur-sm animate-pulse border border-white/20">
                                     {t('reveal')}
                                 </div>
                             </div>
@@ -449,11 +507,11 @@
                 return (
                     <div className="w-full max-w-[400px] mt-6 animate-in slide-in-from-bottom-4 fade-in duration-500">
                         <div className="flex items-center gap-2 mb-2 px-1">
-                            <div className="h-4 w-1 bg-[#d4af37] rounded-full"></div>
-                            <h3 className="text-[#d4af37] font-bold text-sm tracking-wider uppercase">{t('analysis_title')}</h3>
-                            <span className="text-[10px] text-zinc-500 ml-auto">{t('click_hint')}</span>
+                            <Sparkles className="w-4 h-4 text-[#d4af37]" />
+                            <h3 className="text-[#fcd34d] font-bold text-sm tracking-wider uppercase drop-shadow">{t('analysis_title')}</h3>
+                            <span className="text-[10px] text-zinc-400 ml-auto">{t('click_hint')}</span>
                         </div>
-                        <div className="bg-[#23232a] border border-[#3f3f46] rounded-xl overflow-hidden divide-y divide-[#3f3f46] shadow-xl">
+                        <div className="bg-[#2d1b4e]/60 backdrop-blur-md border border-[#ffffff1a] rounded-xl overflow-hidden divide-y divide-[#ffffff1a] shadow-xl">
                             {rankedSolutions.map((sol, rank) => {
                                 const isBest = sol.originalIndex === bestLineIndex;
                                 const name = getLineName(sol.originalIndex);
@@ -469,31 +527,31 @@
                                             onClick={() => toggleExpand(sol.originalIndex)}
                                             className={`
                                                 w-full flex items-center justify-between p-3 transition-colors text-left
-                                                ${isBest ? 'bg-gradient-to-r from-green-900/30 to-transparent' : 'hover:bg-[#27272a]'}
+                                                ${isBest ? 'bg-gradient-to-r from-green-900/40 to-transparent border-l-4 border-green-500' : 'hover:bg-white/5 border-l-4 border-transparent'}
                                                 ${isExpanded ? 'bg-black/20' : ''}
                                             `}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-6 h-6 flex items-center justify-center rounded font-bold text-xs ${isBest ? 'bg-green-600 text-white' : 'bg-zinc-700 text-zinc-400'}`}>
+                                                <div className={`w-6 h-6 flex items-center justify-center rounded-full font-bold text-xs shadow-inner ${isBest ? 'bg-green-600 text-white' : 'bg-[#1a0b2e] text-zinc-500'}`}>
                                                     {arrow}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className={`text-sm font-bold ${isBest ? 'text-green-400' : 'text-zinc-300'}`}>{name}</span>
+                                                    <span className={`text-sm font-bold ${isBest ? 'text-green-300 drop-shadow' : 'text-zinc-300'}`}>{name}</span>
                                                     <span className="text-[10px] text-zinc-500 uppercase tracking-wider">{isBest ? t('best_pick') : `${t('rank')} #${rank+1}`}</span>
                                                 </div>
                                             </div>
                                             
                                             <div className="text-right flex flex-col items-end">
-                                                <span className={`font-bold font-mono text-sm ${isBest ? 'text-[#d4af37]' : 'text-white'}`}>
+                                                <span className={`font-bold font-mono text-sm ${isBest ? 'text-[#fcd34d]' : 'text-white'}`}>
                                                     ${Math.floor(sol.ev).toLocaleString()}
                                                 </span>
                                                 <div className="flex gap-2 text-[10px] mt-0.5 items-center">
                                                     {hasBigPrize ? (
                                                         <>
-                                                            <span className={sol.chance10k > 0 ? 'text-yellow-500' : 'text-zinc-600'}>
+                                                            <span className={sol.chance10k > 0 ? 'text-[#fcd34d] font-bold' : 'text-zinc-600'}>
                                                                 {t('label_10k')}: {sol.chance10k.toFixed(0)}%
                                                             </span>
-                                                            <span className={sol.chance3600 > 0 ? 'text-blue-400' : 'text-zinc-600'}>
+                                                            <span className={sol.chance3600 > 0 ? 'text-blue-300' : 'text-zinc-600'}>
                                                                 {t('label_3600')}: {sol.chance3600.toFixed(0)}%
                                                             </span>
                                                         </>
@@ -511,25 +569,25 @@
 
                                         {/* Expanded Details */}
                                         {isExpanded && (
-                                            <div className="bg-black/40 p-3 shadow-inner border-t border-[#3f3f46]/50 animate-in slide-in-from-top-2 duration-200">
+                                            <div className="bg-black/30 p-3 shadow-inner border-t border-[#ffffff1a] animate-in slide-in-from-top-2 duration-200">
                                                 <div className="grid grid-cols-3 gap-2">
                                                     {sol.allProbs.map((prob) => {
                                                         const isJackpot = prob.mgp === 10000;
                                                         const isSecond = prob.mgp === 3600;
                                                         const isHigh = prob.mgp >= 1000 && prob.mgp < 3600;
                                                         
-                                                        let bgClass = "bg-zinc-800 border-zinc-700";
+                                                        let bgClass = "bg-[#1a0b2e] border-[#ffffff1a]";
                                                         let textClass = "text-zinc-400";
 
                                                         if (isJackpot) {
-                                                            bgClass = "bg-gradient-to-br from-yellow-900/40 to-yellow-600/20 border-yellow-500/50";
-                                                            textClass = "text-[#d4af37]";
+                                                            bgClass = "bg-gradient-to-br from-yellow-900/60 to-yellow-600/30 border-yellow-500/50";
+                                                            textClass = "text-[#fcd34d]";
                                                         } else if (isSecond) {
-                                                            bgClass = "bg-yellow-900/20 border-yellow-700/50";
-                                                            textClass = "text-yellow-200";
+                                                            bgClass = "bg-blue-900/30 border-blue-500/30";
+                                                            textClass = "text-blue-200";
                                                         } else if (isHigh) {
-                                                            bgClass = "bg-blue-900/20 border-blue-700/50";
-                                                            textClass = "text-blue-300";
+                                                            bgClass = "bg-purple-900/30 border-purple-500/30";
+                                                            textClass = "text-purple-200";
                                                         }
 
                                                         return (
@@ -537,7 +595,7 @@
                                                                 <span className={`text-[10px] font-bold ${textClass}`}>
                                                                     {prob.mgp.toLocaleString()}
                                                                 </span>
-                                                                <span className="text-xs font-mono text-white">
+                                                                <span className="text-xs font-mono text-white/70">
                                                                     {prob.percent.toFixed(0)}%
                                                                 </span>
                                                             </div>
@@ -555,15 +613,15 @@
             };
 
             return (
-                <div className="min-h-screen bg-[#0f0f11] text-[#e2e2e2] flex flex-col items-center justify-center py-6 px-2 font-sans overflow-x-hidden pb-20 relative">
+                <div className="min-h-screen flex flex-col items-center justify-center py-6 px-2 font-sans overflow-x-hidden pb-20 relative">
                 
                 {/* Language Switcher */}
-                <div className="absolute top-4 right-4 z-40 flex bg-[#27272a] border border-[#3f3f46] rounded-lg p-1">
+                <div className="absolute top-4 right-4 z-40 flex bg-black/40 backdrop-blur-md border border-[#ffffff1a] rounded-full p-1 shadow-lg">
                     {['zh', 'en', 'ja'].map(l => (
                         <button 
                             key={l}
                             onClick={() => setLang(l)}
-                            className={`px-3 py-1 rounded text-xs font-bold uppercase transition-all ${lang === l ? 'bg-[#d4af37] text-black' : 'text-zinc-500 hover:text-zinc-300'}`}
+                            className={`px-3 py-1 rounded-full text-xs font-bold uppercase transition-all ${lang === l ? 'bg-[#d4af37] text-black shadow' : 'text-zinc-400 hover:text-white'}`}
                         >
                             {l === 'zh' ? '繁' : l === 'ja' ? '日' : l}
                         </button>
@@ -571,32 +629,33 @@
                 </div>
 
                 {/* Header */}
-                <div className="w-full max-w-md mb-4 text-center relative shrink-0 mt-8">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-[#d4af37]/20 blur-[50px] rounded-full pointer-events-none"></div>
+                <div className="w-full max-w-md mb-2 text-center relative shrink-0 mt-8">
+                    {/* 背景光暈 */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-purple-500/20 blur-[60px] rounded-full pointer-events-none mix-blend-screen"></div>
                     <div className="relative flex flex-col items-center gap-2">
                         <div className="flex items-center gap-3">
-                        <Trophy className="w-6 h-6 text-[#d4af37]" />
-                        <h1 className="text-2xl md:text-3xl font-serif font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-[#f3eacb] to-[#b89542] drop-shadow-sm">
+                        <Trophy className="w-6 h-6 text-[#fcd34d] drop-shadow-[0_0_5px_rgba(252,211,77,0.8)]" />
+                        <h1 className="text-gold text-3xl md:text-4xl font-serif font-extrabold tracking-widest drop-shadow-lg">
                             {t('title')}
                         </h1>
-                        <Trophy className="w-6 h-6 text-[#d4af37]" />
+                        <Trophy className="w-6 h-6 text-[#fcd34d] drop-shadow-[0_0_5px_rgba(252,211,77,0.8)]" />
                         </div>
-                        <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-[#d4af37]/50 to-transparent"></div>
+                        <div className="h-[2px] w-32 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent opacity-80"></div>
                     </div>
                 </div>
 
-                {/* --- CONTROLS AT TOP --- */}
-                <div className="mb-1 flex flex-col w-full max-w-[320px] gap-3 shrink-0">
+                {/* --- CONTROLS AT TOP (Arcade Buttons) --- */}
+                <div className="mb-1 flex flex-col w-full max-w-[320px] gap-3 shrink-0 relative z-20">
                     <div className="flex gap-2">
                         <button 
                             onClick={handleReset}
-                            className="flex-1 py-3 bg-[#27272a] hover:bg-[#3f3f46] border border-[#3f3f46] rounded-lg text-red-400 font-bold tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg"
+                            className="flex-1 py-3 btn-3d bg-gradient-to-br from-red-600 to-red-800 border-b-4 border-red-950 rounded-xl text-white font-bold tracking-wider flex items-center justify-center gap-2 active:border-b-0"
                         >
                             <RefreshCw className="w-4 h-4" /> {t('reset')}
                         </button>
                         <button 
                             onClick={() => setShowPayouts(true)}
-                            className="flex-1 py-3 bg-[#27272a] hover:bg-[#3f3f46] border border-[#3f3f46] rounded-lg text-[#d4af37] font-bold tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg"
+                            className="flex-1 py-3 btn-3d bg-gradient-to-br from-[#fcd34d] to-[#d4af37] border-b-4 border-[#b45309] rounded-xl text-black font-bold tracking-wider flex items-center justify-center gap-2 active:border-b-0"
                         >
                             <BookOpen className="w-4 h-4" /> {t('payout_btn')}
                         </button>
@@ -605,24 +664,24 @@
                     <button 
                         onClick={() => setIsFullFillMode(!isFullFillMode)}
                         className={`
-                            w-full py-3 border rounded-lg font-bold tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg
+                            w-full py-3 btn-3d rounded-xl font-bold tracking-wider flex items-center justify-center gap-2 border-b-4 active:border-b-0
                             ${isFullFillMode 
-                                ? 'bg-blue-900/20 border-blue-500/50 text-blue-400' 
-                                : 'bg-[#27272a] border-[#3f3f46] text-zinc-400 hover:text-zinc-200'}
+                                ? 'bg-gradient-to-br from-blue-600 to-blue-800 border-blue-950 text-white' 
+                                : 'bg-zinc-800 border-black text-zinc-400 hover:text-zinc-200'}
                         `}
                     >
                         {isFullFillMode ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                         {isFullFillMode ? t('mode_on') : t('mode_off')}
                     </button>
 
-                    <div className="text-center text-zinc-600 text-xs mt-1 font-mono">
+                    <div className="text-center text-[#fcd34d] text-xs mt-1 font-mono font-bold drop-shadow">
                         {t('filled_status').replace('{n}', filledCount)}
                     </div>
                 </div>
 
                 {/* Grid */}
                 <div className="w-full max-w-[400px] aspect-[4/5] flex flex-col justify-center shrink-0">
-                    <div className="grid grid-cols-[3.5rem_1fr_1fr_1fr_3.5rem] gap-1.5 md:gap-2 items-center justify-items-center w-full">
+                    <div className="grid grid-cols-[3.5rem_1fr_1fr_1fr_3.5rem] gap-2 items-center justify-items-center w-full">
                         <Indicator lineId={6} arrow="↘" /> 
                         <Indicator lineId={3} arrow="⬇" /> 
                         <Indicator lineId={4} arrow="⬇" /> 
@@ -643,7 +702,7 @@
                 {/* Analysis Table */}
                 <AnalysisList />
 
-                <div className="mt-8 text-zinc-700 text-[10px] font-mono">
+                <div className="mt-8 text-zinc-500 text-[10px] font-mono">
                     {t('ver')}: {BUILD_DATE}
                 </div>
 
