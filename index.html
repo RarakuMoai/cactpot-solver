@@ -6,13 +6,13 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Mini Cactpot">
+    <meta name="apple-mobile-web-app-title" content="FF14-仙人微彩">
     
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
 
-    <title>FF14 Mini Cactpot Solver</title>
+    <title>FF14-仙人微彩</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -136,7 +136,7 @@
 
     <script type="text/babel">
         // ★★★ 請手動修改版本號 ★★★
-        const BUILD_DATE = "2024.12.12 13:50 (Layout Fix)"; 
+        const BUILD_DATE = "2025.12.12 14:45"; 
 
         const { useState, useEffect, useMemo, useRef } = React;
 
@@ -155,13 +155,14 @@
         // --- Localization Dictionary ---
         const LOCALE = {
             zh: {
+                app_title: "FF14-仙人微彩",
                 title: "仙人微彩模擬器",
                 sum: "總和",
                 payout_title: "獎金一覽表",
                 close_hint: "點擊背景關閉",
                 select_num: "選擇數字",
                 clear_cell: "清除",
-                analysis_title: "全方案分析",
+                analysis_title: "全部機率分析", // 修改文字
                 click_hint: "(點擊查看詳情)",
                 best_pick: "最佳推薦",
                 rank: "Rank",
@@ -179,16 +180,17 @@
                 label_10k: "1萬",
                 label_3600: "3千6",
                 ver: "版本",
-                force_update: "更新頁面" // 文字已修改
+                force_update: "更新頁面" 
             },
             en: {
+                app_title: "FF14-Cactpot",
                 title: "Mini Cactpot Solver",
                 sum: "Sum",
                 payout_title: "Payout Table",
                 close_hint: "Tap background to close",
                 select_num: "Select Number",
                 clear_cell: "Clear",
-                analysis_title: "Risk Analysis",
+                analysis_title: "All Probability", // English Update
                 click_hint: "(Tap row for details)",
                 best_pick: "Recommended",
                 rank: "Rank",
@@ -209,13 +211,14 @@
                 force_update: "Refresh Page"
             },
             ja: {
+                app_title: "FF14-くじテンダー",
                 title: "ミニ・くじテンダー",
                 sum: "合計",
                 payout_title: "賞金一覧",
                 close_hint: "背景タップで閉じる",
                 select_num: "数字を選択",
                 clear_cell: "クリア",
-                analysis_title: "全パターン分析",
+                analysis_title: "全確率分析", // Japanese Update
                 click_hint: "(行クリックで詳細)",
                 best_pick: "推奨",
                 rank: "順位",
@@ -375,6 +378,14 @@
             const [suggestedCellIndex, setSuggestedCellIndex] = useState(null);
 
             const t = (key) => LOCALE[lang][key] || key;
+
+            // ★★★ 動態修改 PWA 標題與網頁標題 ★★★
+            useEffect(() => {
+                const currentTitle = t('app_title');
+                document.title = currentTitle;
+                const metaTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+                if (metaTitle) metaTitle.setAttribute('content', currentTitle);
+            }, [lang]);
 
             const getLineName = (index) => {
                 if (index <= 2) return `${t('row')} ${index + 1}`;
@@ -709,7 +720,7 @@
                     </div>
                 </div>
 
-                {/* --- 頂部控制區 (賭場按鈕風格) --- */}
+                {/* --- 頂部控制區 (移除全填模式按鈕) --- */}
                 <div className="mb-6 flex flex-col w-full max-w-[340px] gap-4 shrink-0 relative z-20">
                     <div className="flex gap-3">
                         <button 
@@ -726,26 +737,12 @@
                         </button>
                     </div>
 
-                    <button 
-                        onClick={() => setIsFullFillMode(!isFullFillMode)}
-                        className={`
-                            w-full py-3 btn-3d rounded-2xl font-bold tracking-wider flex items-center justify-center gap-2 border-2 shadow-lg transition-all
-                            ${isFullFillMode 
-                                ? 'bg-gradient-to-b from-blue-600 to-blue-900 border-blue-400 text-blue-100' 
-                                : 'bg-zinc-800/80 border-zinc-600 text-zinc-400 hover:text-zinc-200'}
-                        `}
-                    >
-                        {isFullFillMode ? <Unlock className="w-5 h-5 drop-shadow-[0_0_5px_rgba(59,130,246,0.8)]" /> : <Lock className="w-5 h-5" />}
-                        {isFullFillMode ? t('mode_on') : t('mode_off')}
-                    </button>
-
                     <div className="text-center text-[#d4af37] text-sm mt-1 font-game font-bold drop-shadow-sm">
                         --- {t('filled_status').replace('{n}', filledCount)} ---
                     </div>
                 </div>
 
                 {/* 核心九宮格區域 */}
-                {/* 這裡調整了 grid-cols 和 gap */}
                 <div className="w-full max-w-[420px] casino-panel rounded-[40px] p-6 flex flex-col justify-center shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
                     <div className="grid grid-cols-[2.2rem_1fr_1fr_1fr_2.2rem] gap-1.5 md:gap-3 items-center justify-items-center w-full">
                         {/* 指示器 */}
@@ -764,6 +761,21 @@
                         <Indicator lineId={2} arrow="➡" />
                         <GameCell idx={6} /> <GameCell idx={7} /> <GameCell idx={8} /> <div />
                     </div>
+                </div>
+
+                {/* --- 全填模式按鈕 (移到這裡) --- */}
+                <div className="w-full max-w-[340px] mt-6 flex justify-center">
+                    <button 
+                        onClick={() => setIsFullFillMode(!isFullFillMode)}
+                        className={`
+                            px-6 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all border
+                            ${isFullFillMode 
+                                ? 'bg-blue-900/50 border-blue-400 text-blue-200 shadow-[0_0_10px_rgba(59,130,246,0.5)]' 
+                                : 'bg-transparent border-[#d4af37]/30 text-[#d4af37]/50 hover:bg-[#d4af37]/10 hover:text-[#d4af37]'}
+                        `}
+                    >
+                        {isFullFillMode ? <span className="flex items-center gap-2"><Unlock className="w-3 h-3"/> {t('mode_on')}</span> : <span className="flex items-center gap-2"><Lock className="w-3 h-3"/> {t('mode_off')}</span>}
+                    </button>
                 </div>
                 
                 {/* 分析列表 */}
