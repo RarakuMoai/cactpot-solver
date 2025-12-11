@@ -117,13 +117,13 @@
             z-index: 10;
         }
 
-        /* 1萬MGP 特效流光 - 修正版 */
+        /* 1萬MGP 特效流光 - 更柔和版 */
         @keyframes shimmer {
             0% { background-position: -200% center; }
             100% { background-position: 200% center; }
         }
         .jackpot-row-bg {
-            background: linear-gradient(90deg, rgba(212,175,55,0.1), rgba(252,211,77,0.4), rgba(255,255,255,0.6), rgba(252,211,77,0.4), rgba(212,175,55,0.1));
+            background: linear-gradient(90deg, rgba(212,175,55,0.05), rgba(252,211,77,0.2), rgba(255,255,255,0.3), rgba(252,211,77,0.2), rgba(212,175,55,0.05));
             background-size: 200% auto;
             animation: shimmer 3s linear infinite;
         }
@@ -138,50 +138,65 @@
 
     <script type="text/babel">
         // ★★★ 更新時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 06:15"; 
+        const BUILD_TIMESTAMP = "2025/12/12 08:30"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // --- 音效控制器 (Sound Controller - V5 Final Fix) ---
-        // 修復邏輯：AudioContext 的初始化與解鎖不應依賴 isSoundOn。
-        // 只有在實際要發出聲音的那一刻，才去檢查是否靜音。
+        // --- 音效控制器 (Sound Controller - V6 Persistent Fix) ---
+        // 核心修正：將 AudioContext 的建立與 React State 解耦，
+        // 確保在第一次點擊頁面時「必定」建立 Context，解決靜音開局後無法開啟聲音的問題。
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
-            // 初始化與解鎖 (無條件執行)
-            const initAndUnlock = useCallback(async () => {
+            // 1. 全域初始化函式：只負責建立和喚醒 Context
+            const initGlobalAudio = useCallback(() => {
                 if (!audioCtxRef.current) {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
-                    if (Ctx) audioCtxRef.current = new Ctx();
+                    if (Ctx) {
+                        audioCtxRef.current = new Ctx();
+                    }
                 }
                 const ctx = audioCtxRef.current;
                 if (ctx && (ctx.state === 'suspended' || ctx.state === 'interrupted')) {
-                    try { await ctx.resume(); } catch (e) {}
+                    ctx.resume().catch(e => console.error(e));
                 }
             }, []);
 
+            // 2. 在組件掛載時，監聽全域點擊事件 (只執行一次)
             useEffect(() => {
-                // 綁定全域點擊事件來解鎖 AudioContext
-                const handleInteraction = () => initAndUnlock();
-                window.addEventListener('click', handleInteraction);
-                window.addEventListener('touchstart', handleInteraction);
-                return () => {
-                    window.removeEventListener('click', handleInteraction);
-                    window.removeEventListener('touchstart', handleInteraction);
+                const handleFirstInteraction = () => {
+                    initGlobalAudio();
                 };
-            }, [initAndUnlock]);
-
-            const playTone = useCallback(async (freq, type, duration, vol = 0.1, startTime = 0) => {
-                // 這裡才檢查 enabled，確保就算 Context 已經準備好，靜音時也不會出聲
-                if (!enabled) return;
                 
-                await initAndUnlock(); // 確保 context 是醒著的
+                // 綁定到 window 的捕獲階段，確保最早觸發
+                window.addEventListener('click', handleFirstInteraction, { capture: true, once: true });
+                window.addEventListener('touchstart', handleFirstInteraction, { capture: true, once: true });
+                
+                // 備用：每次 enabled 變為 true 時也嘗試喚醒 (以防萬一)
+                if (enabled) {
+                    initGlobalAudio();
+                }
+
+                return () => {
+                    window.removeEventListener('click', handleFirstInteraction, { capture: true });
+                    window.removeEventListener('touchstart', handleFirstInteraction, { capture: true });
+                };
+            }, [initGlobalAudio, enabled]);
+
+            // 3. 播放函式：現在只負責發聲，不負責建立 Context (除非 Context 意外遺失)
+            const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
+                if (!enabled) return;
+
+                // 再次確保 Context 存在 (雙保險)
+                if (!audioCtxRef.current) initGlobalAudio();
+                
                 const ctx = audioCtxRef.current;
                 if (!ctx) return;
 
                 try {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
+
                     osc.type = type;
                     osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
                     gain.gain.setValueAtTime(vol, ctx.currentTime + startTime);
@@ -190,8 +205,8 @@
                     gain.connect(ctx.destination);
                     osc.start(ctx.currentTime + startTime);
                     osc.stop(ctx.currentTime + startTime + duration);
-                } catch(e) {}
-            }, [enabled, initAndUnlock]);
+                } catch (e) {}
+            }, [enabled, initGlobalAudio]);
 
             const sounds = useMemo(() => ({
                 click: () => playTone(800, 'sine', 0.1, 0.1),
@@ -200,7 +215,11 @@
                     playTone(500, 'square', 0.05, 0.05, 0.05);
                     playTone(600, 'square', 0.05, 0.05, 0.1);
                 },
-                toggle: () => playTone(300, 'square', 0.1, 0.05),
+                toggle: () => {
+                    // 切換時強制喚醒一次，確保反饋
+                    initGlobalAudio(); 
+                    playTone(300, 'square', 0.1, 0.05);
+                },
                 cash: () => {
                     playTone(2000, 'sine', 0.4, 0.1, 0);
                     playTone(2500, 'sine', 0.4, 0.1, 0.05);
@@ -211,7 +230,7 @@
                       playTone(523.25, 'sine', 0.2, 0.1);
                       setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50);
                 }
-            }), [playTone]);
+            }), [playTone, initGlobalAudio]);
 
             return sounds;
         };
@@ -239,7 +258,7 @@
                 clear_cell: "清除",
                 analysis_title: "全部機率分析",
                 best_pick: "最佳推薦",
-                tap_hint: "點選查看詳細機率 👆", 
+                tap_view: "點擊查看 👆",
                 rank: "Rank",
                 guaranteed: "保底",
                 view_details: "查看詳情",
@@ -270,7 +289,7 @@
                 clear_cell: "Clear",
                 analysis_title: "All Probability",
                 best_pick: "Recommended",
-                tap_hint: "Tap to view details 👆",
+                tap_view: "Tap to View 👆",
                 rank: "Rank",
                 guaranteed: "Guaranteed",
                 view_details: "View Details",
@@ -301,7 +320,7 @@
                 clear_cell: "クリア",
                 analysis_title: "全確率分析",
                 best_pick: "推奨",
-                tap_hint: "タップして詳細を見る 👆",
+                tap_view: "詳細を見る 👆",
                 rank: "順位",
                 guaranteed: "確定",
                 view_details: "詳細を見る",
@@ -335,6 +354,9 @@
         const RotateCcw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
         const Volume2 = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
         const VolumeX = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>;
+        const HandPointingUp = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 2a4 4 0 0 1 4 4v8.05a2 2 0 0 1 1.5-1.55h.5a2 2 0 0 1 2 2v2.76c0 5.09-4.21 9.24-9.5 9.24H10a2 2 0 0 1-2-2v-5a2 2 0 0 1-2-2v-1.05a2 2 0 0 1 1.5-1.55V4a4 4 0 0 1 4-4Z"/></svg>;
+        const Hand = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>;
+
         
         // Unified SVG Arrows
         const ArrowRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
@@ -401,8 +423,8 @@
                 let isJackpot = false;
                 
                 if (mgp === 10000) {
-                    // ★★★ 修正：移除高度改變與過度放大，保留流光與金邊 ★★★
-                    rowBgClass = "border-[#d4af37] relative overflow-hidden shadow-[0_0_15px_rgba(212,175,55,0.4)]";
+                    // ★★★ 修正：更柔和的背景流光，不刺眼 ★★★
+                    rowBgClass = "border-[#d4af37] relative overflow-hidden shadow-[0_0_15px_rgba(212,175,55,0.3)]";
                     textClass = "text-[#fcd34d] font-bold drop-shadow";
                     isJackpot = true;
                 } else if (mgp === 3600 || mgp === 1800) {
@@ -789,13 +811,12 @@
                                 
                                 const notablePrizes = sol.allProbs.filter(p => p.mgp >= 720).sort((a, b) => b.mgp - a.mgp);
 
-                                // ★★★ 最佳推薦特別版面：高度加高，直接顯示關鍵機率 ★★★
-                                const bestChanceText = isBest ? (
-                                    sol.chance10k > 0 
-                                        ? <span className="text-[#fcd34d] font-bold text-sm bg-yellow-900/40 px-2 py-0.5 rounded border border-[#fcd34d]/50 shadow-[0_0_5px_rgba(252,211,77,0.5)]">10k: {Math.round(sol.chance10k)}%</span> 
-                                        : (sol.chance3600 > 0 
-                                            ? <span className="text-fuchsia-300 font-bold text-sm bg-fuchsia-900/40 px-2 py-0.5 rounded border border-fuchsia-500/50">3.6k: {Math.round(sol.chance3600)}%</span>
-                                            : null)
+                                // ★★★ 最佳推薦顯示修正：中間改為「點擊查看」引導 ★★★
+                                const bestPickCenter = isBest ? (
+                                    <div className="flex-1 flex items-center justify-center gap-1.5 animate-pulse mx-2 bg-black/20 rounded-full py-1 border border-white/10">
+                                        <HandPointingUp className="w-4 h-4 text-[#fcd34d]" />
+                                        <span className="text-[#fcd34d] text-xs font-bold tracking-wider">{t('tap_view')}</span>
+                                    </div>
                                 ) : null;
 
                                 return (
@@ -810,7 +831,8 @@
                                                 ${isExpanded ? 'bg-black/40' : ''}
                                             `}
                                         >
-                                            <div className="flex items-center gap-3">
+                                            {/* 左側：排名與名稱 */}
+                                            <div className="flex items-center gap-3 shrink-0">
                                                 <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm shadow-inner border ${isBest ? 'bg-green-700 border-green-400 text-white shadow-[0_0_10px_rgba(0,255,0,0.3)]' : 'bg-black/40 border-[#d4af37]/20 text-[#d4af37]/60'}`}>
                                                     {ArrowIcon}
                                                 </div>
@@ -820,33 +842,31 @@
                                                 </div>
                                             </div>
                                             
-                                            <div className="flex flex-col items-end gap-1">
+                                            {/* 中間：最佳推薦的引導按鈕 (僅最佳推薦顯示) */}
+                                            {bestPickCenter}
+
+                                            {/* 右側：期望值與小標籤 */}
+                                            <div className="flex flex-col items-end gap-1 shrink-0">
                                                 <span className={`font-bold font-mono text-base ${isBest ? 'text-gold drop-shadow-sm' : 'text-zinc-300'}`}>
                                                     ${Math.floor(sol.ev).toLocaleString()}
                                                 </span>
                                                 
                                                 <div className="flex flex-wrap justify-end gap-1.5 min-h-[20px]">
-                                                    {isBest ? (
-                                                        // ★★★ 最佳推薦：直接顯示機率文字，不顯示 Tap Hint ★★★
-                                                        bestChanceText
-                                                    ) : (
-                                                        notablePrizes.length > 0 ? (
-                                                            notablePrizes.map(p => {
-                                                                const badgeStyle = getPrizeStyle(p.mgp);
-                                                                const textSize = p.mgp >= 10000 ? "text-xs" : "text-[10px]";
-                                                                return (
-                                                                    <span key={p.mgp} className={`${textSize} px-1.5 py-0.5 rounded border ${badgeStyle} backdrop-blur-sm flex items-center`}>
-                                                                        {p.mgp >= 10000 ? '1萬' : p.mgp}
-                                                                        <span className="opacity-70 text-[9px] ml-0.5">:{p.percent.toFixed(0)}%</span>
-                                                                    </span>
-                                                                )
-                                                            })
-                                                        ) : null 
-                                                    )}
+                                                    {/* 如果是最佳推薦，右側不顯示詳細機率(已移至展開內容)，保持乾淨，或可選擇顯示 */}
+                                                    {!isBest && notablePrizes.length > 0 ? (
+                                                        notablePrizes.map(p => {
+                                                            const badgeStyle = getPrizeStyle(p.mgp);
+                                                            const textSize = p.mgp >= 10000 ? "text-xs" : "text-[10px]";
+                                                            return (
+                                                                <span key={p.mgp} className={`${textSize} px-1.5 py-0.5 rounded border ${badgeStyle} backdrop-blur-sm flex items-center`}>
+                                                                    {p.mgp >= 10000 ? '1萬' : p.mgp}
+                                                                    <span className="opacity-70 text-[9px] ml-0.5">:{p.percent.toFixed(0)}%</span>
+                                                                </span>
+                                                            )
+                                                        })
+                                                    ) : null}
                                                 </div>
                                             </div>
-                                            
-                                            {/* 已移除跳動的箭頭 Chevron */}
                                         </button>
 
                                         {isExpanded && (
