@@ -138,22 +138,18 @@
 
     <script type="text/babel">
         // ★★★ 更新時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 04:33"; 
+        const BUILD_TIMESTAMP = "2025/12/12 05:00"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // --- 音效控制器 (Sound Controller - V8 Resurrection Logic) ---
-        // 這個版本在每次用戶互動時都會檢查 AudioContext 是否存活，確保在 APP 切換回來後能復活。
+        // --- 音效控制器 (Sound Controller - V8) ---
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
-            // 初始化與喚醒
             const initOrResumeAudio = useCallback(() => {
                 if (!audioCtxRef.current) {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
-                    if (Ctx) {
-                        audioCtxRef.current = new Ctx();
-                    }
+                    if (Ctx) audioCtxRef.current = new Ctx();
                 }
                 const ctx = audioCtxRef.current;
                 if (ctx) {
@@ -164,22 +160,17 @@
                 return ctx;
             }, []);
 
-            // 監聽頁面可見性變化 (當使用者切換 APP 回來時，嘗試喚醒)
             useEffect(() => {
                 const handleVisibilityChange = () => {
-                    if (!document.hidden) {
-                        initOrResumeAudio();
-                    }
+                    if (!document.hidden) initOrResumeAudio();
                 };
                 document.addEventListener('visibilitychange', handleVisibilityChange);
                 return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
             }, [initOrResumeAudio]);
 
-            // 第一次點擊時的暖機 (Silent Warm-up)
             useEffect(() => {
                 const handleInteraction = () => {
                     const ctx = initOrResumeAudio();
-                    // 播放極短無聲波形，強制切換 iOS 音訊通道
                     if (ctx) {
                         try {
                             const buffer = ctx.createBuffer(1, 1, 22050);
@@ -192,28 +183,21 @@
                     window.removeEventListener('click', handleInteraction, true);
                     window.removeEventListener('touchstart', handleInteraction, true);
                 };
-                
                 window.addEventListener('click', handleInteraction, true);
                 window.addEventListener('touchstart', handleInteraction, true);
-                
                 return () => {
                     window.removeEventListener('click', handleInteraction, true);
                     window.removeEventListener('touchstart', handleInteraction, true);
                 };
             }, [initOrResumeAudio]);
 
-            // 播放音效
             const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
                 if (!enabled) return;
-                
-                // ★★★ 關鍵修改：每次播放前都嘗試喚醒 ★★★
                 const ctx = initOrResumeAudio();
                 if (!ctx) return; 
-
                 try {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
-
                     osc.type = type;
                     osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
                     gain.gain.setValueAtTime(vol, ctx.currentTime + startTime);
@@ -359,7 +343,7 @@
             }
         };
 
-        // --- Icons (SVG) ---
+        // --- Icons ---
         const RefreshCw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>;
         const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
         const Unlock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>;
@@ -564,8 +548,10 @@
             const sounds = useSound(isSoundOn);
             
             const [solutions, setSolutions] = useState([]);
-            const [bestLineIndex, setBestLineIndex] = useState(null);
-            const [suggestedCellIndex, setSuggestedCellIndex] = useState(null);
+            // ★★★ CHANGE: Use an array for indices to handle ties ★★★
+            const [bestLineIndices, setBestLineIndices] = useState([]);
+            // ★★★ CHANGE: Use an array for cell indices to handle ties ★★★
+            const [suggestedCellIndices, setSuggestedCellIndices] = useState([]);
 
             const t = (key) => LOCALE[lang][key] || key;
 
@@ -649,22 +635,40 @@
                 });
 
                 setSolutions(results);
+                
                 const maxEV = Math.max(...results.map(r => r.ev));
-                setBestLineIndex(results.findIndex(r => r.ev === maxEV));
+                const bestIndices = results
+                    .map((r, i) => r.ev === maxEV ? i : -1)
+                    .filter(i => i !== -1);
+                setBestLineIndices(bestIndices);
 
                 if (isSelectionPhase && filledCount > 0) {
                     let maxScore = -1;
-                    let bestCell = -1;
+                    // First pass: find max score
                     cellImpactScore.forEach((score, idx) => {
-                        if (score > maxScore && board[idx] === null) maxScore = score, bestCell = idx;
+                        if (board[idx] === null && score > maxScore) maxScore = score;
                     });
-                    if (bestCell === -1) {
-                        const priority = [4, 0, 2, 6, 8, 1, 3, 5, 7];
-                        bestCell = priority.find(idx => board[idx] === null) ?? -1;
+
+                    // Second pass: gather all cells with max score
+                    const bestCells = [];
+                    if (maxScore > 0) {
+                        cellImpactScore.forEach((score, idx) => {
+                            if (board[idx] === null && score === maxScore) {
+                                bestCells.push(idx);
+                            }
+                        });
                     }
-                    setSuggestedCellIndex(bestCell);
+
+                    // Fallback logic
+                    if (bestCells.length === 0) {
+                         const priority = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+                         const fallback = priority.find(idx => board[idx] === null);
+                         if (fallback !== undefined) bestCells.push(fallback);
+                    }
+
+                    setSuggestedCellIndices(bestCells);
                 } else {
-                    setSuggestedCellIndex(null);
+                    setSuggestedCellIndices([]);
                 }
             }, [board, availableNumbers, filledCount, isSelectionPhase, isFullFillMode]);
 
@@ -705,7 +709,7 @@
                 
                 if (!solutions[lineId]) return <div className="w-12 h-12"></div>;
                 const { ev, chance10k, chance3600 } = solutions[lineId];
-                const isBest = showAnalysis && lineId === bestLineIndex;
+                const isBest = showAnalysis && bestLineIndices.includes(lineId);
                 const displayEv = ev >= 1000 ? (ev/1000).toFixed(1).replace('.0','') + 'k' : ev;
 
                 let bestInfo = null;
@@ -753,7 +757,8 @@
 
             const GameCell = ({ idx }) => {
                 const cellValue = board[idx];
-                const isSuggested = isSelectionPhase && idx === suggestedCellIndex;
+                // ★★★ CHANGE: Check if idx is in the suggested list ★★★
+                const isSuggested = isSelectionPhase && suggestedCellIndices.includes(idx);
                 const isLocked = !isFullFillMode && (cellValue === null && filledCount >= 4);
 
                 return (
@@ -815,15 +820,12 @@
                         </div>
                         <div className="casino-panel rounded-2xl overflow-hidden divide-y divide-[#d4af37]/20">
                             {rankedSolutions.map((sol, rank) => {
-                                const isBest = sol.originalIndex === bestLineIndex;
+                                const isBest = bestLineIndices.includes(sol.originalIndex);
                                 const name = getLineName(sol.originalIndex);
                                 const ArrowIcon = getArrowIcon(sol.originalIndex);
                                 const isExpanded = expandedLine === sol.originalIndex;
                                 
                                 const notablePrizes = sol.allProbs.filter(p => p.mgp >= 720).sort((a, b) => b.mgp - a.mgp);
-                                
-                                // ★★★ 最佳推薦修正：只取前1個最高的機率顯示 (10k > 3.6k > 1800...) ★★★
-                                // 這樣保證只有一個標籤，英文版就不會跑版
                                 const displayPrizes = isBest ? notablePrizes.slice(0, 1) : notablePrizes;
 
                                 const bestPickCenter = isBest ? (
@@ -844,7 +846,6 @@
                                                 ${isExpanded ? 'bg-black/40' : ''}
                                             `}
                                         >
-                                            {/* 左側：排名與名稱 */}
                                             <div className="flex items-center gap-3 shrink-0">
                                                 <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm shadow-inner border ${isBest ? 'bg-green-700 border-green-400 text-white shadow-[0_0_10px_rgba(0,255,0,0.3)]' : 'bg-black/40 border-[#d4af37]/20 text-[#d4af37]/60'}`}>
                                                     {ArrowIcon}
@@ -855,22 +856,18 @@
                                                 </div>
                                             </div>
                                             
-                                            {/* 中間：點擊引導 (僅最佳推薦) */}
                                             {bestPickCenter}
 
-                                            {/* 右側：資料區 (最佳推薦會顯示更多) */}
                                             <div className="flex flex-col items-end justify-center gap-1 shrink-0 h-full">
                                                 <span className={`font-bold font-mono ${isBest ? 'text-xl text-gold drop-shadow-md mb-1' : 'text-base text-zinc-300'}`}>
                                                     ${Math.floor(sol.ev).toLocaleString()}
                                                 </span>
                                                 
                                                 <div className="flex flex-wrap justify-end gap-1.5 min-h-[20px]">
-                                                    {/* ★★★ 統一顯示邏輯：最佳推薦只會顯示 1 個標籤 ★★★ */}
                                                     {displayPrizes.length > 0 ? (
                                                         displayPrizes.map(p => {
                                                             const badgeStyle = getPrizeStyle(p.mgp);
                                                             const textSize = p.mgp >= 10000 ? "text-xs" : "text-[10px]";
-                                                            // 統一格式化：大於等於1000用 k 表示
                                                             const label = p.mgp >= 1000 
                                                                 ? (p.mgp === 10000 ? '10k' : (p.mgp/1000).toString() + 'k') 
                                                                 : p.mgp;
