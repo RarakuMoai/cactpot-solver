@@ -127,11 +127,11 @@
 
     <script type="text/babel">
         // ★★★ 更新時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 02:40"; 
+        const BUILD_TIMESTAMP = "2025/12/12 02:50"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // --- 音效控制器 ---
+        // --- 音效控制器 (Sound Controller) ---
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
@@ -154,7 +154,9 @@
                     gain.connect(ctx.destination);
                     osc.start(ctx.currentTime + startTime);
                     osc.stop(ctx.currentTime + startTime + duration);
-                } catch (e) { }
+                } catch (e) { 
+                    console.warn("Audio play failed", e);
+                }
             }, [enabled]);
 
             const sounds = useMemo(() => ({
@@ -176,19 +178,26 @@
                 reveal: () => {
                      if(!enabled) return;
                      playTone(523.25, 'sine', 0.2, 0.1);
-                     setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50);
+                     // setTimeout here is usually okay for audio sequencing, but we wrap in try
+                     try { setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50); } catch(e){}
                 }
             }), [enabled, playTone]);
 
             return sounds;
         };
 
+        // --- 安全的自動更新機制 ---
         const AutoUpdateCheck = () => {
             useEffect(() => {
-                const savedVersion = localStorage.getItem('cactpot_version');
-                if (savedVersion !== BUILD_TIMESTAMP) {
-                    localStorage.setItem('cactpot_version', BUILD_TIMESTAMP);
-                    if (savedVersion) window.location.reload(true);
+                try {
+                    const savedVersion = localStorage.getItem('cactpot_version');
+                    if (savedVersion !== BUILD_TIMESTAMP) {
+                        localStorage.setItem('cactpot_version', BUILD_TIMESTAMP);
+                        // 只有在真的讀取到舊版本時才重整，避免第一次進入就重整
+                        if (savedVersion) window.location.reload();
+                    }
+                } catch (e) {
+                    console.warn("Auto update check failed (likely private mode)", e);
                 }
             }, []);
             return null;
@@ -214,6 +223,7 @@
                 payout_btn: "獎金表",
                 mode_on: "無限填數字 (已開啟)",
                 mode_off: "無限填數字 (鎖定中)", 
+                filled_status: "已填寫 {n}/9 格",
                 reveal: "揭開!",
                 row: "橫排",
                 col: "直排",
@@ -282,7 +292,7 @@
             }
         };
 
-        // --- Icons (SVG) ---
+        // --- SVG Icons (Unified Arrows) ---
         const RefreshCw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>;
         const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
         const ChevronDown = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m6 9 6 6 6-6"/></svg>;
@@ -297,11 +307,19 @@
         const Hand = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>;
         const TouchIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19 14v4h-4"/><path d="M15 10V6h4"/><path d="M5 10V6H9"/><path d="M9 14v4H5"/></svg>;
         
-        // ★★★ 統一的 SVG 箭頭圖示 (Unify Arrows) ★★★
+        // Unified SVG Arrows
         const ArrowRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
         const ArrowDown = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>;
         const ArrowDownRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m7 7 10 10"/><path d="M17 7v10H7"/></svg>;
         const ArrowDownLeft = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M17 7 7 17"/><path d="M7 7v10h10"/></svg>;
+
+        const getArrowIcon = (lineId) => {
+            if (lineId <= 2) return <ArrowRight />;
+            if (lineId <= 5) return <ArrowDown />;
+            if (lineId === 6) return <ArrowDownRight />;
+            if (lineId === 7) return <ArrowDownLeft />;
+            return null;
+        };
 
         // --- Logic Constants ---
         const PAYOUTS = {
@@ -336,15 +354,6 @@
             if (mgp === 3600 || mgp === 1800) return "text-fuchsia-300 border-fuchsia-500/40 bg-fuchsia-900/40 font-bold";
             if (mgp === 1080 || mgp === 720) return "text-cyan-300 border-cyan-500/40 bg-cyan-900/40 font-bold"; 
             return "text-[#a8a29e] border-[#57534e]/40 bg-[#1c1917]/60";
-        };
-
-        // --- Helper to get Arrow Component ---
-        const getArrowIcon = (lineId) => {
-            if (lineId <= 2) return <ArrowRight />;
-            if (lineId <= 5) return <ArrowDown />;
-            if (lineId === 6) return <ArrowDownRight />;
-            if (lineId === 7) return <ArrowDownLeft />;
-            return null;
         };
 
         // --- Components ---
@@ -450,11 +459,11 @@
         // Main App
         function MiniCactpotSolver() {
             const [lang, setLang] = useState(() => {
-                return localStorage.getItem('cactpot_lang') || 'zh';
+                try { return localStorage.getItem('cactpot_lang') || 'zh'; } catch(e) { return 'zh'; }
             });
 
             useEffect(() => {
-                localStorage.setItem('cactpot_lang', lang);
+                try { localStorage.setItem('cactpot_lang', lang); } catch(e) {}
                 const currentTitle = LOCALE[lang]['app_title'];
                 document.title = currentTitle;
                 const metaTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
@@ -467,14 +476,16 @@
             const [showPayouts, setShowPayouts] = useState(false);
             
             const [isSoundOn, setIsSoundOn] = useState(() => {
-                const saved = localStorage.getItem('cactpot_sound');
-                return saved === null ? true : saved === 'true'; 
+                try {
+                    const saved = localStorage.getItem('cactpot_sound');
+                    return saved === null ? true : saved === 'true'; 
+                } catch(e) { return true; }
             });
 
             const toggleSound = () => {
                 setIsSoundOn(prev => {
                     const newState = !prev;
-                    localStorage.setItem('cactpot_sound', String(newState)); 
+                    try { localStorage.setItem('cactpot_sound', String(newState)); } catch(e) {}
                     return newState;
                 });
             };
@@ -486,6 +497,14 @@
             const [suggestedCellIndex, setSuggestedCellIndex] = useState(null);
 
             const t = (key) => LOCALE[lang][key] || key;
+
+            const getLineName = (index) => {
+                if (index <= 2) return `${t('row')} ${index + 1}`;
+                if (index <= 5) return `${t('col')} ${index - 2}`;
+                if (index === 6) return `${t('diag')} ↘`;
+                if (index === 7) return `${t('diag')} ↙`;
+                return "";
+            };
 
             const filledCount = board.filter(n => n !== null).length;
             const isSelectionPhase = filledCount < 4; 
@@ -589,8 +608,9 @@
                     newBoard[openSelectorIndex] = val;
                     const newFilledCount = newBoard.filter(n => n !== null).length;
                     
+                    // 音效改成同步呼叫，避免 setTimeout 在 iOS 被擋
                     if (newFilledCount === 4 && filledCount < 4) {
-                        setTimeout(() => sounds.cash(), 100);
+                        sounds.cash();
                     }
                 }
                 
@@ -601,7 +621,7 @@
             const handleReset = () => {
                 setBoard(Array(9).fill(null));
                 setOpenSelectorIndex(null);
-                setTimeout(() => sounds.reset(), 50);
+                sounds.reset();
             };
 
             const handleForceUpdate = () => {
@@ -611,7 +631,7 @@
             }
 
             const Indicator = ({ lineId }) => {
-                const ArrowIcon = getArrowIcon(lineId); // ★★★ 統一使用 SVG 箭頭 ★★★
+                const ArrowIcon = getArrowIcon(lineId);
                 
                 if (!solutions[lineId]) return <div className="w-full h-full opacity-0"></div>;
                 const { ev, chance10k } = solutions[lineId];
@@ -638,7 +658,7 @@
                         </span>
                         </div>
                     )}
-                    <div className={`mt-0.5 ${isBest ? 'text-white animate-pulse drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]' : ''}`}>
+                    <div className={`text-sm mt-0.5 ${isBest ? 'text-white animate-pulse drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]' : ''}`}>
                         {ArrowIcon}
                     </div>
                     </div>
@@ -656,11 +676,10 @@
                         disabled={isLocked}
                         onClick={() => {
                             if (!isLocked) {
+                                // 修正重點：UI 操作優先且同步執行，音效隨後
                                 setOpenSelectorIndex(idx);
-                                setTimeout(() => {
-                                    if (isSuggested && !cellValue) sounds.reveal(); 
-                                    else sounds.click(); 
-                                }, 0);
+                                if (isSuggested && !cellValue) sounds.reveal(); 
+                                else sounds.click(); 
                             }
                         }}
                         className={`
@@ -681,7 +700,7 @@
                         )}
                         
                         {isSuggested && !cellValue && (
-                            <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] animate-bounce border border-white/50 tracking-wider">
                                     {t('reveal')}
                                 </div>
@@ -716,7 +735,7 @@
                             {rankedSolutions.map((sol, rank) => {
                                 const isBest = sol.originalIndex === bestLineIndex;
                                 const name = getLineName(sol.originalIndex);
-                                const ArrowIcon = getArrowIcon(sol.originalIndex); // ★★★ 列表也使用統一箭頭 ★★★
+                                const ArrowIcon = getArrowIcon(sol.originalIndex);
                                 const isExpanded = expandedLine === sol.originalIndex;
                                 
                                 const notablePrizes = sol.allProbs.filter(p => p.mgp >= 720).sort((a, b) => b.mgp - a.mgp);
@@ -854,6 +873,10 @@
                         >
                             <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" /> {t('payout_btn')}
                         </button>
+                    </div>
+
+                    <div className="text-center text-[#d4af37] text-sm mt-1 font-game font-bold drop-shadow-sm">
+                        --- {t('filled_status').replace('{n}', filledCount)} ---
                     </div>
                 </div>
 
