@@ -125,10 +125,67 @@
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
-        // ★★★ 已修正為台灣凌晨時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 01:40"; 
+        // ★★★ 時間更新 ★★★
+        const BUILD_TIMESTAMP = "2025/12/12 02:00"; 
 
-        const { useState, useEffect, useMemo, useRef } = React;
+        const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+        // --- 音效控制器 (Sound Controller) ---
+        // 使用 Web Audio API 避免依賴外部檔案
+        const useSound = (enabled) => {
+            const audioCtxRef = useRef(null);
+
+            const playTone = (freq, type, duration, vol = 0.1) => {
+                if (!enabled) return;
+                try {
+                    const Ctx = window.AudioContext || window.webkitAudioContext;
+                    if (!audioCtxRef.current) audioCtxRef.current = new Ctx();
+                    const ctx = audioCtxRef.current;
+                    if (ctx.state === 'suspended') ctx.resume();
+
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                    
+                    gain.gain.setValueAtTime(vol, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start();
+                    osc.stop(ctx.currentTime + duration);
+                } catch (e) {
+                    console.error("Audio error", e);
+                }
+            };
+
+            const sounds = useMemo(() => ({
+                click: () => playTone(800, 'sine', 0.1, 0.1),
+                select: () => playTone(1200, 'triangle', 0.15, 0.1),
+                clear: () => playTone(300, 'sawtooth', 0.2, 0.1),
+                reset: () => {
+                    if(!enabled) return;
+                    // 模擬洗牌聲
+                    setTimeout(() => playTone(400, 'square', 0.05, 0.05), 0);
+                    setTimeout(() => playTone(500, 'square', 0.05, 0.05), 50);
+                    setTimeout(() => playTone(600, 'square', 0.05, 0.05), 100);
+                },
+                reveal: () => {
+                    if(!enabled) return;
+                    // 魔法琶音 (C Major)
+                    playTone(523.25, 'sine', 0.3, 0.1); // C5
+                    setTimeout(() => playTone(659.25, 'sine', 0.3, 0.1), 50); // E5
+                    setTimeout(() => playTone(783.99, 'sine', 0.3, 0.1), 100); // G5
+                    setTimeout(() => playTone(1046.50, 'sine', 0.5, 0.1), 150); // C6
+                },
+                toggle: () => playTone(200, 'square', 0.05, 0.05)
+            }), [enabled]);
+
+            return sounds;
+        };
 
         // --- 自動更新機制 ---
         const AutoUpdateCheck = () => {
@@ -152,7 +209,7 @@
                 close_hint: "點擊背景關閉",
                 select_num: "選擇數字",
                 clear_cell: "清除",
-                analysis_title: "全部機率分析", 
+                analysis_title: "全部機率分析",
                 click_hint: "(點擊查看詳情)",
                 best_pick: "最佳推薦",
                 rank: "Rank",
@@ -161,7 +218,7 @@
                 reset: "重置盤面",
                 payout_btn: "獎金表",
                 mode_on: "無限填數字 (已開啟)",
-                mode_off: "無限填數字 (解除鎖定)",
+                mode_off: "無限填數字 (鎖定中)", 
                 filled_status: "已填寫 {n}/9 格",
                 reveal: "揭開!",
                 row: "橫排",
@@ -171,7 +228,9 @@
                 label_3600: "3千6",
                 ver_prefix: "版本更新於",
                 force_update: "更新頁面",
-                region: "台北時間"
+                region: "台北時間",
+                sound_on: "音效開啟",
+                sound_off: "音效關閉"
             },
             en: {
                 app_title: "FF14-Cactpot",
@@ -182,15 +241,15 @@
                 select_num: "Select Number",
                 clear_cell: "Clear",
                 analysis_title: "All Probability",
-                click_hint: "(Tap row for details)",
+                click_hint: "(Details)",
                 best_pick: "Recommended",
                 rank: "Rank",
                 guaranteed: "Guaranteed",
                 view_details: "View Details",
                 reset: "Reset Board",
                 payout_btn: "Payouts",
-                mode_on: "Infinite Fill (ON)",
-                mode_off: "Infinite Fill (Unlock)",
+                mode_on: "Infinite Fill (Active)", 
+                mode_off: "Infinite Fill (Locked)", 
                 filled_status: "Filled {n}/9",
                 reveal: "Reveal!",
                 row: "Row",
@@ -200,7 +259,9 @@
                 label_3600: "3.6k",
                 ver_prefix: "Updated",
                 force_update: "Refresh Page",
-                region: "Taipei Time"
+                region: "Taipei Time",
+                sound_on: "Sound ON",
+                sound_off: "Sound OFF"
             },
             ja: {
                 app_title: "FF14-くじテンダー",
@@ -211,15 +272,15 @@
                 select_num: "数字を選択",
                 clear_cell: "クリア",
                 analysis_title: "全確率分析",
-                click_hint: "(行クリックで詳細)",
+                click_hint: "(詳細)",
                 best_pick: "推奨",
                 rank: "順位",
                 guaranteed: "確定",
                 view_details: "詳細を見る",
                 reset: "リセット",
                 payout_btn: "賞金表",
-                mode_on: "無限入力 (ON)",
-                mode_off: "無限入力 (解除)",
+                mode_on: "無限入力 (編集中)",
+                mode_off: "無限入力 (ロック中)",
                 filled_status: "入力済み {n}/9",
                 reveal: "めくる!",
                 row: "横",
@@ -229,7 +290,9 @@
                 label_3600: "3600",
                 ver_prefix: "最終更新",
                 force_update: "ページ更新",
-                region: "台北時間"
+                region: "台北時間",
+                sound_on: "Sound ON",
+                sound_off: "Sound OFF"
             }
         };
 
@@ -243,6 +306,8 @@
         const X = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
         const Sparkles = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
         const RotateCcw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
+        const Volume2 = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
+        const VolumeX = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>;
 
         // --- Logic Constants ---
         const PAYOUTS = {
@@ -274,9 +339,17 @@
             return allPermutations;
         }
 
+        // --- Helper: Get Prize Style ---
+        const getPrizeStyle = (mgp) => {
+            if (mgp === 10000) return "text-[#fcd34d] border-[#fcd34d]/50 bg-yellow-900/40 shadow-[0_0_10px_rgba(252,211,77,0.3)] font-bold"; 
+            if (mgp === 3600 || mgp === 1800) return "text-fuchsia-300 border-fuchsia-500/40 bg-fuchsia-900/40 font-bold";
+            if (mgp === 1080 || mgp === 720) return "text-cyan-300 border-cyan-500/40 bg-cyan-900/40 font-bold"; 
+            return "text-[#a8a29e] border-[#57534e]/40 bg-[#1c1917]/60"; // 深棕色玻璃風格 (安慰獎)
+        };
+
         // --- Components ---
 
-        const PayoutTableModal = ({ isOpen, onClose, t }) => {
+        const PayoutTableModal = ({ isOpen, onClose, t, playSound }) => {
             if (!isOpen) return null;
             
             const sortedPayouts = Object.entries(PAYOUTS).sort((a,b) => Number(a[0]) - Number(b[0]));
@@ -285,25 +358,38 @@
             const rightCol = sortedPayouts.slice(midPoint);
 
             const RowItem = ({ sum, mgp }) => {
-                const isHigh = mgp >= 1800;
+                let rowBgClass = "bg-black/20 border-white/5";
+                let textClass = "text-zinc-400";
+                
+                if (mgp === 10000) {
+                    rowBgClass = "bg-yellow-900/30 border-yellow-500/30";
+                    textClass = "text-[#fcd34d] font-bold drop-shadow";
+                } else if (mgp === 3600 || mgp === 1800) {
+                    rowBgClass = "bg-fuchsia-900/20 border-fuchsia-500/20";
+                    textClass = "text-fuchsia-300 font-bold";
+                } else if (mgp === 1080 || mgp === 720) {
+                    rowBgClass = "bg-cyan-900/20 border-cyan-500/20";
+                    textClass = "text-cyan-300 font-bold";
+                }
+
                 return (
-                    <div className={`flex justify-between items-center p-2 rounded-lg h-9 border-b border-[#d4af37]/20 ${isHigh ? 'bg-[#d4af37]/20' : 'bg-black/20'}`}>
-                        <span className="text-zinc-400 font-mono text-xs">{t('sum')} <span className="text-[#fcd34d] font-bold">{sum}</span></span>
-                        <span className={`font-bold text-sm ${isHigh ? 'text-gold drop-shadow' : 'text-zinc-300'}`}>
-                            {mgp.toLocaleString()} <span className="text-[10px] text-[#d4af37]/70">MGP</span>
+                    <div className={`flex justify-between items-center p-2 rounded-lg h-9 border-b ${rowBgClass}`}>
+                        <span className="text-zinc-400 font-mono text-xs">{t('sum')} <span className="text-white font-bold">{sum}</span></span>
+                        <span className={`text-sm ${textClass}`}>
+                            {mgp.toLocaleString()} <span className="text-[10px] opacity-70">MGP</span>
                         </span>
                     </div>
                 );
             };
 
             return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => { playSound('click'); onClose(); }}>
                     <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden">
                         <div className="p-4 border-b border-[#d4af37]/30 flex items-center justify-between bg-black/30">
                             <h3 className="text-gold font-bold text-lg flex items-center gap-2">
                                 <Trophy className="w-5 h-5 text-[#d4af37]" /> {t('payout_title')}
                             </h3>
-                            <button onClick={onClose} className="text-[#d4af37] hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"><X className="w-6 h-6"/></button>
+                            <button onClick={() => { playSound('click'); onClose(); }} className="text-[#d4af37] hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"><X className="w-6 h-6"/></button>
                         </div>
                         <div className="p-4">
                             <div className="flex gap-4">
@@ -323,10 +409,10 @@
             );
         };
 
-        const NumberSelector = ({ isOpen, onSelect, usedNumbers, currentValue, onClose, t }) => {
+        const NumberSelector = ({ isOpen, onSelect, usedNumbers, currentValue, onClose, t, playSound }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => { playSound('click'); onClose(); }}>
                 <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-3xl p-5 w-full max-w-[320px] grid grid-cols-3 gap-3">
                     <div className="col-span-3 text-center text-gold font-bold mb-3 uppercase tracking-widest text-sm">{t('select_num')}</div>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
@@ -335,7 +421,7 @@
                         <button
                         key={num}
                         disabled={isUsed}
-                        onClick={() => onSelect(num)}
+                        onClick={() => { playSound('select'); onSelect(num); }}
                         className={`
                             h-16 w-16 rounded-full font-bold text-2xl flex items-center justify-center transition-all btn-3d mx-auto
                             ${num === currentValue 
@@ -350,7 +436,7 @@
                         </button>
                     );
                     })}
-                    <button onClick={() => onSelect(null)} className="btn-3d col-span-3 h-12 mt-3 font-bold text-white bg-gradient-to-b from-red-600 to-red-900 border-2 border-red-400 rounded-full flex items-center justify-center uppercase tracking-wider transition-transform shadow-lg">
+                    <button onClick={() => { playSound('clear'); onSelect(null); }} className="btn-3d col-span-3 h-12 mt-3 font-bold text-white bg-gradient-to-b from-red-600 to-red-900 border-2 border-red-400 rounded-full flex items-center justify-center uppercase tracking-wider transition-transform shadow-lg">
                         {t('clear_cell')}
                     </button>
                 </div>
@@ -365,6 +451,31 @@
             const [openSelectorIndex, setOpenSelectorIndex] = useState(null);
             const [isFullFillMode, setIsFullFillMode] = useState(false);
             const [showPayouts, setShowPayouts] = useState(false);
+            
+            // --- 音效狀態管理 (記憶功能) ---
+            const [isSoundOn, setIsSoundOn] = useState(true); // 預設開啟
+
+            useEffect(() => {
+                // 初始化讀取 LocalStorage
+                const savedSound = localStorage.getItem('cactpot_sound');
+                if (savedSound !== null) {
+                    setIsSoundOn(savedSound === 'true');
+                }
+            }, []);
+
+            const toggleSound = () => {
+                const newState = !isSoundOn;
+                setIsSoundOn(newState);
+                localStorage.setItem('cactpot_sound', newState);
+                // 播放一個切換音效，如果切換成開的話
+                if (newState) {
+                    const tempSound = useSound(true); // 暫時取得音效
+                    // 這裡無法直接在 render 內呼叫 useSound hook 產生的函數，
+                    // 但因為 toggleSound 會觸發 re-render，下面的 playSound 會在下次點擊生效
+                }
+            };
+
+            const sounds = useSound(isSoundOn);
             
             const [solutions, setSolutions] = useState([]);
             const [bestLineIndex, setBestLineIndex] = useState(null);
@@ -492,6 +603,7 @@
             const handleReset = () => {
                 setBoard(Array(9).fill(null));
                 setOpenSelectorIndex(null);
+                sounds.reset();
             };
 
             const handleForceUpdate = () => {
@@ -542,7 +654,13 @@
                 return (
                     <button
                         disabled={isLocked}
-                        onClick={() => setOpenSelectorIndex(idx)}
+                        onClick={() => {
+                            if (!isLocked) {
+                                if (isSuggested && !cellValue) sounds.reveal(); // 播放揭示音效
+                                else sounds.click(); // 一般點擊
+                                setOpenSelectorIndex(idx);
+                            }
+                        }}
                         className={`
                             circle-cell w-20 h-20 flex flex-col items-center justify-center text-4xl md:text-5xl font-bold transition-all duration-200 group
                             ${cellValue !== null ? 'filled' : ''}
@@ -581,6 +699,7 @@
                 const [expandedLine, setExpandedLine] = useState(null);
 
                 const toggleExpand = (idx) => {
+                    sounds.click();
                     setExpandedLine(expandedLine === idx ? null : idx);
                 };
 
@@ -598,8 +717,8 @@
                                 const arrow = LINE_ARROWS[sol.originalIndex];
                                 const isExpanded = expandedLine === sol.originalIndex;
                                 
-                                // ★★★ 大獎顯示邏輯升級 ★★★
-                                const bigPrizes = sol.allProbs.filter(p => p.mgp >= 1000).sort((a, b) => b.mgp - a.mgp);
+                                // ★★★ 顯示 720 以上的獎項 (Top 5) ★★★
+                                const notablePrizes = sol.allProbs.filter(p => p.mgp >= 720).sort((a, b) => b.mgp - a.mgp);
 
                                 return (
                                     <div key={sol.originalIndex} className="flex flex-col">
@@ -629,19 +748,10 @@
                                                 
                                                 {/* 徽章顯示區 */}
                                                 <div className="flex flex-wrap justify-end gap-1.5 max-w-[180px]">
-                                                    {bigPrizes.length > 0 ? (
-                                                        bigPrizes.map(p => {
-                                                            // 樣式判斷
-                                                            let badgeStyle = "text-purple-300 border-purple-500/40 bg-purple-900/40"; // 預設紫色 (1000+)
-                                                            let textSize = "text-[10px]";
-                                                            
-                                                            if (p.mgp === 10000) {
-                                                                badgeStyle = "text-[#fcd34d] border-[#fcd34d]/60 bg-yellow-900/60 font-bold shadow-[0_0_8px_rgba(252,211,77,0.4)]";
-                                                                textSize = "text-xs"; // 1萬的字體最大
-                                                            } else if (p.mgp === 3600) {
-                                                                badgeStyle = "text-blue-300 border-blue-400/50 bg-blue-900/50 font-bold";
-                                                                textSize = "text-[11px]"; // 3600 次之
-                                                            }
+                                                    {notablePrizes.length > 0 ? (
+                                                        notablePrizes.map(p => {
+                                                            const badgeStyle = getPrizeStyle(p.mgp);
+                                                            const textSize = p.mgp >= 10000 ? "text-xs" : "text-[10px]";
                                                             
                                                             return (
                                                                 <span key={p.mgp} className={`${textSize} px-1.5 py-0.5 rounded border ${badgeStyle} backdrop-blur-sm flex items-center`}>
@@ -662,16 +772,10 @@
                                             <div className="bg-black/40 p-3 shadow-inner border-t border-[#d4af37]/20 animate-in slide-in-from-top-2 duration-200">
                                                 <div className="grid grid-cols-3 gap-2">
                                                     {sol.allProbs.map((prob) => {
-                                                        const isHigh = prob.mgp >= 1000;
-                                                        
-                                                        let bgClass = "bg-black/30 border-[#d4af37]/10 text-[#d4af37]/70";
-
-                                                        if (isHigh) {
-                                                            bgClass = "bg-gradient-to-br from-[#fcd34d]/10 to-transparent border-[#fcd34d]/30 text-gold drop-shadow-sm";
-                                                        }
+                                                        const badgeStyle = getPrizeStyle(prob.mgp);
 
                                                         return (
-                                                            <div key={prob.mgp} className={`flex flex-col items-center justify-center p-2 rounded-lg border ${bgClass} shadow-sm`}>
+                                                            <div key={prob.mgp} className={`flex flex-col items-center justify-center p-2 rounded-lg border shadow-sm ${badgeStyle} bg-opacity-20`}>
                                                                 <span className="text-xs font-bold">
                                                                     {prob.mgp.toLocaleString()}
                                                                 </span>
@@ -697,12 +801,20 @@
                 
                 <AutoUpdateCheck />
 
-                {/* Language Switcher */}
+                {/* 音效開關 (左上角) */}
+                <button 
+                    onClick={() => { sounds.toggle(); toggleSound(); }}
+                    className="absolute top-4 left-4 z-40 flex items-center gap-1 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full px-3 py-1 shadow-md text-[#d4af37]/60 hover:text-white transition-all"
+                >
+                    {isSoundOn ? <Volume2 className="w-4 h-4 text-[#d4af37]" /> : <VolumeX className="w-4 h-4 text-zinc-500" />}
+                </button>
+
+                {/* Language Switcher (右上角) */}
                 <div className="absolute top-4 right-4 z-40 flex bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full p-1 shadow-md">
                     {['zh', 'en', 'ja'].map(l => (
                         <button 
                             key={l}
-                            onClick={() => setLang(l)}
+                            onClick={() => { sounds.click(); setLang(l); }}
                             className={`px-3 py-1 rounded-full text-xs font-bold uppercase transition-all ${lang === l ? 'bg-[#d4af37] text-black shadow-sm' : 'text-[#d4af37]/60 hover:text-white'}`}
                         >
                             {l === 'zh' ? '繁' : l === 'ja' ? '日' : l}
@@ -736,7 +848,7 @@
                             <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" /> {t('reset')}
                         </button>
                         <button 
-                            onClick={() => setShowPayouts(true)}
+                            onClick={() => { sounds.click(); setShowPayouts(true); }}
                             className="flex-1 py-4 btn-3d bg-gradient-to-b from-[#fcd34d] to-[#b45309] border-2 border-[#fcd34d] rounded-2xl text-[#451a03] font-bold tracking-wider flex items-center justify-center gap-2 shadow-lg group"
                         >
                             <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" /> {t('payout_btn')}
@@ -751,6 +863,7 @@
                 {/* 核心九宮格區域 */}
                 <div className="w-full max-w-[420px] casino-panel rounded-[40px] p-6 flex flex-col justify-center shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
                     <div className="grid grid-cols-[2.2rem_1fr_1fr_1fr_2.2rem] gap-1.5 md:gap-3 items-center justify-items-center w-full">
+                        {/* 指示器 */}
                         <Indicator lineId={6} arrow="↘" /> 
                         <Indicator lineId={3} arrow="⬇" /> 
                         <Indicator lineId={4} arrow="⬇" /> 
@@ -771,7 +884,7 @@
                 {/* --- 無限填數字模式按鈕 --- */}
                 <div className="w-full max-w-[340px] mt-6 flex justify-center">
                     <button 
-                        onClick={() => setIsFullFillMode(!isFullFillMode)}
+                        onClick={() => { sounds.toggle(); setIsFullFillMode(!isFullFillMode); }}
                         className={`
                             px-6 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all border
                             ${isFullFillMode 
@@ -804,12 +917,14 @@
                     onSelect={handleSelect}
                     onClose={() => setOpenSelectorIndex(null)}
                     t={t}
+                    playSound={val => val === 'select' ? sounds.select() : (val === 'clear' ? sounds.clear() : sounds.click())}
                 />
                 
                 <PayoutTableModal 
                     isOpen={showPayouts}
                     onClose={() => setShowPayouts(false)}
                     t={t}
+                    playSound={sounds.click}
                 />
                 </div>
             );
