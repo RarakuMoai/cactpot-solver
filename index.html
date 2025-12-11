@@ -117,14 +117,13 @@
             z-index: 10;
         }
 
-        /* 1萬MGP 特效流光 - 亮度微調版 */
+        /* 1萬MGP 特效流光 - 亮度修正版 */
         @keyframes shimmer {
             0% { background-position: -200% center; }
             100% { background-position: 200% center; }
         }
         .jackpot-row-bg {
-            /* 調整了透明度，使其比上一版稍微亮一點點 */
-            background: linear-gradient(90deg, rgba(212,175,55,0.05), rgba(252,211,77,0.3), rgba(255,255,255,0.5), rgba(252,211,77,0.3), rgba(212,175,55,0.05));
+            background: linear-gradient(90deg, rgba(212,175,55,0.05), rgba(252,211,77,0.35), rgba(255,255,255,0.5), rgba(252,211,77,0.35), rgba(212,175,55,0.05));
             background-size: 200% auto;
             animation: shimmer 3s linear infinite;
         }
@@ -138,16 +137,15 @@
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
-        // ★★★ 更新時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 16:00"; 
+        // ★★★ 更新時間 (GMT+8) ★★★
+        const BUILD_TIMESTAMP = "2025/12/12 04:10"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // --- 音效控制器 (Sound Controller - V7 iOS Warm-up Fix) ---
+        // --- 音效控制器 (Sound Controller) ---
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
-            // 建立並「暖機」AudioContext
             const warmUpAudio = useCallback(() => {
                 if (!audioCtxRef.current) {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -157,11 +155,9 @@
                 }
                 const ctx = audioCtxRef.current;
                 if (ctx) {
-                    // 如果被暫停，恢復它
                     if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
                         ctx.resume().catch(e => console.error(e));
                     }
-                    // ★★★ 關鍵：播放一個極短的無聲 Buffer，強制切換 iOS 音訊通道 ★★★
                     try {
                         const buffer = ctx.createBuffer(1, 1, 22050);
                         const source = ctx.createBufferSource();
@@ -172,7 +168,6 @@
                 }
             }, []);
 
-            // 監聽第一次觸控事件 (One-time listener)
             useEffect(() => {
                 const handleInteraction = () => {
                     warmUpAudio();
@@ -423,8 +418,8 @@
                 let isJackpot = false;
                 
                 if (mgp === 10000) {
-                    // ★★★ 修正：微調了流光的透明度，使其比上一版稍微亮一點，但不刺眼 ★★★
-                    rowBgClass = "border-[#d4af37] relative overflow-hidden shadow-[0_0_10px_rgba(212,175,55,0.2)]";
+                    // ★★★ 修正：流光亮度微調，不刺眼但有高級感 ★★★
+                    rowBgClass = "border-[#d4af37] relative overflow-hidden shadow-[0_0_15px_rgba(212,175,55,0.4)]";
                     textClass = "text-[#fcd34d] font-bold drop-shadow";
                     isJackpot = true;
                 } else if (mgp === 3600 || mgp === 1800) {
@@ -440,7 +435,7 @@
 
                 return (
                     <div className={`flex justify-between items-center px-3 rounded-lg h-9 border ${rowBgClass}`}>
-                        {isJackpot && <div className="absolute inset-0 jackpot-row-bg -z-10 pointer-events-none"></div>}
+                        {isJackpot && <div className="absolute inset-0 jackpot-row-bg -z-10 pointer-events-none opacity-80"></div>}
                         
                         <span className="text-[#d4af37]/70 font-mono text-xs">
                             {t('sum')} <span className="text-white font-bold">{sum}</span>
@@ -810,10 +805,10 @@
                                 
                                 const notablePrizes = sol.allProbs.filter(p => p.mgp >= 720).sort((a, b) => b.mgp - a.mgp);
 
-                                // ★★★ 最佳推薦：中間的「點擊查看詳情」引導 (修正版：移除大圖標，放大文字) ★★★
+                                // ★★★ 最佳推薦：中間的「點擊查看詳細」引導 (字體加大，移除手指圖示) ★★★
                                 const bestPickCenter = isBest ? (
                                     <div className="flex-1 flex items-center justify-center animate-pulse mx-2">
-                                        <span className="text-[#fcd34d] text-sm font-bold tracking-wider whitespace-nowrap drop-shadow-sm">{t('tap_view')}</span>
+                                        <span className="text-[#fcd34d] text-sm font-bold tracking-wider whitespace-nowrap drop-shadow-md border-b border-[#fcd34d]/50 pb-0.5">{t('tap_view')}</span>
                                     </div>
                                 ) : null;
 
@@ -850,23 +845,23 @@
                                                 </span>
                                                 
                                                 <div className="flex flex-wrap justify-end gap-1.5 min-h-[20px]">
-                                                    {isBest ? (
-                                                        // ★★★ 最佳推薦：右側顯示機率標籤 (金錢下方) ★★★
-                                                        <>
-                                                            {sol.chance10k > 0 && (
-                                                                <span className="text-[#fcd34d] font-bold text-xs bg-yellow-900/60 px-2 py-0.5 rounded border border-[#fcd34d]/50 shadow-[0_0_5px_rgba(252,211,77,0.3)]">
-                                                                    10k: {Math.round(sol.chance10k)}%
-                                                                </span>
-                                                            )}
-                                                            {sol.chance3600 > 0 && (
-                                                                <span className="text-fuchsia-300 font-bold text-xs bg-fuchsia-900/60 px-2 py-0.5 rounded border border-fuchsia-500/50">
-                                                                    3.6k: {Math.round(sol.chance3600)}%
-                                                                </span>
-                                                            )}
-                                                        </>
-                                                    ) : (
-                                                        // 一般行：顯示小標籤
-                                                        notablePrizes.length > 0 ? (
+                                                    {/* ★★★ 最佳推薦：右側顯示機率標籤 (金錢下方) ★★★ */}
+                                                    {/* 這次確保只有最佳推薦顯示時，才使用這些樣式，其他行使用原樣式 */}
+                                                    {(isBest || notablePrizes.length > 0) && (
+                                                        isBest ? (
+                                                            <>
+                                                                {sol.chance10k > 0 && (
+                                                                    <span className="text-[#fcd34d] font-bold text-xs bg-yellow-900/60 px-2 py-0.5 rounded border border-[#fcd34d]/50 shadow-[0_0_5px_rgba(252,211,77,0.3)]">
+                                                                        10k: {Math.round(sol.chance10k)}%
+                                                                    </span>
+                                                                )}
+                                                                {sol.chance3600 > 0 && (
+                                                                    <span className="text-fuchsia-300 font-bold text-xs bg-fuchsia-900/60 px-2 py-0.5 rounded border border-fuchsia-500/50">
+                                                                        3.6k: {Math.round(sol.chance3600)}%
+                                                                    </span>
+                                                                )}
+                                                            </>
+                                                        ) : (
                                                             notablePrizes.map(p => {
                                                                 const badgeStyle = getPrizeStyle(p.mgp);
                                                                 const textSize = p.mgp >= 10000 ? "text-xs" : "text-[10px]";
@@ -877,7 +872,7 @@
                                                                     </span>
                                                                 )
                                                             })
-                                                        ) : null 
+                                                        )
                                                     )}
                                                 </div>
                                             </div>
