@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FF14 仙人微彩模擬器</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+    <style>
+        body { -webkit-tap-highlight-color: transparent; }
+        /* 禁止選取文字，讓體驗更像 App */
+        .select-none { user-select: none; -webkit-user-select: none; }
+    </style>
+</head>
+<body class="bg-[#0f0f11] select-none">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+
+        // --- Icons (SVG) ---
+        const RefreshCw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>;
+        const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
+        const ChevronDown = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m6 9 6 6 6-6"/></svg>;
+        const Unlock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>;
+        const Lock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+        const BookOpen = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const X = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
+        const Star = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+
+        // --- Logic Constants ---
+        const PAYOUTS = {
+        6: 10000, 7: 36, 8: 720, 9: 360, 10: 80,
+        11: 252, 12: 108, 13: 72, 14: 54, 15: 180,
+        16: 72, 17: 180, 18: 119, 19: 36, 20: 306,
+        21: 1080, 22: 144, 23: 1800, 24: 3600,
+        };
+
+        const LINES = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+        [0, 4, 8], [2, 4, 6], 
+        ];
+
+        const LINE_NAMES = [
+            "橫排 1 (Row 1)", "橫排 2 (Row 2)", "橫排 3 (Row 3)",
+            "直排 1 (Col 1)", "直排 2 (Col 2)", "直排 3 (Col 3)",
+            "對角 ↘ (Diag 1)", "對角 ↙ (Diag 2)"
+        ];
+
+        const LINE_ARROWS = ["➡", "➡", "➡", "⬇", "⬇", "⬇", "↘", "↙"];
+
+        function getPermutations(arr) {
+        if (arr.length === 0) return [[]];
+        const firstEl = arr[0];
+        const rest = arr.slice(1);
+        const permsWithoutFirst = getPermutations(rest);
+        const allPermutations = [];
+        permsWithoutFirst.forEach((perm) => {
+            for (let i = 0; i <= perm.length; i++) {
+            allPermutations.push([...perm.slice(0, i), firstEl, ...perm.slice(i)]);
+            }
+        });
+        return allPermutations;
+        }
+
+        // --- Components ---
+
+        // 1. Payout Table Modal (Vertical Flow Split)
+        const PayoutTableModal = ({ isOpen, onClose }) => {
+            if (!isOpen) return null;
+            
+            // Sort logic: 6 -> 24
+            const sortedPayouts = Object.entries(PAYOUTS).sort((a,b) => Number(a[0]) - Number(b[0]));
+            
+            // Split into two columns for vertical reading
+            const midPoint = Math.ceil(sortedPayouts.length / 2);
+            const leftCol = sortedPayouts.slice(0, midPoint);
+            const rightCol = sortedPayouts.slice(midPoint);
+
+            const RowItem = ({ sum, mgp }) => {
+                const isHigh = mgp >= 1800;
+                return (
+                    <div className={`flex justify-between items-center p-2 rounded h-9 ${isHigh ? 'bg-gradient-to-r from-yellow-900/40 to-transparent border border-yellow-700/50' : 'bg-zinc-800/50 border border-zinc-700'}`}>
+                        <span className="text-zinc-400 font-mono text-xs">總和 <span className="text-white font-bold">{sum}</span></span>
+                        <span className={`font-bold text-sm ${isHigh ? 'text-[#d4af37]' : 'text-zinc-300'}`}>
+                            ${mgp.toLocaleString()}
+                        </span>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
+                    <div onClick={(e) => e.stopPropagation()} className="bg-[#23232a] border border-[#d4af37] rounded-xl w-full max-w-sm flex flex-col relative shadow-2xl overflow-hidden">
+                        <div className="p-4 border-b border-[#3f3f46] flex items-center justify-between bg-[#18181b]">
+                            <h3 className="text-[#d4af37] font-bold text-lg flex items-center gap-2">
+                                <Trophy className="w-5 h-5" /> 獎金一覽表
+                            </h3>
+                            <button onClick={onClose} className="text-zinc-500 hover:text-white p-1"><X className="w-6 h-6"/></button>
+                        </div>
+                        
+                        <div className="p-4 bg-[#23232a]">
+                            <div className="flex gap-4">
+                                {/* Left Column (6 - 15) */}
+                                <div className="flex-1 space-y-1.5">
+                                    {leftCol.map(([sum, mgp]) => <RowItem key={sum} sum={sum} mgp={mgp} />)}
+                                </div>
+                                {/* Right Column (16 - 24) */}
+                                <div className="flex-1 space-y-1.5">
+                                    {rightCol.map(([sum, mgp]) => <RowItem key={sum} sum={sum} mgp={mgp} />)}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-3 text-center text-xs text-zinc-500 border-t border-[#3f3f46] bg-[#18181b]">
+                            點擊背景關閉
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 2. Number Selector Modal
+        const NumberSelector = ({ isOpen, onSelect, usedNumbers, currentValue, onClose }) => {
+        if (!isOpen) return null;
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
+            <div onClick={(e) => e.stopPropagation()} className="bg-[#2e2e35] border-2 border-[#d4af37] rounded-xl shadow-2xl p-4 w-full max-w-[320px] grid grid-cols-3 gap-3">
+                <div className="col-span-3 text-center text-[#d4af37] font-bold mb-2 uppercase tracking-widest text-sm">選擇數字</div>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
+                const isUsed = usedNumbers.has(num) && num !== currentValue;
+                return (
+                    <button
+                    key={num}
+                    disabled={isUsed}
+                    onClick={() => onSelect(num)}
+                    className={`h-14 rounded-lg font-bold text-2xl flex items-center justify-center transition-all ${num === currentValue ? 'bg-blue-600 text-white ring-2 ring-white/50' : isUsed ? 'bg-gray-800 text-gray-600' : 'bg-[#4a4a55] text-[#e2e2e2] hover:bg-[#d4af37] hover:text-black active:scale-95'}`}
+                    >
+                    {num}
+                    </button>
+                );
+                })}
+                <button onClick={() => onSelect(null)} className="col-span-3 h-10 mt-2 font-bold text-red-300 bg-red-900/30 border border-red-800 rounded-lg flex items-center justify-center uppercase tracking-wider active:scale-95 transition-transform">清除此格</button>
+            </div>
+            </div>
+        );
+        };
+
+        // Main App
+        function MiniCactpotSolver() {
+        const [board, setBoard] = useState(Array(9).fill(null));
+        const [openSelectorIndex, setOpenSelectorIndex] = useState(null);
+        const [isFullFillMode, setIsFullFillMode] = useState(false);
+        const [showPayouts, setShowPayouts] = useState(false);
+        
+        // Results State
+        const [solutions, setSolutions] = useState([]);
+        const [bestLineIndex, setBestLineIndex] = useState(null);
+        const [suggestedCellIndex, setSuggestedCellIndex] = useState(null);
+
+        const filledCount = board.filter(n => n !== null).length;
+        const isSelectionPhase = filledCount < 4; 
+        const showAnalysis = !isSelectionPhase || isFullFillMode;
+
+        const availableNumbers = useMemo(() => {
+            const used = new Set(board.filter((n) => n !== null));
+            return [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((n) => !used.has(n));
+        }, [board]);
+
+        const usedNumbersSet = useMemo(() => new Set(board.filter((n) => n !== null)), [board]);
+
+        // Logic Calculation
+        useEffect(() => {
+            const emptyIndices = board.map((val, idx) => (val === null ? idx : -1)).filter((idx) => idx !== -1);
+            const perms = getPermutations(availableNumbers);
+            const lineStats = LINES.map(() => ({ totalMGP: 0, chance10k: 0, chance3600: 0, counts: 0 }));
+            const cellImpactScore = Array(9).fill(0); 
+
+            perms.forEach((perm) => {
+            const tempBoard = [...board];
+            perm.forEach((val, i) => tempBoard[emptyIndices[i]] = val);
+
+            LINES.forEach((lineIndices, lineId) => {
+                const sum = tempBoard[lineIndices[0]] + tempBoard[lineIndices[1]] + tempBoard[lineIndices[2]];
+                const payout = PAYOUTS[sum] || 0;
+                
+                lineStats[lineId].totalMGP += payout;
+                lineStats[lineId].counts++;
+                
+                const isJackpot = sum === 6; 
+                const isSecond = sum === 24; 
+                
+                if (isJackpot) lineStats[lineId].chance10k++;
+                if (isSecond) lineStats[lineId].chance3600++;
+
+                if (isSelectionPhase && (isJackpot || isSecond)) {
+                    lineIndices.forEach(cellIdx => {
+                        if (board[cellIdx] === null) {
+                            cellImpactScore[cellIdx] += isJackpot ? 10 : 1; 
+                        }
+                    });
+                }
+            });
+            });
+
+            const results = lineStats.map(stat => {
+                if (stat.counts === 0) return { ev: 0, chance10k: 0, chance3600: 0 };
+                return {
+                    ev: Math.floor(stat.totalMGP / stat.counts),
+                    chance10k: (stat.chance10k / stat.counts) * 100,
+                    chance3600: (stat.chance3600 / stat.counts) * 100,
+                };
+            });
+            setSolutions(results);
+            const maxEV = Math.max(...results.map(r => r.ev));
+            setBestLineIndex(results.findIndex(r => r.ev === maxEV));
+
+            if (isSelectionPhase && filledCount > 0) {
+                let maxScore = -1;
+                let bestCell = -1;
+                cellImpactScore.forEach((score, idx) => {
+                    if (score > maxScore && board[idx] === null) maxScore = score, bestCell = idx;
+                });
+                if (bestCell === -1) {
+                    const priority = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+                    bestCell = priority.find(idx => board[idx] === null) ?? -1;
+                }
+                setSuggestedCellIndex(bestCell);
+            } else {
+                setSuggestedCellIndex(null);
+            }
+        }, [board, availableNumbers, filledCount, isSelectionPhase, isFullFillMode]);
+
+        const handleSelect = (val) => {
+            const newBoard = [...board];
+            if (val !== null) {
+            const existingIdx = newBoard.indexOf(val);
+            if (existingIdx !== -1) newBoard[existingIdx] = null;
+            }
+            if (openSelectorIndex !== null) newBoard[openSelectorIndex] = val;
+            setBoard(newBoard);
+            setOpenSelectorIndex(null);
+        };
+
+        const handleReset = () => {
+            setBoard(Array(9).fill(null));
+            setOpenSelectorIndex(null);
+        };
+
+        // --- Visual Components ---
+        
+        // Indicator
+        const Indicator = ({ lineId, arrow }) => {
+            if (!solutions[lineId]) return <div className="w-full h-full opacity-0"></div>;
+            const { ev, chance10k } = solutions[lineId];
+            const isBest = showAnalysis && lineId === bestLineIndex;
+            const displayEv = ev >= 1000 ? (ev/1000).toFixed(1).replace('.0','') + 'k' : ev;
+
+            return (
+            <div className={`flex items-center justify-center w-full h-full p-0.5`}>
+                <div className={`
+                relative flex flex-col items-center justify-center w-[3rem] h-[3rem] rounded-lg border backdrop-blur-md transition-all duration-300
+                ${isBest 
+                    ? 'bg-gradient-to-b from-green-800 to-green-950 border-green-500 text-white shadow-[0_0_10px_rgba(74,222,128,0.4)] z-10 scale-105' 
+                    : 'bg-[#27272a] border-[#3f3f46] text-[#71717a] opacity-80'}
+                `}>
+                <span className={`text-[10px] md:text-xs font-bold leading-none flex items-center justify-center ${isBest ? 'text-white' : 'text-[#a1a1aa]'}`}>
+                    <span className={`mr-[1px] ${isBest ? 'text-yellow-300' : 'text-[#d4af37]'}`}>$</span>
+                    {displayEv}
+                </span>
+
+                {chance10k > 0 && (
+                    <div className="absolute -top-1 -right-1">
+                    <span className="flex h-2 w-2 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                    </span>
+                    </div>
+                )}
+                <div className={`text-xs mt-0.5 ${isBest ? 'text-white animate-pulse' : 'text-[#52525b]'}`}>
+                    {arrow}
+                </div>
+                </div>
+            </div>
+            );
+        };
+
+        // Game Cell
+        const GameCell = ({ idx }) => {
+            const cellValue = board[idx];
+            const isSuggested = isSelectionPhase && idx === suggestedCellIndex;
+            const isLocked = !isFullFillMode && (cellValue === null && filledCount >= 4);
+
+            return (
+                <button
+                    disabled={isLocked}
+                    onClick={() => setOpenSelectorIndex(idx)}
+                    className={`
+                        relative w-full h-full aspect-square rounded-xl flex flex-col items-center justify-center text-4xl md:text-5xl font-bold transition-all duration-150 group
+                        border-[3px] 
+                        ${cellValue !== null 
+                            ? 'bg-gradient-to-br from-[#f3eacb] to-[#cba955] text-[#2a2a32] border-[#f2e6c2] shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]' 
+                            : isLocked
+                                ? 'bg-[#18181b] border-[#27272a] cursor-not-allowed opacity-30'
+                                : 'bg-[#27272a] text-transparent border-[#3f3f46] active:bg-[#33333d]'
+                        }
+                        ${isSuggested ? 'ring-4 ring-blue-500/80 z-20 shadow-[0_0_25px_rgba(59,130,246,0.6)]' : ''}
+                    `}
+                >
+                    {cellValue ? (
+                        <span className="drop-shadow-sm font-serif">{cellValue}</span>
+                    ) : (
+                        !isLocked && <ChevronDown className="w-5 h-5 text-[#52525b] opacity-50" />
+                    )}
+                    
+                    {isSuggested && !cellValue && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="bg-blue-600/90 text-white text-[10px] px-2 py-1 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
+                                揭開
+                            </div>
+                        </div>
+                    )}
+                </button>
+            );
+        }
+
+        // Analysis List
+        const AnalysisList = () => {
+            if (!showAnalysis || solutions.length === 0) return null;
+
+            const rankedSolutions = solutions
+                .map((sol, index) => ({ ...sol, originalIndex: index }))
+                .sort((a, b) => b.ev - a.ev);
+
+            return (
+                <div className="w-full max-w-[400px] mt-6 animate-in slide-in-from-bottom-4 fade-in duration-500">
+                    <div className="flex items-center gap-2 mb-2 px-1">
+                        <div className="h-4 w-1 bg-[#d4af37] rounded-full"></div>
+                        <h3 className="text-[#d4af37] font-bold text-sm tracking-wider uppercase">全方案風險分析</h3>
+                    </div>
+                    <div className="bg-[#23232a] border border-[#3f3f46] rounded-xl overflow-hidden divide-y divide-[#3f3f46] shadow-xl">
+                        {rankedSolutions.map((sol, rank) => {
+                            const isBest = sol.originalIndex === bestLineIndex;
+                            const name = LINE_NAMES[sol.originalIndex];
+                            const arrow = LINE_ARROWS[sol.originalIndex];
+
+                            return (
+                                <div key={sol.originalIndex} className={`flex items-center justify-between p-3 ${isBest ? 'bg-gradient-to-r from-green-900/30 to-transparent' : 'hover:bg-[#27272a]'}`}>
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-6 h-6 flex items-center justify-center rounded font-bold text-xs ${isBest ? 'bg-green-600 text-white' : 'bg-zinc-700 text-zinc-400'}`}>
+                                            {arrow}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className={`text-sm font-bold ${isBest ? 'text-green-400' : 'text-zinc-300'}`}>{name}</span>
+                                            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">{isBest ? '最佳推薦' : `Rank #${rank+1}`}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="text-right flex flex-col items-end">
+                                        <span className={`font-bold font-mono text-sm ${isBest ? 'text-[#d4af37]' : 'text-white'}`}>
+                                            ${Math.floor(sol.ev).toLocaleString()}
+                                        </span>
+                                        <div className="flex gap-2 text-[10px] mt-0.5">
+                                            <span className={sol.chance10k > 0 ? 'text-yellow-500' : 'text-zinc-600'}>
+                                                1萬: {sol.chance10k.toFixed(0)}%
+                                            </span>
+                                            <span className={sol.chance3600 > 0 ? 'text-blue-400' : 'text-zinc-600'}>
+                                                3千6: {sol.chance3600.toFixed(0)}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        return (
+            <div className="min-h-screen bg-[#0f0f11] text-[#e2e2e2] flex flex-col items-center justify-center py-6 px-2 font-sans overflow-x-hidden pb-20">
+            
+            {/* Header */}
+            <div className="w-full max-w-md mb-6 text-center relative shrink-0">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-[#d4af37]/20 blur-[50px] rounded-full pointer-events-none"></div>
+                <div className="relative flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-3">
+                    <Trophy className="w-6 h-6 text-[#d4af37]" />
+                    <h1 className="text-2xl md:text-3xl font-serif font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-[#f3eacb] to-[#b89542] drop-shadow-sm">
+                        仙人微彩模擬器
+                    </h1>
+                    <Trophy className="w-6 h-6 text-[#d4af37]" />
+                    </div>
+                    <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-[#d4af37]/50 to-transparent"></div>
+                </div>
+            </div>
+
+            {/* Grid */}
+            <div className="w-full max-w-[400px] aspect-[4/5] flex flex-col justify-center shrink-0">
+                <div className="grid grid-cols-[3.5rem_1fr_1fr_1fr_3.5rem] gap-1.5 md:gap-2 items-center justify-items-center w-full">
+                    <Indicator lineId={6} arrow="↘" /> 
+                    <Indicator lineId={3} arrow="⬇" /> 
+                    <Indicator lineId={4} arrow="⬇" /> 
+                    <Indicator lineId={5} arrow="⬇" /> 
+                    <Indicator lineId={7} arrow="↙" /> 
+
+                    <Indicator lineId={0} arrow="➡" />
+                    <GameCell idx={0} /> <GameCell idx={1} /> <GameCell idx={2} /> <div />
+
+                    <Indicator lineId={1} arrow="➡" />
+                    <GameCell idx={3} /> <GameCell idx={4} /> <GameCell idx={5} /> <div />
+
+                    <Indicator lineId={2} arrow="➡" />
+                    <GameCell idx={6} /> <GameCell idx={7} /> <GameCell idx={8} /> <div />
+                </div>
+            </div>
+            
+            {/* Analysis Table */}
+            <AnalysisList />
+
+            {/* Footer Controls */}
+            <div className="mt-8 flex flex-col w-full max-w-[320px] gap-3 shrink-0">
+                <div className="flex gap-2">
+                    <button 
+                        onClick={handleReset}
+                        className="flex-1 py-3 bg-[#27272a] hover:bg-[#3f3f46] border border-[#3f3f46] rounded-lg text-red-400 font-bold tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg"
+                    >
+                        <RefreshCw className="w-4 h-4" /> 重置
+                    </button>
+                    <button 
+                        onClick={() => setShowPayouts(true)}
+                        className="flex-1 py-3 bg-[#27272a] hover:bg-[#3f3f46] border border-[#3f3f46] rounded-lg text-[#d4af37] font-bold tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg"
+                    >
+                        <BookOpen className="w-4 h-4" /> 獎金表
+                    </button>
+                </div>
+
+                <button 
+                    onClick={() => setIsFullFillMode(!isFullFillMode)}
+                    className={`
+                        w-full py-3 border rounded-lg font-bold tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg
+                        ${isFullFillMode 
+                            ? 'bg-blue-900/20 border-blue-500/50 text-blue-400' 
+                            : 'bg-[#27272a] border-[#3f3f46] text-zinc-400 hover:text-zinc-200'}
+                    `}
+                >
+                    {isFullFillMode ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                    {isFullFillMode ? "全填模式 (已開啟)" : "全填模式 (解除限制)"}
+                </button>
+
+                <div className="text-center text-zinc-600 text-xs mt-1 font-mono">
+                    已填寫 {filledCount}/9 格
+                </div>
+            </div>
+
+            <NumberSelector 
+                isOpen={openSelectorIndex !== null}
+                currentValue={openSelectorIndex !== null ? board[openSelectorIndex] : null}
+                usedNumbers={usedNumbersSet}
+                onSelect={handleSelect}
+                onClose={() => setOpenSelectorIndex(null)}
+            />
+            
+            <PayoutTableModal 
+                isOpen={showPayouts}
+                onClose={() => setShowPayouts(false)}
+            />
+            </div>
+        );
+        }
+
+        // Render to DOM
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<MiniCactpotSolver />);
+    </script>
+</body>
+</html>
