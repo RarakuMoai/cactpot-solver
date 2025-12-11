@@ -95,7 +95,6 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,1), 0 4px 10px rgba(0,0,0,0.5);
             position: relative;
             overflow: hidden;
-            /* 關鍵修正：允許操作 */
             touch-action: manipulation;
         }
         .circle-cell.filled {
@@ -128,11 +127,11 @@
 
     <script type="text/babel">
         // ★★★ 更新時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 02:25"; 
+        const BUILD_TIMESTAMP = "2025/12/12 02:40"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // --- 音效控制器 (Sound Controller) ---
+        // --- 音效控制器 ---
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
@@ -149,37 +148,32 @@
 
                     osc.type = type;
                     osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
-                    
                     gain.gain.setValueAtTime(vol, ctx.currentTime + startTime);
                     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + startTime + duration);
-
                     osc.connect(gain);
                     gain.connect(ctx.destination);
-
                     osc.start(ctx.currentTime + startTime);
                     osc.stop(ctx.currentTime + startTime + duration);
-                } catch (e) {
-                    console.error("Audio error", e);
-                }
+                } catch (e) { }
             }, [enabled]);
 
             const sounds = useMemo(() => ({
-                click: () => playTone(800, 'sine', 0.1, 0.1), // 基礎點擊
-                reset: () => { // 洗牌聲
+                click: () => playTone(800, 'sine', 0.1, 0.1),
+                reset: () => {
                     if(!enabled) return;
                     playTone(400, 'square', 0.05, 0.05, 0);
                     playTone(500, 'square', 0.05, 0.05, 0.05);
                     playTone(600, 'square', 0.05, 0.05, 0.1);
                 },
-                toggle: () => playTone(300, 'square', 0.1, 0.05), // 開關聲
-                cash: () => { // ★★★ 撒錢音效 ★★★
+                toggle: () => playTone(300, 'square', 0.1, 0.05),
+                cash: () => {
                     if(!enabled) return;
                     playTone(2000, 'sine', 0.4, 0.1, 0);
                     playTone(2500, 'sine', 0.4, 0.1, 0.05);
                     playTone(3000, 'sine', 0.5, 0.08, 0.1);
                     playTone(4000, 'triangle', 0.2, 0.05, 0.15);
                 },
-                reveal: () => { // 揭示音效 (琶音)
+                reveal: () => {
                      if(!enabled) return;
                      playTone(523.25, 'sine', 0.2, 0.1);
                      setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50);
@@ -189,7 +183,6 @@
             return sounds;
         };
 
-        // --- 自動更新機制 ---
         const AutoUpdateCheck = () => {
             useEffect(() => {
                 const savedVersion = localStorage.getItem('cactpot_version');
@@ -201,7 +194,7 @@
             return null;
         };
 
-        // --- Localization Dictionary ---
+        // --- Localization ---
         const LOCALE = {
             zh: {
                 app_title: "FF14-仙人微彩",
@@ -212,16 +205,15 @@
                 select_num: "選擇數字",
                 clear_cell: "清除",
                 analysis_title: "全部機率分析",
-                click_hint: "(點擊查看詳情)",
+                click_hint: "點擊行查看",
                 best_pick: "最佳推薦",
                 rank: "Rank",
                 guaranteed: "保底",
-                view_details: "詳細機率",
+                view_details: "查看詳情",
                 reset: "重置盤面",
                 payout_btn: "獎金表",
                 mode_on: "無限填數字 (已開啟)",
                 mode_off: "無限填數字 (鎖定中)", 
-                filled_status: "已填寫 {n}/9 格",
                 reveal: "揭開!",
                 row: "橫排",
                 col: "直排",
@@ -231,8 +223,6 @@
                 ver_prefix: "版本更新於",
                 force_update: "更新頁面",
                 region: "台北時間",
-                sound_on: "音效開啟",
-                sound_off: "音效關閉"
             },
             en: {
                 app_title: "FF14-Cactpot",
@@ -243,7 +233,7 @@
                 select_num: "Select Number",
                 clear_cell: "Clear",
                 analysis_title: "All Probability",
-                click_hint: "(Details)",
+                click_hint: "Tap row",
                 best_pick: "Recommended",
                 rank: "Rank",
                 guaranteed: "Guaranteed",
@@ -252,7 +242,6 @@
                 payout_btn: "Payouts",
                 mode_on: "Infinite Fill (Active)", 
                 mode_off: "Infinite Fill (Locked)", 
-                filled_status: "Filled {n}/9",
                 reveal: "Reveal!",
                 row: "Row",
                 col: "Col",
@@ -262,8 +251,6 @@
                 ver_prefix: "Updated",
                 force_update: "Refresh Page",
                 region: "Taipei Time",
-                sound_on: "Sound ON",
-                sound_off: "Sound OFF"
             },
             ja: {
                 app_title: "FF14-くじテンダー",
@@ -274,7 +261,7 @@
                 select_num: "数字を選択",
                 clear_cell: "クリア",
                 analysis_title: "全確率分析",
-                click_hint: "(詳細)",
+                click_hint: "行をタップ",
                 best_pick: "推奨",
                 rank: "順位",
                 guaranteed: "確定",
@@ -283,7 +270,6 @@
                 payout_btn: "賞金表",
                 mode_on: "無限入力 (編集中)",
                 mode_off: "無限入力 (ロック中)",
-                filled_status: "入力済み {n}/9",
                 reveal: "めくる!",
                 row: "横",
                 col: "縦",
@@ -293,8 +279,6 @@
                 ver_prefix: "最終更新",
                 force_update: "ページ更新",
                 region: "台北時間",
-                sound_on: "Sound ON",
-                sound_off: "Sound OFF"
             }
         };
 
@@ -310,6 +294,14 @@
         const RotateCcw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
         const Volume2 = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
         const VolumeX = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>;
+        const Hand = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>;
+        const TouchIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19 14v4h-4"/><path d="M15 10V6h4"/><path d="M5 10V6H9"/><path d="M9 14v4H5"/></svg>;
+        
+        // ★★★ 統一的 SVG 箭頭圖示 (Unify Arrows) ★★★
+        const ArrowRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
+        const ArrowDown = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>;
+        const ArrowDownRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m7 7 10 10"/><path d="M17 7v10H7"/></svg>;
+        const ArrowDownLeft = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M17 7 7 17"/><path d="M7 7v10h10"/></svg>;
 
         // --- Logic Constants ---
         const PAYOUTS = {
@@ -325,8 +317,6 @@
             [0, 4, 8], [2, 4, 6], 
         ];
 
-        const LINE_ARROWS = ["➡", "➡", "➡", "⬇", "⬇", "⬇", "↘", "↙"];
-
         function getPermutations(arr) {
             if (arr.length === 0) return [[]];
             const firstEl = arr[0];
@@ -341,12 +331,20 @@
             return allPermutations;
         }
 
-        // --- Helper: Get Prize Style ---
         const getPrizeStyle = (mgp) => {
             if (mgp === 10000) return "text-[#fcd34d] border-[#fcd34d]/50 bg-yellow-900/40 shadow-[0_0_10px_rgba(252,211,77,0.3)] font-bold"; 
             if (mgp === 3600 || mgp === 1800) return "text-fuchsia-300 border-fuchsia-500/40 bg-fuchsia-900/40 font-bold";
             if (mgp === 1080 || mgp === 720) return "text-cyan-300 border-cyan-500/40 bg-cyan-900/40 font-bold"; 
-            return "text-[#a8a29e] border-[#57534e]/40 bg-[#1c1917]/60"; // 深棕色玻璃風格 (安慰獎)
+            return "text-[#a8a29e] border-[#57534e]/40 bg-[#1c1917]/60";
+        };
+
+        // --- Helper to get Arrow Component ---
+        const getArrowIcon = (lineId) => {
+            if (lineId <= 2) return <ArrowRight />;
+            if (lineId <= 5) return <ArrowDown />;
+            if (lineId === 6) return <ArrowDownRight />;
+            if (lineId === 7) return <ArrowDownLeft />;
+            return null;
         };
 
         // --- Components ---
@@ -360,23 +358,26 @@
             const rightCol = sortedPayouts.slice(midPoint);
 
             const RowItem = ({ sum, mgp }) => {
-                let rowBgClass = "bg-black/20 border-white/5";
-                let textClass = "text-zinc-400";
+                let rowBgClass = "bg-white/5 border-white/10";
+                let textClass = "text-zinc-300";
                 
                 if (mgp === 10000) {
-                    rowBgClass = "bg-yellow-900/30 border-yellow-500/30";
+                    rowBgClass = "bg-gradient-to-r from-yellow-600/30 to-yellow-900/30 border-yellow-500/40";
                     textClass = "text-[#fcd34d] font-bold drop-shadow";
                 } else if (mgp === 3600 || mgp === 1800) {
-                    rowBgClass = "bg-fuchsia-900/20 border-fuchsia-500/20";
+                    rowBgClass = "bg-gradient-to-r from-fuchsia-600/20 to-fuchsia-900/20 border-fuchsia-500/30";
                     textClass = "text-fuchsia-300 font-bold";
                 } else if (mgp === 1080 || mgp === 720) {
-                    rowBgClass = "bg-cyan-900/20 border-cyan-500/20";
+                    rowBgClass = "bg-gradient-to-r from-cyan-600/20 to-cyan-900/20 border-cyan-500/30";
                     textClass = "text-cyan-300 font-bold";
+                } else {
+                    rowBgClass = "bg-[#d4af37]/10 border-[#d4af37]/20";
+                    textClass = "text-[#d4af37]/80";
                 }
 
                 return (
-                    <div className={`flex justify-between items-center p-2 rounded-lg h-9 border-b ${rowBgClass}`}>
-                        <span className="text-zinc-400 font-mono text-xs">{t('sum')} <span className="text-white font-bold">{sum}</span></span>
+                    <div className={`flex justify-between items-center p-2 rounded-lg h-9 border ${rowBgClass}`}>
+                        <span className="text-[#d4af37]/70 font-mono text-xs">{t('sum')} <span className="text-white font-bold">{sum}</span></span>
                         <span className={`text-sm ${textClass}`}>
                             {mgp.toLocaleString()} <span className="text-[10px] opacity-70">MGP</span>
                         </span>
@@ -423,7 +424,7 @@
                         <button
                         key={num}
                         disabled={isUsed}
-                        onClick={() => { onSelect(num); /* No sound here as requested */ }}
+                        onClick={() => { onSelect(num); }}
                         className={`
                             h-16 w-16 rounded-full font-bold text-2xl flex items-center justify-center transition-all btn-3d mx-auto
                             ${num === currentValue 
@@ -438,7 +439,7 @@
                         </button>
                     );
                     })}
-                    <button onClick={() => { onSelect(null); /* No sound here as requested */ }} className="btn-3d col-span-3 h-12 mt-3 font-bold text-white bg-gradient-to-b from-red-600 to-red-900 border-2 border-red-400 rounded-full flex items-center justify-center uppercase tracking-wider transition-transform shadow-lg">
+                    <button onClick={() => { onSelect(null); }} className="btn-3d col-span-3 h-12 mt-3 font-bold text-white bg-gradient-to-b from-red-600 to-red-900 border-2 border-red-400 rounded-full flex items-center justify-center uppercase tracking-wider transition-transform shadow-lg">
                         {t('clear_cell')}
                     </button>
                 </div>
@@ -448,7 +449,6 @@
 
         // Main App
         function MiniCactpotSolver() {
-            // --- 語言狀態管理 ---
             const [lang, setLang] = useState(() => {
                 return localStorage.getItem('cactpot_lang') || 'zh';
             });
@@ -466,7 +466,6 @@
             const [isFullFillMode, setIsFullFillMode] = useState(false);
             const [showPayouts, setShowPayouts] = useState(false);
             
-            // --- 音效狀態管理 (Fix: 確保布林值正確讀取) ---
             const [isSoundOn, setIsSoundOn] = useState(() => {
                 const saved = localStorage.getItem('cactpot_sound');
                 return saved === null ? true : saved === 'true'; 
@@ -487,14 +486,6 @@
             const [suggestedCellIndex, setSuggestedCellIndex] = useState(null);
 
             const t = (key) => LOCALE[lang][key] || key;
-
-            const getLineName = (index) => {
-                if (index <= 2) return `${t('row')} ${index + 1}`;
-                if (index <= 5) return `${t('col')} ${index - 2}`;
-                if (index === 6) return `${t('diag')} ↘`;
-                if (index === 7) return `${t('diag')} ↙`;
-                return "";
-            };
 
             const filledCount = board.filter(n => n !== null).length;
             const isSelectionPhase = filledCount < 4; 
@@ -598,7 +589,6 @@
                     newBoard[openSelectorIndex] = val;
                     const newFilledCount = newBoard.filter(n => n !== null).length;
                     
-                    // 填入第4個數字時播放撒錢音效
                     if (newFilledCount === 4 && filledCount < 4) {
                         setTimeout(() => sounds.cash(), 100);
                     }
@@ -620,7 +610,9 @@
                 }
             }
 
-            const Indicator = ({ lineId, arrow }) => {
+            const Indicator = ({ lineId }) => {
+                const ArrowIcon = getArrowIcon(lineId); // ★★★ 統一使用 SVG 箭頭 ★★★
+                
                 if (!solutions[lineId]) return <div className="w-full h-full opacity-0"></div>;
                 const { ev, chance10k } = solutions[lineId];
                 const isBest = showAnalysis && lineId === bestLineIndex;
@@ -646,15 +638,14 @@
                         </span>
                         </div>
                     )}
-                    <div className={`text-sm mt-0.5 ${isBest ? 'text-white animate-pulse drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]' : ''}`}>
-                        {arrow}
+                    <div className={`mt-0.5 ${isBest ? 'text-white animate-pulse drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]' : ''}`}>
+                        {ArrowIcon}
                     </div>
                     </div>
                 </div>
                 );
             };
 
-            // ★★★ Fix: 確保點擊有效，音效為輔 ★★★
             const GameCell = ({ idx }) => {
                 const cellValue = board[idx];
                 const isSuggested = isSelectionPhase && idx === suggestedCellIndex;
@@ -665,9 +656,7 @@
                         disabled={isLocked}
                         onClick={() => {
                             if (!isLocked) {
-                                // 先執行狀態更新 (UI反饋最優先)
                                 setOpenSelectorIndex(idx);
-                                // 音效延後一點點，確保不阻塞 UI
                                 setTimeout(() => {
                                     if (isSuggested && !cellValue) sounds.reveal(); 
                                     else sounds.click(); 
@@ -691,7 +680,6 @@
                             !isLocked && <Sparkles className={`w-6 h-6 ${isSuggested ? 'text-white animate-pulse' : 'text-[#d4af37]/30'}`} />
                         )}
                         
-                        {/* 這裡移除了 pointer-events-none，讓點擊自然冒泡 */}
                         {isSuggested && !cellValue && (
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] animate-bounce border border-white/50 tracking-wider">
@@ -720,15 +708,15 @@
                 return (
                     <div className="w-full max-w-[400px] mt-8 animate-in slide-in-from-bottom-4 fade-in duration-500">
                         <div className="flex items-center gap-2 mb-3 px-2">
-                            <Sparkles className="w-5 h-5 text-[#d4af37] animate-pulse" />
+                            <Hand className="w-5 h-5 text-[#fcd34d] animate-bounce" /> 
                             <h3 className="text-gold font-bold text-base tracking-wider uppercase drop-shadow-sm">{t('analysis_title')}</h3>
-                            <span className="text-[10px] text-[#d4af37]/60 ml-auto">{t('click_hint')}</span>
+                            <span className="text-[10px] text-[#fcd34d]/80 ml-auto animate-pulse">{t('click_hint')}</span>
                         </div>
                         <div className="casino-panel rounded-2xl overflow-hidden divide-y divide-[#d4af37]/20">
                             {rankedSolutions.map((sol, rank) => {
                                 const isBest = sol.originalIndex === bestLineIndex;
                                 const name = getLineName(sol.originalIndex);
-                                const arrow = LINE_ARROWS[sol.originalIndex];
+                                const ArrowIcon = getArrowIcon(sol.originalIndex); // ★★★ 列表也使用統一箭頭 ★★★
                                 const isExpanded = expandedLine === sol.originalIndex;
                                 
                                 const notablePrizes = sol.allProbs.filter(p => p.mgp >= 720).sort((a, b) => b.mgp - a.mgp);
@@ -738,14 +726,14 @@
                                         <button 
                                             onClick={() => toggleExpand(sol.originalIndex)}
                                             className={`
-                                                w-full flex items-center justify-between p-3 transition-all text-left border-l-4
+                                                w-full flex items-center justify-between p-3 transition-all text-left border-l-4 group
                                                 ${isBest ? 'bg-gradient-to-r from-green-900/50 to-transparent border-green-500' : 'hover:bg-white/5 border-transparent'}
                                                 ${isExpanded ? 'bg-black/40' : ''}
                                             `}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm shadow-inner border ${isBest ? 'bg-green-700 border-green-400 text-white shadow-[0_0_10px_rgba(0,255,0,0.3)]' : 'bg-black/40 border-[#d4af37]/20 text-[#d4af37]/60'}`}>
-                                                    {arrow}
+                                                    {ArrowIcon}
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className={`text-sm font-bold ${isBest ? 'text-green-400 drop-shadow' : 'text-zinc-300'}`}>{name}</span>
@@ -753,13 +741,11 @@
                                                 </div>
                                             </div>
                                             
-                                            {/* 右側資訊區 */}
                                             <div className="flex flex-col items-end gap-1">
                                                 <span className={`font-bold font-mono text-base ${isBest ? 'text-gold drop-shadow-sm' : 'text-zinc-300'}`}>
                                                     ${Math.floor(sol.ev).toLocaleString()}
                                                 </span>
                                                 
-                                                {/* 徽章顯示區 */}
                                                 <div className="flex flex-wrap justify-end gap-1.5 max-w-[180px]">
                                                     {notablePrizes.length > 0 ? (
                                                         notablePrizes.map(p => {
@@ -774,13 +760,19 @@
                                                             )
                                                         })
                                                     ) : (
-                                                        <span className="text-[#d4af37]/50 text-[10px]">{t('view_details')}</span>
+                                                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full border border-[#d4af37]/40 bg-[#d4af37]/10 text-[#d4af37] text-[10px] shadow-sm group-hover:bg-[#d4af37]/20 transition-colors">
+                                                            <TouchIcon className="w-3 h-3" />
+                                                            {t('view_details')}
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
+                                            
+                                            <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <ChevronDown className="w-4 h-4 text-[#fcd34d] drop-shadow-[0_0_5px_rgba(252,211,77,0.8)]"/>
+                                            </div>
                                         </button>
 
-                                        {/* Expanded Details */}
                                         {isExpanded && (
                                             <div className="bg-black/40 p-3 shadow-inner border-t border-[#d4af37]/20 animate-in slide-in-from-top-2 duration-200">
                                                 <div className="grid grid-cols-3 gap-2">
@@ -814,7 +806,6 @@
                 
                 <AutoUpdateCheck />
 
-                {/* 音效開關 (左上角) - 放大按鈕 */}
                 <button 
                     onClick={() => { toggleSound(); setTimeout(() => sounds.toggle(), 0); }}
                     className="absolute top-4 left-4 z-40 flex items-center justify-center w-12 h-12 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37]/60 hover:text-white transition-all active:scale-95"
@@ -822,7 +813,6 @@
                     {isSoundOn ? <Volume2 className="w-6 h-6 text-[#d4af37]" /> : <VolumeX className="w-6 h-6 text-zinc-500" />}
                 </button>
 
-                {/* Language Switcher (右上角) */}
                 <div className="absolute top-4 right-4 z-40 flex bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full p-1 shadow-md">
                     {['zh', 'en', 'ja'].map(l => (
                         <button 
@@ -835,7 +825,6 @@
                     ))}
                 </div>
 
-                {/* Header */}
                 <div className="w-full max-w-md mb-6 text-center relative shrink-0">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-red-600/30 blur-[80px] rounded-full pointer-events-none mix-blend-screen"></div>
                     <div className="relative flex flex-col items-center gap-3">
@@ -851,7 +840,6 @@
                     </div>
                 </div>
 
-                {/* --- 頂部控制區 --- */}
                 <div className="mb-6 flex flex-col w-full max-w-[340px] gap-4 shrink-0 relative z-20">
                     <div className="flex gap-3">
                         <button 
@@ -867,33 +855,27 @@
                             <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" /> {t('payout_btn')}
                         </button>
                     </div>
-
-                    <div className="text-center text-[#d4af37] text-sm mt-1 font-game font-bold drop-shadow-sm">
-                        --- {t('filled_status').replace('{n}', filledCount)} ---
-                    </div>
                 </div>
 
-                {/* 核心九宮格區域 */}
                 <div className="w-full max-w-[420px] casino-panel rounded-[40px] p-6 flex flex-col justify-center shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
                     <div className="grid grid-cols-[2.2rem_1fr_1fr_1fr_2.2rem] gap-1.5 md:gap-3 items-center justify-items-center w-full">
-                        <Indicator lineId={6} arrow="↘" /> 
-                        <Indicator lineId={3} arrow="⬇" /> 
-                        <Indicator lineId={4} arrow="⬇" /> 
-                        <Indicator lineId={5} arrow="⬇" /> 
-                        <Indicator lineId={7} arrow="↙" /> 
+                        <Indicator lineId={6} /> 
+                        <Indicator lineId={3} /> 
+                        <Indicator lineId={4} /> 
+                        <Indicator lineId={5} /> 
+                        <Indicator lineId={7} /> 
 
-                        <Indicator lineId={0} arrow="➡" />
+                        <Indicator lineId={0} />
                         <GameCell idx={0} /> <GameCell idx={1} /> <GameCell idx={2} /> <div />
 
-                        <Indicator lineId={1} arrow="➡" />
+                        <Indicator lineId={1} />
                         <GameCell idx={3} /> <GameCell idx={4} /> <GameCell idx={5} /> <div />
 
-                        <Indicator lineId={2} arrow="➡" />
+                        <Indicator lineId={2} />
                         <GameCell idx={6} /> <GameCell idx={7} /> <GameCell idx={8} /> <div />
                     </div>
                 </div>
 
-                {/* --- 無限填數字模式按鈕 --- */}
                 <div className="w-full max-w-[340px] mt-6 flex justify-center">
                     <button 
                         onClick={() => { setIsFullFillMode(!isFullFillMode); setTimeout(() => sounds.toggle(), 0); }}
@@ -908,10 +890,8 @@
                     </button>
                 </div>
                 
-                {/* 分析列表 */}
                 <AnalysisList />
 
-                {/* 底部資訊 */}
                 <div className="mt-12 flex flex-col items-center gap-2 pb-8 opacity-60 hover:opacity-100 transition-opacity">
                     <div className="text-[#d4af37] text-xs font-mono">
                         {t('ver_prefix')} {BUILD_TIMESTAMP} ({t('region')} GMT+8) {t('force_update').replace('頁面','')}
@@ -921,7 +901,6 @@
                     </button>
                 </div>
 
-                {/* Modals */}
                 <NumberSelector 
                     isOpen={openSelectorIndex !== null}
                     currentValue={openSelectorIndex !== null ? board[openSelectorIndex] : null}
