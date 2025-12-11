@@ -127,15 +127,14 @@
 
     <script type="text/babel">
         // ★★★ 更新時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 02:55"; 
+        const BUILD_TIMESTAMP = "2025/12/12 03:10"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // --- 音效控制器 (Sound Controller - V3 Fixed) ---
+        // --- 音效控制器 (Sound Controller - V4) ---
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
-            // 1. 初始化 AudioContext (但先不啟動，等待使用者互動)
             const initAudio = () => {
                 if (!audioCtxRef.current) {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -143,21 +142,16 @@
                 }
             };
 
-            // 2. 解鎖音效 (在使用者點擊頁面任何地方時觸發)
             const unlockAudio = useCallback(() => {
                 if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-                    audioCtxRef.current.resume().then(() => {
-                        console.log("AudioContext unlocked");
-                    }).catch(e => console.error(e));
+                    audioCtxRef.current.resume().catch(e => console.error(e));
                 }
             }, []);
 
-            // 監聽全域點擊來解鎖音效
             useEffect(() => {
                 initAudio();
                 const handleUnlock = () => {
                     unlockAudio();
-                    // 只要解鎖一次即可，移除監聽
                     window.removeEventListener('click', handleUnlock);
                     window.removeEventListener('touchstart', handleUnlock);
                 };
@@ -169,15 +163,12 @@
                 };
             }, [unlockAudio]);
 
-            const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
+            const playTone = useCallback((freq, type, duration, vol = 0.05, startTime = 0) => {
                 if (!enabled) return;
                 try {
-                    // 確保 Context 存在
                     if (!audioCtxRef.current) initAudio();
                     const ctx = audioCtxRef.current;
                     if (!ctx) return;
-
-                    // 再次嘗試 resume (雙重保險)
                     if (ctx.state === 'suspended') ctx.resume();
 
                     const osc = ctx.createOscillator();
@@ -186,40 +177,48 @@
                     osc.type = type;
                     osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
                     
-                    gain.gain.setValueAtTime(vol, ctx.currentTime + startTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + startTime + duration);
+                    // ★★★ 改進音量控制 (Consistency Fix) ★★★
+                    // 使用稍微平滑一點的曲線，避免第一聲被瀏覽器硬切
+                    gain.gain.setValueAtTime(0, ctx.currentTime + startTime);
+                    gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + startTime + 0.01); // 0.01s Attack
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration); // Decay
 
                     osc.connect(gain);
                     gain.connect(ctx.destination);
 
                     osc.start(ctx.currentTime + startTime);
                     osc.stop(ctx.currentTime + startTime + duration);
-                } catch (e) {
-                    // Fail silently
-                }
+                } catch (e) { }
             }, [enabled]);
 
             const sounds = useMemo(() => ({
-                click: () => playTone(800, 'sine', 0.1, 0.1),
+                // 點擊：降低音量 (0.1 -> 0.05)
+                click: () => playTone(800, 'sine', 0.1, 0.05),
+                
+                // 重置：洗牌聲降低音量 (0.05 -> 0.03)
                 reset: () => {
                     if(!enabled) return;
-                    playTone(400, 'square', 0.05, 0.05, 0);
-                    playTone(500, 'square', 0.05, 0.05, 0.05);
-                    playTone(600, 'square', 0.05, 0.05, 0.1);
+                    playTone(400, 'square', 0.05, 0.03, 0);
+                    playTone(500, 'square', 0.05, 0.03, 0.05);
+                    playTone(600, 'square', 0.05, 0.03, 0.1);
                 },
-                toggle: () => playTone(300, 'square', 0.1, 0.05),
+                
+                // 開關：降低音量 (0.05 -> 0.03)
+                toggle: () => playTone(300, 'square', 0.1, 0.03),
+                
+                // 撒錢：大幅降低音量 (0.4 -> 0.12) 並柔和化
                 cash: () => {
                     if(!enabled) return;
-                    playTone(2000, 'sine', 0.4, 0.1, 0);
-                    playTone(2500, 'sine', 0.4, 0.1, 0.05);
-                    playTone(3000, 'sine', 0.5, 0.08, 0.1);
-                    playTone(4000, 'triangle', 0.2, 0.05, 0.15);
+                    playTone(2000, 'sine', 0.3, 0.12, 0);
+                    playTone(3000, 'sine', 0.3, 0.1, 0.05);
+                    playTone(4000, 'triangle', 0.3, 0.05, 0.1);
                 },
+                
+                // 揭示：降低音量 (0.2 -> 0.08)
                 reveal: () => {
                      if(!enabled) return;
-                     playTone(523.25, 'sine', 0.2, 0.1);
-                     // 使用 try-catch 包裹，避免報錯影響 UI
-                     try { setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50); } catch(e){}
+                     playTone(523.25, 'sine', 0.2, 0.08);
+                     try { setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.08), 50); } catch(e){}
                 }
             }), [enabled, playTone]);
 
@@ -248,9 +247,8 @@
                 select_num: "選擇數字",
                 clear_cell: "清除",
                 analysis_title: "全部機率分析",
-                click_hint: "點擊行查看",
                 best_pick: "最佳推薦",
-                tap_hint: "點選查看詳細機率 👆", // 新增提示文字
+                tap_hint: "點選查看詳細機率 👆", 
                 rank: "Rank",
                 guaranteed: "保底",
                 view_details: "查看詳情",
@@ -280,7 +278,6 @@
                 select_num: "Select Number",
                 clear_cell: "Clear",
                 analysis_title: "All Probability",
-                click_hint: "Tap row",
                 best_pick: "Recommended",
                 tap_hint: "Tap to view details 👆",
                 rank: "Rank",
@@ -312,7 +309,6 @@
                 select_num: "数字を選択",
                 clear_cell: "クリア",
                 analysis_title: "全確率分析",
-                click_hint: "行をタップ",
                 best_pick: "推奨",
                 tap_hint: "タップして詳細を見る 👆",
                 rank: "順位",
@@ -349,7 +345,6 @@
         const RotateCcw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
         const Volume2 = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
         const VolumeX = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>;
-        const Hand = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>;
         const TouchIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19 14v4h-4"/><path d="M15 10V6h4"/><path d="M5 10V6H9"/><path d="M9 14v4H5"/></svg>;
         
         // Unified SVG Arrows
@@ -653,9 +648,8 @@
                     newBoard[openSelectorIndex] = val;
                     const newFilledCount = newBoard.filter(n => n !== null).length;
                     
-                    // 音效改為同步呼叫，避免被擋
                     if (newFilledCount === 4 && filledCount < 4) {
-                        sounds.cash();
+                        setTimeout(() => sounds.cash(), 100);
                     }
                 }
                 
@@ -722,8 +716,10 @@
                         onClick={() => {
                             if (!isLocked) {
                                 setOpenSelectorIndex(idx);
-                                if (isSuggested && !cellValue) sounds.reveal(); 
-                                else sounds.click(); 
+                                setTimeout(() => {
+                                    if (isSuggested && !cellValue) sounds.reveal(); 
+                                    else sounds.click(); 
+                                }, 0);
                             }
                         }}
                         className={`
@@ -772,7 +768,6 @@
                     <div className="w-full max-w-[400px] mt-8 animate-in slide-in-from-bottom-4 fade-in duration-500">
                         <div className="flex items-center gap-2 mb-3 px-2">
                             <h3 className="text-gold font-bold text-base tracking-wider uppercase drop-shadow-sm">{t('analysis_title')}</h3>
-                            <span className="text-[10px] text-[#fcd34d]/80 ml-auto animate-pulse">{t('click_hint')}</span>
                         </div>
                         <div className="casino-panel rounded-2xl overflow-hidden divide-y divide-[#d4af37]/20">
                             {rankedSolutions.map((sol, rank) => {
@@ -808,8 +803,7 @@
                                                     ${Math.floor(sol.ev).toLocaleString()}
                                                 </span>
                                                 
-                                                <div className="flex flex-wrap justify-end gap-1.5 max-w-[180px]">
-                                                    {/* ★★★ 如果是 Best Pick 且沒有展開，顯示引導文字 ★★★ */}
+                                                <div className="flex flex-wrap justify-end gap-1.5 max-w-[180px] min-h-[20px]">
                                                     {isBest && !isExpanded ? (
                                                         <div className="flex items-center gap-1 px-2 py-0.5 rounded-full border border-[#fcd34d] bg-[#fcd34d]/20 text-[#fcd34d] text-[10px] font-bold animate-pulse shadow-[0_0_10px_rgba(252,211,77,0.4)]">
                                                             {t('tap_hint')}
@@ -827,12 +821,7 @@
                                                                     </span>
                                                                 )
                                                             })
-                                                        ) : (
-                                                            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full border border-[#d4af37]/40 bg-[#d4af37]/10 text-[#d4af37] text-[10px] shadow-sm group-hover:bg-[#d4af37]/20 transition-colors">
-                                                                <TouchIcon className="w-3 h-3" />
-                                                                {t('view_details')}
-                                                            </div>
-                                                        )
+                                                        ) : null 
                                                     )}
                                                 </div>
                                             </div>
@@ -923,6 +912,10 @@
                         >
                             <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" /> {t('payout_btn')}
                         </button>
+                    </div>
+
+                    <div className="text-center text-[#d4af37] text-sm mt-1 font-game font-bold drop-shadow-sm">
+                        --- {t('filled_status').replace('{n}', filledCount)} ---
                     </div>
                 </div>
 
