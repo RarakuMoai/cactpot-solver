@@ -117,7 +117,7 @@
             z-index: 10;
         }
 
-        /* 1萬MGP 特效流光 */
+        /* 1萬MGP 特效流光 - 亮度微調 */
         @keyframes shimmer {
             0% { background-position: -200% center; }
             100% { background-position: 200% center; }
@@ -138,15 +138,17 @@
 
     <script type="text/babel">
         // ★★★ 更新時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 04:30"; 
+        const BUILD_TIMESTAMP = "2025/12/12 04:33"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // --- 音效控制器 (Sound Controller - Optimized) ---
+        // --- 音效控制器 (Sound Controller - V8 Resurrection Logic) ---
+        // 這個版本在每次用戶互動時都會檢查 AudioContext 是否存活，確保在 APP 切換回來後能復活。
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
-            const warmUpAudio = useCallback(() => {
+            // 初始化與喚醒
+            const initOrResumeAudio = useCallback(() => {
                 if (!audioCtxRef.current) {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
                     if (Ctx) {
@@ -158,19 +160,35 @@
                     if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
                         ctx.resume().catch(e => console.error(e));
                     }
-                    try {
-                        const buffer = ctx.createBuffer(1, 1, 22050);
-                        const source = ctx.createBufferSource();
-                        source.buffer = buffer;
-                        source.connect(ctx.destination);
-                        source.start(0);
-                    } catch(e) {}
                 }
+                return ctx;
             }, []);
 
+            // 監聽頁面可見性變化 (當使用者切換 APP 回來時，嘗試喚醒)
+            useEffect(() => {
+                const handleVisibilityChange = () => {
+                    if (!document.hidden) {
+                        initOrResumeAudio();
+                    }
+                };
+                document.addEventListener('visibilitychange', handleVisibilityChange);
+                return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+            }, [initOrResumeAudio]);
+
+            // 第一次點擊時的暖機 (Silent Warm-up)
             useEffect(() => {
                 const handleInteraction = () => {
-                    warmUpAudio();
+                    const ctx = initOrResumeAudio();
+                    // 播放極短無聲波形，強制切換 iOS 音訊通道
+                    if (ctx) {
+                        try {
+                            const buffer = ctx.createBuffer(1, 1, 22050);
+                            const source = ctx.createBufferSource();
+                            source.buffer = buffer;
+                            source.connect(ctx.destination);
+                            source.start(0);
+                        } catch(e) {}
+                    }
                     window.removeEventListener('click', handleInteraction, true);
                     window.removeEventListener('touchstart', handleInteraction, true);
                 };
@@ -182,15 +200,15 @@
                     window.removeEventListener('click', handleInteraction, true);
                     window.removeEventListener('touchstart', handleInteraction, true);
                 };
-            }, [warmUpAudio]);
+            }, [initOrResumeAudio]);
 
+            // 播放音效
             const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
                 if (!enabled) return;
                 
-                const ctx = audioCtxRef.current;
+                // ★★★ 關鍵修改：每次播放前都嘗試喚醒 ★★★
+                const ctx = initOrResumeAudio();
                 if (!ctx) return; 
-
-                if (ctx.state === 'suspended') ctx.resume();
 
                 try {
                     const osc = ctx.createOscillator();
@@ -205,7 +223,7 @@
                     osc.start(ctx.currentTime + startTime);
                     osc.stop(ctx.currentTime + startTime + duration);
                 } catch (e) {}
-            }, [enabled]);
+            }, [enabled, initOrResumeAudio]);
 
             const sounds = useMemo(() => ({
                 click: () => playTone(800, 'sine', 0.1, 0.1),
@@ -215,7 +233,7 @@
                     playTone(600, 'square', 0.05, 0.05, 0.1);
                 },
                 toggle: () => {
-                    warmUpAudio(); 
+                    initOrResumeAudio(); 
                     playTone(300, 'square', 0.1, 0.05);
                 },
                 cash: () => {
@@ -228,7 +246,7 @@
                       playTone(523.25, 'sine', 0.2, 0.1);
                       setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50);
                 }
-            }), [playTone, warmUpAudio]);
+            }), [playTone, initOrResumeAudio]);
 
             return sounds;
         };
@@ -268,8 +286,8 @@
                 row: "橫排",
                 col: "直排",
                 diag: "對角",
-                label_10k: "1萬",
-                label_3600: "3千6",
+                label_10k: "10k",
+                label_3600: "3.6k",
                 ver_prefix: "版本更新於",
                 force_update: "更新頁面",
                 region: "台北時間",
@@ -330,8 +348,8 @@
                 row: "横",
                 col: "縦",
                 diag: "斜め",
-                label_10k: "1万",
-                label_3600: "3600",
+                label_10k: "10k",
+                label_3600: "3.6k",
                 ver_prefix: "最終更新",
                 force_update: "ページ更新",
                 region: "台北時間",
@@ -341,7 +359,7 @@
             }
         };
 
-        // --- Icons (SVG) - Optimized: Removed Unused Icons ---
+        // --- Icons (SVG) ---
         const RefreshCw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>;
         const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
         const Unlock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>;
@@ -804,8 +822,9 @@
                                 
                                 const notablePrizes = sol.allProbs.filter(p => p.mgp >= 720).sort((a, b) => b.mgp - a.mgp);
                                 
-                                // ★★★ 最佳推薦修正：顯示前2高的大獎，不只10k/3.6k ★★★
-                                const displayPrizes = isBest ? notablePrizes.slice(0, 2) : notablePrizes;
+                                // ★★★ 最佳推薦修正：只取前1個最高的機率顯示 (10k > 3.6k > 1800...) ★★★
+                                // 這樣保證只有一個標籤，英文版就不會跑版
+                                const displayPrizes = isBest ? notablePrizes.slice(0, 1) : notablePrizes;
 
                                 const bestPickCenter = isBest ? (
                                     <div className="flex-1 flex items-center justify-center animate-pulse mx-2">
@@ -846,14 +865,19 @@
                                                 </span>
                                                 
                                                 <div className="flex flex-wrap justify-end gap-1.5 min-h-[20px]">
-                                                    {/* ★★★ 最佳推薦與一般行都顯示前2高獎項 (Best Pick 邏輯) ★★★ */}
+                                                    {/* ★★★ 統一顯示邏輯：最佳推薦只會顯示 1 個標籤 ★★★ */}
                                                     {displayPrizes.length > 0 ? (
                                                         displayPrizes.map(p => {
                                                             const badgeStyle = getPrizeStyle(p.mgp);
                                                             const textSize = p.mgp >= 10000 ? "text-xs" : "text-[10px]";
+                                                            // 統一格式化：大於等於1000用 k 表示
+                                                            const label = p.mgp >= 1000 
+                                                                ? (p.mgp === 10000 ? '10k' : (p.mgp/1000).toString() + 'k') 
+                                                                : p.mgp;
+                                                            
                                                             return (
                                                                 <span key={p.mgp} className={`${textSize} px-1.5 py-0.5 rounded border ${badgeStyle} backdrop-blur-sm flex items-center`}>
-                                                                    {p.mgp >= 10000 ? '1萬' : p.mgp}
+                                                                    {label}
                                                                     <span className="opacity-70 text-[9px] ml-0.5">:{p.percent.toFixed(0)}%</span>
                                                                 </span>
                                                             )
