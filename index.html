@@ -117,7 +117,7 @@
             z-index: 10;
         }
 
-        /* 1萬MGP 特效流光 - 最終版 */
+        /* 1萬MGP 特效流光 */
         @keyframes shimmer {
             0% { background-position: -200% center; }
             100% { background-position: 200% center; }
@@ -138,11 +138,11 @@
 
     <script type="text/babel">
         // ★★★ 更新時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 04:21"; 
+        const BUILD_TIMESTAMP = "2025/12/12 04:30"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // --- 音效控制器 ---
+        // --- 音效控制器 (Sound Controller - Optimized) ---
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
@@ -341,7 +341,7 @@
             }
         };
 
-        // --- Icons (SVG) ---
+        // --- Icons (SVG) - Optimized: Removed Unused Icons ---
         const RefreshCw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>;
         const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
         const Unlock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>;
@@ -352,7 +352,6 @@
         const RotateCcw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
         const Volume2 = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
         const VolumeX = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>;
-        const HandPointingUp = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 2a4 4 0 0 1 4 4v8.05a2 2 0 0 1 1.5-1.55h.5a2 2 0 0 1 2 2v2.76c0 5.09-4.21 9.24-9.5 9.24H10a2 2 0 0 1-2-2v-5a2 2 0 0 1-2-2v-1.05a2 2 0 0 1 1.5-1.55V4a4 4 0 0 1 4-4Z"/></svg>;
         
         // Unified SVG Arrows
         const ArrowRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
@@ -419,7 +418,6 @@
                 let isJackpot = false;
                 
                 if (mgp === 10000) {
-                    // ★★★ 修正：流光亮度微調，不刺眼但有高級感 ★★★
                     rowBgClass = "border-[#d4af37] relative overflow-hidden shadow-[0_0_15px_rgba(212,175,55,0.4)]";
                     textClass = "text-[#fcd34d] font-bold drop-shadow";
                     isJackpot = true;
@@ -804,11 +802,11 @@
                                 const ArrowIcon = getArrowIcon(sol.originalIndex);
                                 const isExpanded = expandedLine === sol.originalIndex;
                                 
-                                // ★★★ 最佳推薦修正：只取前兩個最高的機率顯示 (10k, 3.6k, 1800...) ★★★
                                 const notablePrizes = sol.allProbs.filter(p => p.mgp >= 720).sort((a, b) => b.mgp - a.mgp);
+                                
+                                // ★★★ 最佳推薦修正：顯示前2高的大獎，不只10k/3.6k ★★★
                                 const displayPrizes = isBest ? notablePrizes.slice(0, 2) : notablePrizes;
 
-                                // ★★★ 最佳推薦：中間的「點擊查看詳細」引導 (字體加大，移除手指圖示) ★★★
                                 const bestPickCenter = isBest ? (
                                     <div className="flex-1 flex items-center justify-center animate-pulse mx-2">
                                         <span className="text-[#fcd34d] text-sm font-bold tracking-wider whitespace-nowrap drop-shadow-md border-b border-[#fcd34d]/50 pb-0.5">{t('tap_view')}</span>
@@ -848,7 +846,7 @@
                                                 </span>
                                                 
                                                 <div className="flex flex-wrap justify-end gap-1.5 min-h-[20px]">
-                                                    {/* ★★★ 最佳推薦與一般都使用相同的顯示邏輯，只是最佳推薦只取前2個 ★★★ */}
+                                                    {/* ★★★ 最佳推薦與一般行都顯示前2高獎項 (Best Pick 邏輯) ★★★ */}
                                                     {displayPrizes.length > 0 ? (
                                                         displayPrizes.map(p => {
                                                             const badgeStyle = getPrizeStyle(p.mgp);
