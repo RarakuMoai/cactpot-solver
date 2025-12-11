@@ -117,6 +117,17 @@
             z-index: 10;
         }
 
+        /* 1萬MGP 特效流光 */
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        .jackpot-row {
+            background: linear-gradient(90deg, #d4af37, #fcd34d, #fff, #fcd34d, #d4af37);
+            background-size: 200% auto;
+            animation: shimmer 2s linear infinite;
+        }
+
     </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden font-sans">
@@ -127,100 +138,93 @@
 
     <script type="text/babel">
         // ★★★ 更新時間 ★★★
-        const BUILD_TIMESTAMP = "2025/12/12 03:10"; 
+        const BUILD_TIMESTAMP = "2025/12/12 04:20"; 
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // --- 音效控制器 (Sound Controller - V4) ---
+        // --- 音效控制器 (Sound Controller - V4 Robust Fix) ---
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
+            // 初始化 AudioContext
             const initAudio = () => {
                 if (!audioCtxRef.current) {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
-                    if (Ctx) audioCtxRef.current = new Ctx();
+                    if (Ctx) {
+                        audioCtxRef.current = new Ctx();
+                    }
                 }
             };
 
-            const unlockAudio = useCallback(() => {
-                if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-                    audioCtxRef.current.resume().catch(e => console.error(e));
+            // 強制喚醒 Context (解決 iOS/Mobile 睡眠後音效消失問題)
+            const checkAndResume = async () => {
+                if (!audioCtxRef.current) initAudio();
+                const ctx = audioCtxRef.current;
+                if (ctx && (ctx.state === 'suspended' || ctx.state === 'interrupted')) {
+                    try {
+                        await ctx.resume();
+                    } catch (e) {
+                        console.error("Audio resume failed", e);
+                    }
                 }
-            }, []);
+                return ctx;
+            };
 
             useEffect(() => {
                 initAudio();
-                const handleUnlock = () => {
-                    unlockAudio();
-                    window.removeEventListener('click', handleUnlock);
-                    window.removeEventListener('touchstart', handleUnlock);
+                // 在任何點擊時嘗試喚醒，確保 Context 保持活躍
+                const handleInteraction = () => {
+                    checkAndResume();
                 };
-                window.addEventListener('click', handleUnlock);
-                window.addEventListener('touchstart', handleUnlock);
+                window.addEventListener('click', handleInteraction);
+                window.addEventListener('touchstart', handleInteraction);
                 return () => {
-                    window.removeEventListener('click', handleUnlock);
-                    window.removeEventListener('touchstart', handleUnlock);
+                    window.removeEventListener('click', handleInteraction);
+                    window.removeEventListener('touchstart', handleInteraction);
                 };
-            }, [unlockAudio]);
+            }, []);
 
-            const playTone = useCallback((freq, type, duration, vol = 0.05, startTime = 0) => {
+            const playTone = useCallback(async (freq, type, duration, vol = 0.1, startTime = 0) => {
                 if (!enabled) return;
                 try {
-                    if (!audioCtxRef.current) initAudio();
-                    const ctx = audioCtxRef.current;
+                    const ctx = await checkAndResume();
                     if (!ctx) return;
-                    if (ctx.state === 'suspended') ctx.resume();
 
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
 
                     osc.type = type;
                     osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
-                    
-                    // ★★★ 改進音量控制 (Consistency Fix) ★★★
-                    // 使用稍微平滑一點的曲線，避免第一聲被瀏覽器硬切
-                    gain.gain.setValueAtTime(0, ctx.currentTime + startTime);
-                    gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + startTime + 0.01); // 0.01s Attack
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration); // Decay
-
+                    gain.gain.setValueAtTime(vol, ctx.currentTime + startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + startTime + duration);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
-
                     osc.start(ctx.currentTime + startTime);
                     osc.stop(ctx.currentTime + startTime + duration);
-                } catch (e) { }
+                } catch (e) { 
+                    console.warn("Play tone error:", e);
+                }
             }, [enabled]);
 
             const sounds = useMemo(() => ({
-                // 點擊：降低音量 (0.1 -> 0.05)
-                click: () => playTone(800, 'sine', 0.1, 0.05),
-                
-                // 重置：洗牌聲降低音量 (0.05 -> 0.03)
+                click: () => playTone(800, 'sine', 0.1, 0.1),
                 reset: () => {
-                    if(!enabled) return;
-                    playTone(400, 'square', 0.05, 0.03, 0);
-                    playTone(500, 'square', 0.05, 0.03, 0.05);
-                    playTone(600, 'square', 0.05, 0.03, 0.1);
+                    playTone(400, 'square', 0.05, 0.05, 0);
+                    playTone(500, 'square', 0.05, 0.05, 0.05);
+                    playTone(600, 'square', 0.05, 0.05, 0.1);
                 },
-                
-                // 開關：降低音量 (0.05 -> 0.03)
-                toggle: () => playTone(300, 'square', 0.1, 0.03),
-                
-                // 撒錢：大幅降低音量 (0.4 -> 0.12) 並柔和化
+                toggle: () => playTone(300, 'square', 0.1, 0.05),
                 cash: () => {
-                    if(!enabled) return;
-                    playTone(2000, 'sine', 0.3, 0.12, 0);
-                    playTone(3000, 'sine', 0.3, 0.1, 0.05);
-                    playTone(4000, 'triangle', 0.3, 0.05, 0.1);
+                    playTone(2000, 'sine', 0.4, 0.1, 0);
+                    playTone(2500, 'sine', 0.4, 0.1, 0.05);
+                    playTone(3000, 'sine', 0.5, 0.08, 0.1);
+                    playTone(4000, 'triangle', 0.2, 0.05, 0.15);
                 },
-                
-                // 揭示：降低音量 (0.2 -> 0.08)
                 reveal: () => {
-                     if(!enabled) return;
-                     playTone(523.25, 'sine', 0.2, 0.08);
-                     try { setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.08), 50); } catch(e){}
+                      playTone(523.25, 'sine', 0.2, 0.1);
+                      setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50);
                 }
-            }), [enabled, playTone]);
+            }), [playTone]);
 
             return sounds;
         };
@@ -256,7 +260,6 @@
                 payout_btn: "獎金表",
                 mode_on: "無限填數字 (已開啟)",
                 mode_off: "無限填數字 (鎖定中)", 
-                filled_status: "已填寫 {n}/9 格",
                 reveal: "揭開!",
                 row: "橫排",
                 col: "直排",
@@ -267,7 +270,10 @@
                 force_update: "更新頁面",
                 region: "台北時間",
                 sound_on: "音效開啟",
-                sound_off: "音效關閉"
+                sound_off: "音效關閉",
+                jackpot: "JACKPOT",
+                prob_10k: "1萬機率",
+                prob_3600: "3千6機率"
             },
             en: {
                 app_title: "FF14-Cactpot",
@@ -287,7 +293,6 @@
                 payout_btn: "Payouts",
                 mode_on: "Infinite Fill (Active)", 
                 mode_off: "Infinite Fill (Locked)", 
-                filled_status: "Filled {n}/9",
                 reveal: "Reveal!",
                 row: "Row",
                 col: "Col",
@@ -298,7 +303,10 @@
                 force_update: "Refresh Page",
                 region: "Taipei Time",
                 sound_on: "Sound ON",
-                sound_off: "Sound OFF"
+                sound_off: "Sound OFF",
+                jackpot: "JACKPOT",
+                prob_10k: "10k Chance",
+                prob_3600: "3.6k Chance"
             },
             ja: {
                 app_title: "FF14-くじテンダー",
@@ -318,7 +326,6 @@
                 payout_btn: "賞金表",
                 mode_on: "無限入力 (編集中)",
                 mode_off: "無限入力 (ロック中)",
-                filled_status: "入力済み {n}/9",
                 reveal: "めくる!",
                 row: "横",
                 col: "縦",
@@ -329,7 +336,10 @@
                 force_update: "ページ更新",
                 region: "台北時間",
                 sound_on: "Sound ON",
-                sound_off: "Sound OFF"
+                sound_off: "Sound OFF",
+                jackpot: "JACKPOT",
+                prob_10k: "1万 確率",
+                prob_3600: "3600 確率"
             }
         };
 
@@ -345,7 +355,6 @@
         const RotateCcw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
         const Volume2 = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
         const VolumeX = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>;
-        const TouchIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19 14v4h-4"/><path d="M15 10V6h4"/><path d="M5 10V6H9"/><path d="M9 14v4H5"/></svg>;
         
         // Unified SVG Arrows
         const ArrowRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
@@ -409,10 +418,13 @@
             const RowItem = ({ sum, mgp }) => {
                 let rowBgClass = "bg-white/5 border-white/10";
                 let textClass = "text-zinc-300";
+                let isJackpot = false;
                 
                 if (mgp === 10000) {
-                    rowBgClass = "bg-gradient-to-r from-yellow-600/30 to-yellow-900/30 border-yellow-500/40";
-                    textClass = "text-[#fcd34d] font-bold drop-shadow";
+                    // ★★★ 1萬分大獎的特殊樣式 ★★★
+                    rowBgClass = "border-yellow-400/80 h-12 shadow-[0_0_15px_rgba(252,211,77,0.6)] transform scale-105 z-10 relative overflow-hidden";
+                    textClass = "text-black font-black text-lg drop-shadow-[0_1px_0_rgba(255,255,255,0.5)]";
+                    isJackpot = true;
                 } else if (mgp === 3600 || mgp === 1800) {
                     rowBgClass = "bg-gradient-to-r from-fuchsia-600/20 to-fuchsia-900/20 border-fuchsia-500/30";
                     textClass = "text-fuchsia-300 font-bold";
@@ -425,10 +437,17 @@
                 }
 
                 return (
-                    <div className={`flex justify-between items-center p-2 rounded-lg h-9 border ${rowBgClass}`}>
-                        <span className="text-[#d4af37]/70 font-mono text-xs">{t('sum')} <span className="text-white font-bold">{sum}</span></span>
+                    <div className={`flex justify-between items-center px-3 rounded-lg h-9 border ${rowBgClass}`}>
+                        {isJackpot && <div className="absolute inset-0 jackpot-row -z-10 opacity-90"></div>}
+                        
+                        <span className={`${isJackpot ? 'text-black font-extrabold' : 'text-[#d4af37]/70 font-mono text-xs'}`}>
+                            {t('sum')} <span className={`${isJackpot ? 'text-black text-lg' : 'text-white'} font-bold`}>{sum}</span>
+                        </span>
+                        
+                        {isJackpot && <span className="text-[10px] font-black tracking-widest text-black/70 animate-pulse">{t('jackpot')}</span>}
+
                         <span className={`text-sm ${textClass}`}>
-                            {mgp.toLocaleString()} <span className="text-[10px] opacity-70">MGP</span>
+                            {mgp.toLocaleString()} <span className={`text-[10px] ${isJackpot ? 'text-black/60' : 'opacity-70'}`}>MGP</span>
                         </span>
                     </div>
                 );
@@ -445,10 +464,10 @@
                         </div>
                         <div className="p-4">
                             <div className="flex gap-4">
-                                <div className="flex-1 space-y-1.5">
+                                <div className="flex-1 space-y-2">
                                     {leftCol.map(([sum, mgp]) => <RowItem key={sum} sum={sum} mgp={mgp} />)}
                                 </div>
-                                <div className="flex-1 space-y-1.5">
+                                <div className="flex-1 space-y-2">
                                     {rightCol.map(([sum, mgp]) => <RowItem key={sum} sum={sum} mgp={mgp} />)}
                                 </div>
                             </div>
@@ -649,7 +668,11 @@
                     const newFilledCount = newBoard.filter(n => n !== null).length;
                     
                     if (newFilledCount === 4 && filledCount < 4) {
-                        setTimeout(() => sounds.cash(), 100);
+                        // Removed setTimeout to fix audio context issues, sound plays in separate interaction if needed, 
+                        // or we rely on the button click logic.
+                        // Here we just let it be, the button click sound is enough for feedback.
+                        // If we want a cash sound, we play it immediately.
+                        sounds.cash();
                     }
                 }
                 
@@ -660,7 +683,7 @@
             const handleReset = () => {
                 setBoard(Array(9).fill(null));
                 setOpenSelectorIndex(null);
-                setTimeout(() => sounds.reset(), 50);
+                sounds.reset();
             };
 
             const handleForceUpdate = () => {
@@ -673,33 +696,51 @@
                 const ArrowIcon = getArrowIcon(lineId);
                 
                 if (!solutions[lineId]) return <div className="w-full h-full opacity-0"></div>;
-                const { ev, chance10k } = solutions[lineId];
+                const { ev, chance10k, chance3600 } = solutions[lineId];
                 const isBest = showAnalysis && lineId === bestLineIndex;
                 const displayEv = ev >= 1000 ? (ev/1000).toFixed(1).replace('.0','') + 'k' : ev;
 
-                return (
-                <div className={`flex items-center justify-center w-full h-full p-0.5`}>
-                    <div className={`
-                    relative flex flex-col items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 shadow-md
-                    ${isBest 
-                        ? 'bg-gradient-to-b from-green-600 to-green-800 border-green-400 text-white shadow-[0_0_15px_rgba(0,255,0,0.5)] z-10 scale-110' 
-                        : 'bg-black/60 border-[#d4af37]/30 text-[#d4af37]/70'}
-                    `}>
-                    <span className={`text-[10px] font-bold leading-none flex items-center justify-center ${isBest ? 'text-white drop-shadow' : ''}`}>
-                        {displayEv}
-                    </span>
+                // ★★★ 最佳推薦顯示邏輯優化 ★★★
+                // 如果是最佳推薦，我們顯示更多資訊
+                // 如果有 10k 機率，顯示 10k: XX%
+                // 如果沒有 10k 但有 3600，顯示 3.6k: XX%
+                let bestInfoText = null;
+                if (isBest) {
+                    if (chance10k > 0) {
+                        bestInfoText = <span className="text-yellow-200 text-[10px] leading-tight font-mono">{t('label_10k')}: {Math.round(chance10k)}%</span>;
+                    } else if (chance3600 > 0) {
+                        bestInfoText = <span className="text-fuchsia-200 text-[10px] leading-tight font-mono">{t('label_3600')}: {Math.round(chance3600)}%</span>;
+                    }
+                }
 
-                    {chance10k > 0 && (
-                        <div className="absolute -top-1 -right-1">
-                        <span className="flex h-3 w-3 relative">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-gradient-to-br from-yellow-300 to-yellow-600 border border-white shadow-sm"></span>
+                return (
+                <div className={`flex items-center justify-center w-full h-full p-0.5 relative z-[5]`}>
+                    <div className={`
+                        relative flex flex-col items-center justify-center transition-all duration-300 shadow-md border-2
+                        ${isBest 
+                            ? 'w-16 h-16 rounded-xl bg-gradient-to-b from-green-600 to-green-900 border-green-400 text-white shadow-[0_0_20px_rgba(0,255,0,0.6)] z-20 scale-110' 
+                            : 'w-12 h-12 rounded-full bg-black/60 border-[#d4af37]/30 text-[#d4af37]/70'}
+                    `}>
+                        <span className={`text-[10px] font-bold leading-none flex items-center justify-center ${isBest ? 'text-white drop-shadow text-xs mb-0.5' : ''}`}>
+                            {displayEv}
                         </span>
+
+                        {/* 顯示最佳機率細節 */}
+                        {isBest && bestInfoText}
+
+                        {/* 閃爍光點 (如果有10k機會) */}
+                        {chance10k > 0 && !isBest && (
+                            <div className="absolute -top-1 -right-1 pointer-events-none">
+                            <span className="flex h-3 w-3 relative">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-gradient-to-br from-yellow-300 to-yellow-600 border border-white shadow-sm"></span>
+                            </span>
+                            </div>
+                        )}
+                        
+                        <div className={`text-sm mt-0.5 ${isBest ? 'text-white animate-pulse drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]' : ''}`}>
+                            {ArrowIcon}
                         </div>
-                    )}
-                    <div className={`text-sm mt-0.5 ${isBest ? 'text-white animate-pulse drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]' : ''}`}>
-                        {ArrowIcon}
-                    </div>
                     </div>
                 </div>
                 );
@@ -716,10 +757,8 @@
                         onClick={() => {
                             if (!isLocked) {
                                 setOpenSelectorIndex(idx);
-                                setTimeout(() => {
-                                    if (isSuggested && !cellValue) sounds.reveal(); 
-                                    else sounds.click(); 
-                                }, 0);
+                                if (isSuggested && !cellValue) sounds.reveal(); 
+                                else sounds.click(); 
                             }
                         }}
                         className={`
@@ -740,7 +779,7 @@
                         )}
                         
                         {isSuggested && !cellValue && (
-                            <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] animate-bounce border border-white/50 tracking-wider">
                                     {t('reveal')}
                                 </div>
@@ -821,7 +860,7 @@
                                                                     </span>
                                                                 )
                                                             })
-                                                        ) : null 
+                                                        ) : null // 爛獎不顯示任何東西
                                                     )}
                                                 </div>
                                             </div>
@@ -914,9 +953,7 @@
                         </button>
                     </div>
 
-                    <div className="text-center text-[#d4af37] text-sm mt-1 font-game font-bold drop-shadow-sm">
-                        --- {t('filled_status').replace('{n}', filledCount)} ---
-                    </div>
+                    {/* 已移除填寫狀態顯示區塊 */}
                 </div>
 
                 <div className="w-full max-w-[420px] casino-panel rounded-[40px] p-6 flex flex-col justify-center shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
