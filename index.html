@@ -8,6 +8,7 @@
     <meta name="description" content="FF14 / FFXIV 仙人微彩計算器 (Mini Cactpot Solver)。支援繁中、簡中、英文、日文等多國語言。提供每日仙人彩最佳路徑與期望值分析，幫助你輕鬆獲得最高 MGP 獎勵。">
     <meta name="keywords" content="FF14, FFXIV, 仙人微彩, 仙人彩, Mini Cactpot, Solver, 計算器, 攻略, MGP, 金碟遊樂場">
     <meta name="apple-mobile-web-app-title" content="FF14 Cactpot">
+
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -29,7 +30,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 
     <style>
-        /* --- 核心樣式設定 (保持不變) --- */
         :root {
             --gold-primary: #d4af37;
             --gold-light: #fcd34d;
@@ -63,8 +63,6 @@
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* --- UI 元件樣式 --- */
 
         .btn-3d {
             transition: all 0.1s;
@@ -131,7 +129,6 @@
             background-size: 200% auto;
             animation: shimmer 3s linear infinite;
         }
-
     </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden font-sans">
@@ -142,11 +139,11 @@
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
-        const BUILD_TIMESTAMP = "2025/12/17 09:20"; // Updated
+        const BUILD_TIMESTAMP = "2025/12/17 09:35";
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // ★★★ 音效修復版 V8.5 (回復到穩定邏輯) ★★★
+        // ★★★ 音效控制器 (Sound Controller - 100% 還原原版) ★★★
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
@@ -172,7 +169,6 @@
                 return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
             }, [initOrResumeAudio]);
 
-            // 修正：確保在第一次點擊時解鎖音頻
             useEffect(() => {
                 const handleInteraction = () => {
                     const ctx = initOrResumeAudio();
@@ -196,8 +192,8 @@
                 };
             }, [initOrResumeAudio]);
 
-            const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0, force = false) => {
-                if (!enabled && !force) return; // 修正：允許 force 參數強制播放
+            const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
+                if (!enabled) return;
                 const ctx = initOrResumeAudio();
                 if (!ctx) return; 
                 try {
@@ -223,8 +219,7 @@
                 },
                 toggle: () => {
                     initOrResumeAudio(); 
-                    // 修正：強制播放 toggle 音效，即使目前狀態是「關閉」(為了聽到"開啟"的聲音)
-                    playTone(300, 'square', 0.1, 0.05, 0, true);
+                    playTone(300, 'square', 0.1, 0.05);
                 },
                 cash: () => {
                     playTone(2000, 'sine', 0.4, 0.1, 0);
@@ -252,7 +247,6 @@
             return null;
         };
 
-        // --- Localization ---
         const LOCALE = {
             zh: { app_title: "FF14-仙人微彩", title: "仙人微彩模擬器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", mode_on: "無限填 (已開啟)", mode_off: "無限填 (鎖定中)", reveal: "揭開!", row: "橫排", col: "直排", diag: "對角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新於", force_update: "更新頁面", region: "台北時間", sound_on: "音效開啟", sound_off: "音效關閉", jackpot: "JACKPOT", lang_select: "選擇語言" },
             cn: { app_title: "FF14-仙人微彩", title: "仙人微彩模拟器", sum: "总和", payout_title: "奖金一览表", close_hint: "点击背景关闭", select_num: "选择数字", clear_cell: "清除", analysis_title: "全概率分析", best_pick: "最佳推荐", tap_view: "点击查看详细 👆", rank: "Rank", guaranteed: "保底", view_details: "查看详情", reset: "重置盘面", payout_btn: "奖金表", mode_on: "无限填 (已开启)", mode_off: "无限填 (锁定中)", reveal: "揭开!", row: "横排", col: "竖排", diag: "对角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新于", force_update: "刷新页面", region: "北京时间", sound_on: "音效开启", sound_off: "音效关闭", jackpot: "JACKPOT", lang_select: "选择语言" },
@@ -263,7 +257,6 @@
             ko: { app_title: "FF14-미니 텐더", title: "미니 텐더 시뮬레이터", sum: "합계", payout_title: "당첨금 일람", close_hint: "배경을 눌러 닫기", select_num: "숫자 선택", clear_cell: "지우기", analysis_title: "확률 분석", best_pick: "추천", tap_view: "상세 보기 👆", rank: "순위", guaranteed: "보장", view_details: "상세 정보", reset: "초기화", payout_btn: "당첨금", mode_on: "무한 입력 (켜짐)", mode_off: "무한 입력 (꺼짐)", reveal: "확인!", row: "가로", col: "세로", diag: "대각선", label_10k: "10k", label_3600: "3.6k", ver_prefix: "업데이트", force_update: "새로고침", region: "한국 시간", sound_on: "소리 켜기", sound_off: "소리 끄기", jackpot: "JACKPOT", lang_select: "언어 선택" }
         };
 
-        // --- Icons ---
         const RefreshCw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>;
         const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
         const Unlock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>;
@@ -431,29 +424,21 @@
 
         // Main App
         function MiniCactpotSolver() {
-            /* ★★★ 新增：自動語言偵測邏輯 ★★★ */
+            // ★★★ 自動語言偵測 ★★★
             const [lang, setLang] = useState(() => {
                 try {
-                    // 1. 優先讀取使用者上次手動選擇的語言
                     const saved = localStorage.getItem('cactpot_lang');
                     if (saved) return saved;
-
-                    // 2. 如果沒有存檔，偵測瀏覽器語言
                     const browserLang = navigator.language || navigator.userLanguage; 
                     const code = browserLang.toLowerCase();
-
-                    if (code.startsWith('ja')) return 'ja'; // 日文
-                    if (code.startsWith('de')) return 'de'; // 德文
-                    if (code.startsWith('fr')) return 'fr'; // 法文
-                    if (code.startsWith('ko')) return 'ko'; // 韓文
-                    if (code.startsWith('zh-cn') || code.startsWith('zh-sg')) return 'cn'; // 簡體中文
-                    if (code.startsWith('en')) return 'en'; // 英文
-                    
-                    // 3. 預設回傳繁體中文 (zh-TW, zh-HK 或其他)
+                    if (code.startsWith('ja')) return 'ja';
+                    if (code.startsWith('de')) return 'de';
+                    if (code.startsWith('fr')) return 'fr';
+                    if (code.startsWith('ko')) return 'ko';
+                    if (code.startsWith('zh-cn') || code.startsWith('zh-sg')) return 'cn';
+                    if (code.startsWith('en')) return 'en';
                     return 'zh';
-                } catch(e) { 
-                    return 'zh'; 
-                }
+                } catch(e) { return 'zh'; }
             });
 
             useEffect(() => { try { localStorage.setItem('cactpot_lang', lang); } catch(e) {} const currentTitle = LOCALE[lang]['app_title']; document.title = currentTitle; const metaTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if (metaTitle) metaTitle.setAttribute('content', currentTitle); }, [lang]);
@@ -465,8 +450,16 @@
             const [showLangMenu, setShowLangMenu] = useState(false);
             
             const [isSoundOn, setIsSoundOn] = useState(() => { try { const saved = localStorage.getItem('cactpot_sound'); return saved === null ? true : saved === 'true'; } catch(e) { return true; } });
-            const toggleSound = () => { setIsSoundOn(prev => { const newState = !prev; try { localStorage.setItem('cactpot_sound', String(newState)); } catch(e) {} return newState; }); };
+            
             const sounds = useSound(isSoundOn);
+
+            const toggleSound = () => { 
+                setIsSoundOn(prev => { 
+                    const newState = !prev; 
+                    try { localStorage.setItem('cactpot_sound', String(newState)); } catch(e) {} 
+                    return newState; 
+                }); 
+            };
             
             const [solutions, setSolutions] = useState([]);
             const [bestLineIndices, setBestLineIndices] = useState([]);
@@ -617,7 +610,6 @@
                 
                 <AutoUpdateCheck />
 
-                {/* ★★★ 頂部按鈕列 (改為 Flex 佈局，避免遮擋) ★★★ */}
                 <div className="w-full max-w-md flex justify-between items-start mb-2 px-2 z-40 relative">
                     <button 
                         onClick={() => { toggleSound(); setTimeout(() => sounds.toggle(), 0); }}
@@ -657,7 +649,6 @@
                     </div>
                 </div>
 
-                {/* 核心九宮格區域 */}
                 <div className="w-full max-w-[420px] casino-panel rounded-[40px] p-6 flex flex-col justify-center shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
                     <div className="grid grid-cols-[3rem_1fr_1fr_1fr_3rem] gap-2 items-center justify-items-center w-full">
                         <Indicator lineId={6} /> <Indicator lineId={3} /> <Indicator lineId={4} /> <Indicator lineId={5} /> <Indicator lineId={7} /> 
@@ -684,7 +675,6 @@
                 
                 <PayoutTableModal isOpen={showPayouts} onClose={() => setShowPayouts(false)} t={t} playSound={sounds.click} />
                 
-                {/* ★★★ 語言選擇 Modal ★★★ */}
                 <LanguageModal isOpen={showLangMenu} onClose={() => setShowLangMenu(false)} currentLang={lang} setLang={setLang} t={t} playSound={sounds.click} />
                 </div>
             );
