@@ -7,6 +7,7 @@
     <title>FF14 仙人微彩計算器 (FFXIV Mini Cactpot Solver) - 每日 MGP 必中攻略 & 機率分析</title>
     <meta name="description" content="FF14 / FFXIV 仙人微彩計算器 (Mini Cactpot Solver)。支援繁中、簡中、英文、日文等多國語言。提供每日仙人彩最佳路徑與期望值分析，幫助你輕鬆獲得最高 MGP 獎勵。">
     <meta name="keywords" content="FF14, FFXIV, 仙人微彩, 仙人彩, Mini Cactpot, Solver, 計算器, 攻略, MGP, 金碟遊樂場">
+    <meta name="apple-mobile-web-app-title" content="FF14 Cactpot">
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -14,7 +15,6 @@
     })(window,document,'script','dataLayer','GTM-NL7CSVDZ');</script>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FF14-仙人微彩">
     
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -142,39 +142,47 @@
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
-        const BUILD_TIMESTAMP = "2025/12/17 09:00"; 
+        const BUILD_TIMESTAMP = "2025/12/17 09:20"; // Updated
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        /* --- Audio Context Logic --- */
+        // ★★★ 音效修復版 V8.5 (回復到穩定邏輯) ★★★
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
+
             const initOrResumeAudio = useCallback(() => {
                 if (!audioCtxRef.current) {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
                     if (Ctx) audioCtxRef.current = new Ctx();
                 }
                 const ctx = audioCtxRef.current;
-                if (ctx && (ctx.state === 'suspended' || ctx.state === 'interrupted')) {
-                    ctx.resume().catch(e => console.error(e));
+                if (ctx) {
+                    if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
+                        ctx.resume().catch(e => console.error(e));
+                    }
                 }
                 return ctx;
             }, []);
 
             useEffect(() => {
-                const handleVisibilityChange = () => { if (!document.hidden) initOrResumeAudio(); };
+                const handleVisibilityChange = () => {
+                    if (!document.hidden) initOrResumeAudio();
+                };
                 document.addEventListener('visibilitychange', handleVisibilityChange);
                 return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
             }, [initOrResumeAudio]);
 
+            // 修正：確保在第一次點擊時解鎖音頻
             useEffect(() => {
                 const handleInteraction = () => {
                     const ctx = initOrResumeAudio();
                     if (ctx) {
                         try {
                             const buffer = ctx.createBuffer(1, 1, 22050);
-                            const s = ctx.createBufferSource();
-                            s.buffer = buffer; s.connect(ctx.destination); s.start(0);
+                            const source = ctx.createBufferSource();
+                            source.buffer = buffer;
+                            source.connect(ctx.destination);
+                            source.start(0);
                         } catch(e) {}
                     }
                     window.removeEventListener('click', handleInteraction, true);
@@ -188,10 +196,10 @@
                 };
             }, [initOrResumeAudio]);
 
-            const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
-                if (!enabled) return;
+            const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0, force = false) => {
+                if (!enabled && !force) return; // 修正：允許 force 參數強制播放
                 const ctx = initOrResumeAudio();
-                if (!ctx) return;
+                if (!ctx) return; 
                 try {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
@@ -206,13 +214,31 @@
                 } catch (e) {}
             }, [enabled, initOrResumeAudio]);
 
-            return useMemo(() => ({
+            const sounds = useMemo(() => ({
                 click: () => playTone(800, 'sine', 0.1, 0.1),
-                reset: () => { playTone(400, 'square', 0.05, 0.05, 0); playTone(500, 'square', 0.05, 0.05, 0.05); playTone(600, 'square', 0.05, 0.05, 0.1); },
-                toggle: () => { initOrResumeAudio(); playTone(300, 'square', 0.1, 0.05); },
-                cash: () => { playTone(2000, 'sine', 0.4, 0.1, 0); playTone(2500, 'sine', 0.4, 0.1, 0.05); playTone(3000, 'sine', 0.5, 0.08, 0.1); playTone(4000, 'triangle', 0.2, 0.05, 0.15); },
-                reveal: () => { playTone(523.25, 'sine', 0.2, 0.1); setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50); }
+                reset: () => {
+                    playTone(400, 'square', 0.05, 0.05, 0);
+                    playTone(500, 'square', 0.05, 0.05, 0.05);
+                    playTone(600, 'square', 0.05, 0.05, 0.1);
+                },
+                toggle: () => {
+                    initOrResumeAudio(); 
+                    // 修正：強制播放 toggle 音效，即使目前狀態是「關閉」(為了聽到"開啟"的聲音)
+                    playTone(300, 'square', 0.1, 0.05, 0, true);
+                },
+                cash: () => {
+                    playTone(2000, 'sine', 0.4, 0.1, 0);
+                    playTone(2500, 'sine', 0.4, 0.1, 0.05);
+                    playTone(3000, 'sine', 0.5, 0.08, 0.1);
+                    playTone(4000, 'triangle', 0.2, 0.05, 0.15);
+                },
+                reveal: () => {
+                      playTone(523.25, 'sine', 0.2, 0.1);
+                      setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50);
+                }
             }), [playTone, initOrResumeAudio]);
+
+            return sounds;
         };
 
         const AutoUpdateCheck = () => {
