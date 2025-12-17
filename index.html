@@ -139,11 +139,22 @@
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
-        const BUILD_TIMESTAMP = "2025/12/17 09:35";
+        // ★★★ 自動獲取檔案更新時間 (功能實作) ★★★
+        const getBuildTime = () => {
+            try {
+                const lastMod = new Date(document.lastModified);
+                if(isNaN(lastMod.getTime())) return "剛剛更新";
+                return lastMod.toLocaleString('zh-TW', {
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit', hour12: false
+                });
+            } catch(e) { return "Unknown Time"; }
+        };
+        const BUILD_TIMESTAMP = getBuildTime();
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // ★★★ 音效控制器 (Sound Controller - 100% 還原原版) ★★★
+        // ★★★ 音效控制器 (嚴格還原原版邏輯) ★★★
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
@@ -451,6 +462,7 @@
             
             const [isSoundOn, setIsSoundOn] = useState(() => { try { const saved = localStorage.getItem('cactpot_sound'); return saved === null ? true : saved === 'true'; } catch(e) { return true; } });
             
+            // ★★★ 使用原本的 useSound ★★★
             const sounds = useSound(isSoundOn);
 
             const toggleSound = () => { 
