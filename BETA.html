@@ -216,7 +216,7 @@
             return null;
         };
 
-        // ★★★ Localization：新增 Android 手動教學步驟 ★★★
+        // ★★★ Localization：Android 步驟文字更新 (加到主畫面/新增) ★★★
         const LOCALE = {
             zh: { app_title: "FF14-仙人微彩", title: "仙人微彩模擬器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", 
                   mode_on: "無限填數字模式 (已開啟)", mode_off: "無限填數字模式 (鎖定中)", 
@@ -224,9 +224,8 @@
                   install_btn: "APP安裝教學", share: "分享",
                   ios_title: "iOS 安裝步驟", android_title: "Android 安裝步驟",
                   ios_step1: "使用 Safari 開啟", ios_step2: "點擊瀏覽器下方【‧‧‧】", ios_step3: "點擊【分享】圖示", ios_step4: "點擊【‧‧‧】【更多】", ios_step5: "選擇「加入主畫面」",
-                  copy_link: "複製連結", link_copied: "連結已複製!",
-                  android_btn: "點擊安裝 APP", 
-                  android_step1: "點擊瀏覽器右上角選單【:】或【‧‧‧】", android_step2: "若使用 LINE/FB，請選【以其他瀏覽器開啟】", android_step3: "選擇選單內的【安裝應用程式】或【加到主畫面】" },
+                  android_step1: "使用 Chrome 開啟", android_step2: "點擊右上角選單【⋮】", android_step3: "選擇「加到主畫面」", android_step4: "點擊「新增」",
+                  copy_link: "複製連結", link_copied: "連結已複製!" },
             
             cn: { app_title: "FF14-仙人微彩", title: "仙人微彩模拟器", sum: "总和", payout_title: "奖金一览表", close_hint: "点击背景关闭", select_num: "选择数字", clear_cell: "清除", analysis_title: "全概率分析", best_pick: "最佳推荐", tap_view: "点击查看详细 👆", rank: "Rank", guaranteed: "保底", view_details: "查看详情", reset: "重置盘面", payout_btn: "奖金表", 
                   mode_on: "无限填数字模式 (已开启)", mode_off: "无限填数字模式 (锁定中)", 
@@ -234,9 +233,8 @@
                   install_btn: "APP安装教学", share: "分享",
                   ios_title: "iOS 安装步骤", android_title: "Android 安装步骤",
                   ios_step1: "使用 Safari 开启", ios_step2: "点击浏览器下方【‧‧‧】", ios_step3: "点击【分享】图示", ios_step4: "点击【‧‧‧】【更多】", ios_step5: "选择「加入主画面」",
-                  copy_link: "复制链接", link_copied: "链接已复制!",
-                  android_btn: "点击安装 APP",
-                  android_step1: "点击浏览器右上角菜单【:】或【‧‧‧】", android_step2: "若使用 LINE/FB，请选【以其他浏览器开启】", android_step3: "选择菜单内的【安装应用程序】或【加到主画面】" },
+                  android_step1: "使用 Chrome 开启", android_step2: "点击右上角菜单【⋮】", android_step3: "选择「加到主画面」", android_step4: "点击「新增」",
+                  copy_link: "复制链接", link_copied: "链接已复制!" },
             
             en: { app_title: "FF14-Cactpot", title: "Mini Cactpot Solver", sum: "Sum", payout_title: "Payout Table", close_hint: "Tap background to close", select_num: "Select Number", clear_cell: "Clear", analysis_title: "All Probability", best_pick: "Recommended", tap_view: "Tap for Details 👆", rank: "Rank", guaranteed: "Guaranteed", view_details: "View Details", reset: "Reset Board", payout_btn: "Payouts", 
                   mode_on: "Infinite Fill Mode (Active)", mode_off: "Infinite Fill Mode (Locked)", 
@@ -244,9 +242,8 @@
                   install_btn: "Install Guide", share: "Share",
                   ios_title: "iOS Installation", android_title: "Android Installation",
                   ios_step1: "Open in Safari", ios_step2: "Tap [‧‧‧] at bottom", ios_step3: "Tap [Share] icon", ios_step4: "Tap [‧‧‧] More", ios_step5: "Select 'Add to Home Screen'",
-                  copy_link: "Copy Link", link_copied: "Copied!",
-                  android_btn: "Install APP",
-                  android_step1: "Tap menu [:] or [‧‧‧] at top right", android_step2: "If in LINE/FB, tap 'Open in Browser'", android_step3: "Select 'Install App' or 'Add to Home Screen'" },
+                  android_step1: "Open in Chrome", android_step2: "Tap menu [⋮] at top right", android_step3: "Select 'Add to Home screen'", android_step4: "Tap 'Add'",
+                  copy_link: "Copy Link", link_copied: "Copied!" },
             
             ja: { app_title: "FF14-くじテンダー", title: "ミニ・くじテンダー", sum: "合計", payout_title: "賞金一覧", close_hint: "背景タップで閉じる", select_num: "数字を選択", clear_cell: "クリア", analysis_title: "全確率分析", best_pick: "推奨", tap_view: "詳細を見る 👆", rank: "順位", guaranteed: "確定", view_details: "詳細を見る", reset: "リセット", payout_btn: "賞金表", 
                   mode_on: "無限入力モード (編集中)", mode_off: "無限入力モード (ロック)", 
@@ -254,9 +251,8 @@
                   install_btn: "アプリ導入法", share: "共有",
                   ios_title: "iOS インストール手順", android_title: "Android インストール手順",
                   ios_step1: "Safariで開く", ios_step2: "下の [‧‧‧] をタップ", ios_step3: "[共有] をタップ", ios_step4: "[‧‧‧] その他をタップ", ios_step5: "[ホーム画面に追加] を選択",
-                  copy_link: "リンクをコピー", link_copied: "コピーしました!",
-                  android_btn: "アプリをインストール",
-                  android_step1: "右上のメニュー [:] または [‧‧‧] をタップ", android_step2: "LINE/FBの場合は「ブラウザで開く」を選択", android_step3: "「アプリをインストール」または「ホーム画面に追加」を選択" },
+                  android_step1: "Chromeで開く", android_step2: "右上のメニュー [⋮] をタップ", android_step3: "「ホーム画面に追加」を選択", android_step4: "「追加」をタップ",
+                  copy_link: "リンクをコピー", link_copied: "コピーしました!" },
             
             de: { app_title: "FF14-Glückskaktor", title: "Mini-Glückskaktor", sum: "Summe", payout_title: "Gewinntabelle", close_hint: "Zum Schließen tippen", select_num: "Zahl wählen", clear_cell: "Löschen", analysis_title: "Wahrscheinlichkeit", best_pick: "Empfohlen", tap_view: "Details antippen 👆", rank: "Rang", guaranteed: "Garantiert", view_details: "Details", reset: "Zurücksetzen", payout_btn: "Gewinne", 
                   mode_on: "Frei-Eingabe-Modus (Ein)", mode_off: "Frei-Eingabe-Modus (Aus)", 
@@ -264,9 +260,8 @@
                   install_btn: "Installationshilfe", share: "Teilen",
                   ios_title: "iOS Installation", android_title: "Android Installation",
                   ios_step1: "In Safari öffnen", ios_step2: "Tippe auf [‧‧‧]", ios_step3: "Tippe auf [Teilen]", ios_step4: "Tippe auf [‧‧‧] Mehr", ios_step5: "Wähle 'Zum Home-Bildschirm'",
-                  copy_link: "Link kopieren", link_copied: "Kopiert!",
-                  android_btn: "App installieren",
-                  android_step1: "Tippe oben rechts auf [:] oder [‧‧‧]", android_step2: "In LINE/FB: 'Im Browser öffnen' wählen", android_step3: "Wähle 'App installieren' oder 'Zum Startbildschirm'" },
+                  android_step1: "In Chrome öffnen", android_step2: "Tippe oben rechts auf [⋮]", android_step3: "Wähle 'Zum Startbildschirm'", android_step4: "Tippe auf 'Hinzufügen'",
+                  copy_link: "Link kopieren", link_copied: "Kopiert!" },
             
             fr: { app_title: "FF14-Mini Cactpot", title: "Mini Cactpot", sum: "Somme", payout_title: "Tableau des gains", close_hint: "Touchez pour fermer", select_num: "Choisir un nombre", clear_cell: "Effacer", analysis_title: "Probabilités", best_pick: "Recommandé", tap_view: "Voir détails 👆", rank: "Rang", guaranteed: "Garanti", view_details: "Détails", reset: "Réinitialiser", payout_btn: "Gains", 
                   mode_on: "Mode Saisie Libre (Actif)", mode_off: "Mode Saisie Libre (Verrou)", 
@@ -274,9 +269,8 @@
                   install_btn: "Guide d'installation", share: "Partager",
                   ios_title: "Installation iOS", android_title: "Installation Android",
                   ios_step1: "Ouvrir dans Safari", ios_step2: "Touchez [‧‧‧]", ios_step3: "Touchez [Partager]", ios_step4: "Touchez [‧‧‧] Plus", ios_step5: "Sélectionnez 'Sur l'écran d'accueil'",
-                  copy_link: "Copier le lien", link_copied: "Copié!",
-                  android_btn: "Installer l'app",
-                  android_step1: "Touchez [:] ou [‧‧‧] en haut à droite", android_step2: "Sur LINE/FB: 'Ouvrir dans le navigateur'", android_step3: "Sélectionnez 'Installer l'application' ou 'Ajouter à l'écran d'accueil'" },
+                  android_step1: "Ouvrir dans Chrome", android_step2: "Touchez [⋮] en haut à droite", android_step3: "Sélectionnez 'Ajouter à l'écran d'accueil'", android_step4: "Touchez 'Ajouter'",
+                  copy_link: "Copier le lien", link_copied: "Copié!" },
             
             ko: { app_title: "FF14-미니 텐더", title: "미니 텐더 시뮬레이터", sum: "합계", payout_title: "당첨금 일람", close_hint: "배경을 눌러 닫기", select_num: "숫자 선택", clear_cell: "지우기", analysis_title: "확률 분석", best_pick: "추천", tap_view: "상세 보기 👆", rank: "순위", guaranteed: "보장", view_details: "상세 정보", reset: "초기화", payout_btn: "당첨금", 
                   mode_on: "무한 입력 모드 (켜짐)", mode_off: "무한 입력 모드 (꺼짐)", 
@@ -284,9 +278,8 @@
                   install_btn: "설치 가이드", share: "공유",
                   ios_title: "iOS 설치 방법", android_title: "Android 설치 방법",
                   ios_step1: "Safari에서 열기", ios_step2: "하단 [‧‧‧] 클릭", ios_step3: "[공유] 아이콘 클릭", ios_step4: "[‧‧‧] 더보기 클릭", ios_step5: "'홈 화면에 추가' 선택",
-                  copy_link: "링크 복사", link_copied: "복사됨!",
-                  android_btn: "앱 설치",
-                  android_step1: "오른쪽 상단 [:] 또는 [‧‧‧] 클릭", android_step2: "LINE/FB의 경우 '브라우저에서 열기' 선택", android_step3: "'앱 설치' 또는 '홈 화면에 추가' 선택" }
+                  android_step1: "Chrome에서 열기", android_step2: "오른쪽 상단 [⋮] 클릭", android_step3: "'홈 화면에 추가' 선택", android_step4: "'추가' 클릭",
+                  copy_link: "링크 복사", link_copied: "복사됨!" }
         };
 
         // --- Icons ---
@@ -458,7 +451,7 @@
             );
         };
 
-        // ★★★ 新增：安裝教學 Modal (雙模式 - iOS 5步驟 / Android 3步驟) ★★★
+        // ★★★ 新增：安裝教學 Modal (雙模式 - Android 純文字修正版) ★★★
         const InstallModal = ({ isOpen, onClose, t, playSound }) => {
             if (!isOpen) return null;
 
@@ -466,21 +459,6 @@
                 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                 return isIOS ? 'ios' : 'android';
             });
-
-            const [installPrompt, setInstallPrompt] = useState(null);
-            useEffect(() => {
-                const handler = (e) => { e.preventDefault(); setInstallPrompt(e); };
-                window.addEventListener('beforeinstallprompt', handler);
-                return () => window.removeEventListener('beforeinstallprompt', handler);
-            }, []);
-
-            const handleAndroidInstall = () => {
-                if (!installPrompt) return;
-                installPrompt.prompt();
-                installPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') setInstallPrompt(null);
-                });
-            };
 
             const handleCopyLink = async () => {
                 try {
@@ -518,64 +496,55 @@
                                             </button>
                                         </div>
 
-                                        {/* iOS Step 2 */}
+                                        {/* iOS Step 2-5 */}
                                         <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
                                             <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">2</div>
                                             <p className="flex-1 font-medium">{t('ios_step2')}</p>
                                         </div>
-
-                                        {/* iOS Step 3 */}
                                         <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
                                             <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">3</div>
                                             <p className="flex-1 font-medium">{t('ios_step3')}</p>
                                         </div>
-
-                                        {/* iOS Step 4 */}
                                         <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
                                             <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">4</div>
                                             <p className="flex-1 font-medium">{t('ios_step4')}</p>
                                         </div>
-
-                                        {/* iOS Step 5 */}
                                         <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
                                             <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">5</div>
                                             <p className="flex-1 font-medium">{t('ios_step5')}</p>
                                         </div>
-
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center gap-4 text-center">
-                                    <h4 className="text-[#fcd34d] font-bold mb-2">{t('android_title')}</h4>
-                                    
-                                    {installPrompt ? (
-                                        <div className="flex flex-col gap-4 w-full">
-                                            <button onClick={handleAndroidInstall} className="flex items-center justify-center gap-2 bg-[#d4af37] text-black px-6 py-4 rounded-xl font-bold shadow-lg border-2 border-[#fcd34d] hover:scale-105 transition-transform animate-pulse w-full">
-                                                <Download className="w-5 h-5" /> {t('android_btn')}
-                                            </button>
-                                            <p className="text-xs text-[#d4af37]/50">Recommended for Chrome / Samsung Internet</p>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2 text-sm text-zinc-300 w-full text-left">
-                                            {/* Android Manual Step 1 */}
-                                            <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
+                                <div className="space-y-4">
+                                    <h4 className="text-[#fcd34d] font-bold text-center mb-4">{t('android_title')}</h4>
+                                    <div className="space-y-2 text-sm text-zinc-300">
+                                        
+                                        {/* Android Step 1 */}
+                                        <div className="flex flex-col gap-2 p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
+                                            <div className="flex gap-3 items-center">
                                                 <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">1</div>
                                                 <p className="flex-1 font-medium">{t('android_step1')}</p>
                                             </div>
-                                            
-                                            {/* Android Manual Step 2 */}
-                                            <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                                <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">2</div>
-                                                <p className="flex-1 font-medium">{t('android_step2')}</p>
-                                            </div>
-
-                                            {/* Android Manual Step 3 */}
-                                            <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                                <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">3</div>
-                                                <p className="flex-1 font-medium">{t('android_step3')}</p>
-                                            </div>
+                                            <button onClick={handleCopyLink} className="ml-9 flex items-center gap-1.5 text-[#d4af37] text-[10px] font-bold border border-[#d4af37]/50 px-2 py-1 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 w-fit transition-colors">
+                                                <Copy className="w-3 h-3" /> {t('copy_link')}
+                                            </button>
                                         </div>
-                                    )}
+
+                                        {/* Android Step 2-4 */}
+                                        <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
+                                            <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">2</div>
+                                            <p className="flex-1 font-medium">{t('android_step2')}</p>
+                                        </div>
+                                        <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
+                                            <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">3</div>
+                                            <p className="flex-1 font-medium">{t('android_step3')}</p>
+                                        </div>
+                                        <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
+                                            <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">4</div>
+                                            <p className="flex-1 font-medium">{t('android_step4')}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
