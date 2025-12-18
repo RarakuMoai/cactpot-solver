@@ -141,6 +141,7 @@
 <body class="min-h-screen relative overflow-x-hidden font-sans">
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NL7CSVDZ"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    
     <div class="fixed inset-0 casino-pattern pointer-events-none z-0"></div>
 
     <div id="root" class="relative z-10"></div>
@@ -160,54 +161,97 @@
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
+        // ★★★ 修正後的音效引擎：加入強制喚醒 (CheckAndResume) ★★★
+        // 這是唯一修改 Javascript 邏輯的地方，解決偶爾沒聲音的問題
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
-            const initOrResumeAudio = useCallback(() => {
+
+            const getCtx = useCallback(() => {
                 if (!audioCtxRef.current) {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
-                    if (Ctx) audioCtxRef.current = new Ctx();
-                }
-                const ctx = audioCtxRef.current;
-                if (ctx) {
-                    if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
-                        ctx.resume().catch(e => console.error(e));
+                    if (Ctx) {
+                        audioCtxRef.current = new Ctx();
                     }
                 }
-                return ctx;
+                return audioCtxRef.current;
             }, []);
-            useEffect(() => {
-                const handleVisibilityChange = () => { if (!document.hidden) initOrResumeAudio(); };
-                document.addEventListener('visibilitychange', handleVisibilityChange);
-                return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-            }, [initOrResumeAudio]);
+
+            const checkAndResume = useCallback(() => {
+                const ctx = getCtx();
+                if (ctx && ctx.state === 'suspended') {
+                    ctx.resume().catch(e => console.error("Audio resume failed:", e));
+                }
+                return ctx;
+            }, [getCtx]);
+
             useEffect(() => {
                 const handleInteraction = () => {
-                    const ctx = initOrResumeAudio();
-                    if (ctx) { try { const buffer = ctx.createBuffer(1, 1, 22050); const source = ctx.createBufferSource(); source.buffer = buffer; source.connect(ctx.destination); source.start(0); } catch(e) {} }
-                    window.removeEventListener('click', handleInteraction, true); window.removeEventListener('touchstart', handleInteraction, true);
+                    const ctx = checkAndResume();
+                    if (ctx) {
+                        try {
+                            const buffer = ctx.createBuffer(1, 1, 22050);
+                            const source = ctx.createBufferSource();
+                            source.buffer = buffer;
+                            source.connect(ctx.destination);
+                            source.start(0);
+                        } catch(e) {}
+                    }
+                    window.removeEventListener('click', handleInteraction, true);
+                    window.removeEventListener('touchstart', handleInteraction, true);
                 };
-                window.addEventListener('click', handleInteraction, true); window.addEventListener('touchstart', handleInteraction, true);
-                return () => { window.removeEventListener('click', handleInteraction, true); window.removeEventListener('touchstart', handleInteraction, true); };
-            }, [initOrResumeAudio]);
+                window.addEventListener('click', handleInteraction, true);
+                window.addEventListener('touchstart', handleInteraction, true);
+                return () => {
+                    window.removeEventListener('click', handleInteraction, true);
+                    window.removeEventListener('touchstart', handleInteraction, true);
+                };
+            }, [checkAndResume]);
+
             const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
                 if (!enabled) return;
-                const ctx = initOrResumeAudio();
+                
+                const ctx = checkAndResume(); // 每次播放前強制喚醒
                 if (!ctx) return; 
+
                 try {
-                    const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                    osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
                     gain.gain.setValueAtTime(vol, ctx.currentTime + startTime);
                     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + startTime + duration);
-                    osc.connect(gain); gain.connect(ctx.destination); osc.start(ctx.currentTime + startTime); osc.stop(ctx.currentTime + startTime + duration);
-                } catch (e) {}
-            }, [enabled, initOrResumeAudio]);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + startTime);
+                    osc.stop(ctx.currentTime + startTime + duration);
+                } catch (e) {
+                    console.error("Play tone error:", e);
+                }
+            }, [enabled, checkAndResume]);
+
             const sounds = useMemo(() => ({
                 click: () => playTone(800, 'sine', 0.1, 0.1),
-                reset: () => { playTone(400, 'square', 0.05, 0.05, 0); playTone(500, 'square', 0.05, 0.05, 0.05); playTone(600, 'square', 0.05, 0.05, 0.1); },
-                toggle: () => { initOrResumeAudio(); playTone(300, 'square', 0.1, 0.05); },
-                cash: () => { playTone(2000, 'sine', 0.4, 0.1, 0); playTone(2500, 'sine', 0.4, 0.1, 0.05); playTone(3000, 'sine', 0.5, 0.08, 0.1); playTone(4000, 'triangle', 0.2, 0.05, 0.15); },
-                reveal: () => { playTone(523.25, 'sine', 0.2, 0.1); setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50); }
-            }), [playTone, initOrResumeAudio]);
+                reset: () => { 
+                    playTone(400, 'square', 0.05, 0.05, 0); 
+                    playTone(500, 'square', 0.05, 0.05, 0.05); 
+                    playTone(600, 'square', 0.05, 0.05, 0.1); 
+                },
+                toggle: () => { 
+                    checkAndResume(); 
+                    playTone(300, 'square', 0.1, 0.05); 
+                },
+                cash: () => { 
+                    playTone(2000, 'sine', 0.4, 0.1, 0); 
+                    playTone(2500, 'sine', 0.4, 0.1, 0.05); 
+                    playTone(3000, 'sine', 0.5, 0.08, 0.1); 
+                    playTone(4000, 'triangle', 0.2, 0.05, 0.15); 
+                },
+                reveal: () => { 
+                    playTone(523.25, 'sine', 0.2, 0.1); 
+                    setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50); 
+                }
+            }), [playTone, checkAndResume]);
+
             return sounds;
         };
 
@@ -222,7 +266,6 @@
             return null;
         };
 
-        // ★★★ Localization：全面更新為「計算器」與「解題器」相關用詞 ★★★
         const LOCALE = {
             zh: { app_title: "FF14-仙人微彩計算器", title: "仙人微彩計算器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", 
                   mode_on: "無限填數字模式 (已開啟)", mode_off: "無限填數字模式 (鎖定中)", 
