@@ -38,7 +38,6 @@
             --casino-black: #0f0f11;
         }
 
-        /* 修正：強制隱藏水平捲軸，解決左右滑動問題 */
         body { 
             -webkit-tap-highlight-color: transparent; 
             font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; 
@@ -217,51 +216,73 @@
             return null;
         };
 
-        // ★★★ Localization：更新教學步驟文字 ★★★
+        // ★★★ Localization：更新語言按鈕文字與無限填模式 ★★★
         const LOCALE = {
-            zh: { app_title: "FF14-仙人微彩", title: "仙人微彩模擬器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", mode_on: "無限填 (已開啟)", mode_off: "無限填 (鎖定中)", reveal: "揭開!", row: "橫排", col: "直排", diag: "對角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新於", force_update: "更新頁面", region: "台北時間", sound_on: "音效開啟", sound_off: "音效關閉", jackpot: "JACKPOT", lang_select: "選擇語言",
-                  install_btn: "APP安裝教學",
+            zh: { app_title: "FF14-仙人微彩", title: "仙人微彩模擬器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", 
+                  mode_on: "無限填數字模式 (已開啟)", mode_off: "無限填數字模式 (鎖定中)", 
+                  reveal: "揭開!", row: "橫排", col: "直排", diag: "對角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新於", force_update: "更新頁面", region: "台北時間", sound_on: "音效開啟", sound_off: "音效關閉", jackpot: "JACKPOT", lang_select: "選擇語言",
+                  install_btn: "APP安裝教學", lang_btn_label: "語言", share: "分享",
                   ios_title: "iOS 安裝步驟", android_title: "Android 安裝步驟",
-                  ios_step1: "1. 瀏覽器右下角按【‧‧‧】", ios_step2: "2. 點擊【分享】圖示", ios_step3: "3. 再按一個【‧‧‧】【更多】", ios_step4: "4. 選擇「加入主畫面」",
+                  ios_step1: "1. 使用 Safari 開啟", ios_step2: "2. 點擊下方【分享】圖示", ios_step3: "3. 點擊【‧‧‧】【更多】圖示", ios_step4: "4. 選擇「加入主畫面」",
+                  copy_link: "複製連結", link_copied: "連結已複製!",
                   android_btn: "點擊安裝 APP", android_hint: "或點擊瀏覽器選單「安裝應用程式」" },
             
-            cn: { app_title: "FF14-仙人微彩", title: "仙人微彩模拟器", sum: "总和", payout_title: "奖金一览表", close_hint: "点击背景关闭", select_num: "选择数字", clear_cell: "清除", analysis_title: "全概率分析", best_pick: "最佳推荐", tap_view: "点击查看详细 👆", rank: "Rank", guaranteed: "保底", view_details: "查看详情", reset: "重置盘面", payout_btn: "奖金表", mode_on: "无限填 (已开启)", mode_off: "无限填 (锁定中)", reveal: "揭开!", row: "横排", col: "竖排", diag: "对角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新于", force_update: "刷新页面", region: "北京时间", sound_on: "音效开启", sound_off: "音效关闭", jackpot: "JACKPOT", lang_select: "选择语言",
-                  install_btn: "APP安装教学",
+            cn: { app_title: "FF14-仙人微彩", title: "仙人微彩模拟器", sum: "总和", payout_title: "奖金一览表", close_hint: "点击背景关闭", select_num: "选择数字", clear_cell: "清除", analysis_title: "全概率分析", best_pick: "最佳推荐", tap_view: "点击查看详细 👆", rank: "Rank", guaranteed: "保底", view_details: "查看详情", reset: "重置盘面", payout_btn: "奖金表", 
+                  mode_on: "无限填数字模式 (已开启)", mode_off: "无限填数字模式 (锁定中)", 
+                  reveal: "揭开!", row: "横排", col: "竖排", diag: "对角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新于", force_update: "刷新页面", region: "北京时间", sound_on: "音效开启", sound_off: "音效关闭", jackpot: "JACKPOT", lang_select: "选择语言",
+                  install_btn: "APP安装教学", lang_btn_label: "语言", share: "分享",
                   ios_title: "iOS 安装步骤", android_title: "Android 安装步骤",
-                  ios_step1: "1. 浏览器右下角按【‧‧‧】", ios_step2: "2. 点击【分享】图示", ios_step3: "3. 再按一个【‧‧‧】【更多】", ios_step4: "4. 选择「加入主画面」",
+                  ios_step1: "1. 使用 Safari 开启", ios_step2: "2. 点击下方【分享】图示", ios_step3: "3. 点击【‧‧‧】【更多】图示", ios_step4: "4. 选择「加入主画面」",
+                  copy_link: "复制链接", link_copied: "链接已复制!",
                   android_btn: "点击安装 APP", android_hint: "或点击浏览器菜单「安装应用程序」" },
             
-            en: { app_title: "FF14-Cactpot", title: "Mini Cactpot Solver", sum: "Sum", payout_title: "Payout Table", close_hint: "Tap background to close", select_num: "Select Number", clear_cell: "Clear", analysis_title: "All Probability", best_pick: "Recommended", tap_view: "Tap for Details 👆", rank: "Rank", guaranteed: "Guaranteed", view_details: "View Details", reset: "Reset Board", payout_btn: "Payouts", mode_on: "Infinite (Active)", mode_off: "Infinite (Locked)", reveal: "Reveal!", row: "Row", col: "Col", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Updated", force_update: "Refresh Page", region: "Taipei Time", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "Select Language",
-                  install_btn: "Install Guide",
+            en: { app_title: "FF14-Cactpot", title: "Mini Cactpot Solver", sum: "Sum", payout_title: "Payout Table", close_hint: "Tap background to close", select_num: "Select Number", clear_cell: "Clear", analysis_title: "All Probability", best_pick: "Recommended", tap_view: "Tap for Details 👆", rank: "Rank", guaranteed: "Guaranteed", view_details: "View Details", reset: "Reset Board", payout_btn: "Payouts", 
+                  mode_on: "Infinite Fill Mode (Active)", mode_off: "Infinite Fill Mode (Locked)", 
+                  reveal: "Reveal!", row: "Row", col: "Col", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Updated", force_update: "Refresh Page", region: "Taipei Time", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "Select Language",
+                  install_btn: "Install Guide", lang_btn_label: "Language", share: "Share",
                   ios_title: "iOS Installation", android_title: "Android Installation",
-                  ios_step1: "1. Tap [‧‧‧] at bottom right", ios_step2: "2. Tap [Share] icon", ios_step3: "3. Tap [‧‧‧] More", ios_step4: "4. Select 'Add to Home Screen'",
+                  ios_step1: "1. Open in Safari", ios_step2: "2. Tap [Share] icon", ios_step3: "3. Tap [‧‧‧] More", ios_step4: "4. Select 'Add to Home Screen'",
+                  copy_link: "Copy Link", link_copied: "Copied!",
                   android_btn: "Install APP", android_hint: "Or check browser menu for 'Install App'" },
             
-            ja: { app_title: "FF14-くじテンダー", title: "ミニ・くじテンダー", sum: "合計", payout_title: "賞金一覧", close_hint: "背景タップで閉じる", select_num: "数字を選択", clear_cell: "クリア", analysis_title: "全確率分析", best_pick: "推奨", tap_view: "詳細を見る 👆", rank: "順位", guaranteed: "確定", view_details: "詳細を見る", reset: "リセット", payout_btn: "賞金表", mode_on: "無限入力 (編集中)", mode_off: "無限入力 (ロック)", reveal: "めくる!", row: "横", col: "縦", diag: "斜め", label_10k: "10k", label_3600: "3.6k", ver_prefix: "最終更新", force_update: "ページ更新", region: "日本時間", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "言語を選択",
-                  install_btn: "アプリ導入法",
+            ja: { app_title: "FF14-くじテンダー", title: "ミニ・くじテンダー", sum: "合計", payout_title: "賞金一覧", close_hint: "背景タップで閉じる", select_num: "数字を選択", clear_cell: "クリア", analysis_title: "全確率分析", best_pick: "推奨", tap_view: "詳細を見る 👆", rank: "順位", guaranteed: "確定", view_details: "詳細を見る", reset: "リセット", payout_btn: "賞金表", 
+                  mode_on: "無限入力モード (編集中)", mode_off: "無限入力モード (ロック)", 
+                  reveal: "めくる!", row: "横", col: "縦", diag: "斜め", label_10k: "10k", label_3600: "3.6k", ver_prefix: "最終更新", force_update: "ページ更新", region: "日本時間", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "言語を選択",
+                  install_btn: "アプリ導入法", lang_btn_label: "言語設定", share: "共有",
                   ios_title: "iOS インストール手順", android_title: "Android インストール手順",
-                  ios_step1: "1. 右下の [‧‧‧] をタップ", ios_step2: "2. [共有] をタップ", ios_step3: "3. [‧‧‧] その他をタップ", ios_step4: "4. [ホーム画面に追加] を選択",
+                  ios_step1: "1. Safariで開く", ios_step2: "2. 下の [共有] をタップ", ios_step3: "3. [‧‧‧] その他をタップ", ios_step4: "4. [ホーム画面に追加] を選択",
+                  copy_link: "リンクをコピー", link_copied: "コピーしました!",
                   android_btn: "アプリをインストール", android_hint: "またはメニューから「アプリをインストール」" },
             
-            de: { app_title: "FF14-Glückskaktor", title: "Mini-Glückskaktor", sum: "Summe", payout_title: "Gewinntabelle", close_hint: "Zum Schließen tippen", select_num: "Zahl wählen", clear_cell: "Löschen", analysis_title: "Wahrscheinlichkeit", best_pick: "Empfohlen", tap_view: "Details antippen 👆", rank: "Rang", guaranteed: "Garantiert", view_details: "Details", reset: "Zurücksetzen", payout_btn: "Gewinne", mode_on: "Frei Modus (Ein)", mode_off: "Frei Modus (Aus)", reveal: "Aufdecken!", row: "Reihe", col: "Spalte", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Aktualisiert", force_update: "Aktualisieren", region: "Berlin Zeit", sound_on: "Ton AN", sound_off: "Ton AUS", jackpot: "JACKPOT", lang_select: "Sprache wählen",
-                  install_btn: "Installationshilfe",
+            de: { app_title: "FF14-Glückskaktor", title: "Mini-Glückskaktor", sum: "Summe", payout_title: "Gewinntabelle", close_hint: "Zum Schließen tippen", select_num: "Zahl wählen", clear_cell: "Löschen", analysis_title: "Wahrscheinlichkeit", best_pick: "Empfohlen", tap_view: "Details antippen 👆", rank: "Rang", guaranteed: "Garantiert", view_details: "Details", reset: "Zurücksetzen", payout_btn: "Gewinne", 
+                  mode_on: "Frei-Eingabe-Modus (Ein)", mode_off: "Frei-Eingabe-Modus (Aus)", 
+                  reveal: "Aufdecken!", row: "Reihe", col: "Spalte", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Aktualisiert", force_update: "Aktualisieren", region: "Berlin Zeit", sound_on: "Ton AN", sound_off: "Ton AUS", jackpot: "JACKPOT", lang_select: "Sprache wählen",
+                  install_btn: "Installationshilfe", lang_btn_label: "Sprache", share: "Teilen",
                   ios_title: "iOS Installation", android_title: "Android Installation",
-                  ios_step1: "1. Tippe unten rechts auf [‧‧‧]", ios_step2: "2. Tippe auf [Teilen]", ios_step3: "3. Tippe auf [‧‧‧] Mehr", ios_step4: "4. Wähle 'Zum Home-Bildschirm'",
+                  ios_step1: "1. In Safari öffnen", ios_step2: "2. Tippe auf [Teilen]", ios_step3: "3. Tippe auf [‧‧‧] Mehr", ios_step4: "4. Wähle 'Zum Home-Bildschirm'",
+                  copy_link: "Link kopieren", link_copied: "Kopiert!",
                   android_btn: "App installieren", android_hint: "Oder im Menü 'App installieren' wählen" },
             
-            fr: { app_title: "FF14-Mini Cactpot", title: "Mini Cactpot", sum: "Somme", payout_title: "Tableau des gains", close_hint: "Touchez pour fermer", select_num: "Choisir un nombre", clear_cell: "Effacer", analysis_title: "Probabilités", best_pick: "Recommandé", tap_view: "Voir détails 👆", rank: "Rang", guaranteed: "Garanti", view_details: "Détails", reset: "Réinitialiser", payout_btn: "Gains", mode_on: "Mode Libre (Actif)", mode_off: "Mode Libre (Verrou)", reveal: "Révéler!", row: "Rangée", col: "Colonne", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Mise à jour", force_update: "Actualiser", region: "Paris", sound_on: "Son ON", sound_off: "Son OFF", jackpot: "JACKPOT", lang_select: "Choisir la langue",
-                  install_btn: "Guide d'installation",
+            fr: { app_title: "FF14-Mini Cactpot", title: "Mini Cactpot", sum: "Somme", payout_title: "Tableau des gains", close_hint: "Touchez pour fermer", select_num: "Choisir un nombre", clear_cell: "Effacer", analysis_title: "Probabilités", best_pick: "Recommandé", tap_view: "Voir détails 👆", rank: "Rang", guaranteed: "Garanti", view_details: "Détails", reset: "Réinitialiser", payout_btn: "Gains", 
+                  mode_on: "Mode Saisie Libre (Actif)", mode_off: "Mode Saisie Libre (Verrou)", 
+                  reveal: "Révéler!", row: "Rangée", col: "Colonne", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Mise à jour", force_update: "Actualiser", region: "Paris", sound_on: "Son ON", sound_off: "Son OFF", jackpot: "JACKPOT", lang_select: "Choisir la langue",
+                  install_btn: "Guide d'installation", lang_btn_label: "Langue", share: "Partager",
                   ios_title: "Installation iOS", android_title: "Installation Android",
-                  ios_step1: "1. Touchez [‧‧‧] en bas à droite", ios_step2: "2. Touchez [Partager]", ios_step3: "3. Touchez [‧‧‧] Plus", ios_step4: "4. Sélectionnez 'Sur l'écran d'accueil'",
+                  ios_step1: "1. Ouvrir dans Safari", ios_step2: "2. Touchez [Partager]", ios_step3: "3. Touchez [‧‧‧] Plus", ios_step4: "4. Sélectionnez 'Sur l'écran d'accueil'",
+                  copy_link: "Copier le lien", link_copied: "Copié!",
                   android_btn: "Installer l'app", android_hint: "Ou via le menu 'Installer l'application'" },
             
-            ko: { app_title: "FF14-미니 텐더", title: "미니 텐더 시뮬레이터", sum: "합계", payout_title: "당첨금 일람", close_hint: "배경을 눌러 닫기", select_num: "숫자 선택", clear_cell: "지우기", analysis_title: "확률 분석", best_pick: "추천", tap_view: "상세 보기 👆", rank: "순위", guaranteed: "보장", view_details: "상세 정보", reset: "초기화", payout_btn: "당첨금", mode_on: "무한 입력 (켜짐)", mode_off: "무한 입력 (꺼짐)", reveal: "확인!", row: "가로", col: "세로", diag: "대각선", label_10k: "10k", label_3600: "3.6k", ver_prefix: "업데이트", force_update: "새로고침", region: "한국 시간", sound_on: "소리 켜기", sound_off: "소리 끄기", jackpot: "JACKPOT", lang_select: "언어 선택",
-                  install_btn: "설치 가이드",
+            ko: { app_title: "FF14-미니 텐더", title: "미니 텐더 시뮬레이터", sum: "합계", payout_title: "당첨금 일람", close_hint: "배경을 눌러 닫기", select_num: "숫자 선택", clear_cell: "지우기", analysis_title: "확률 분석", best_pick: "추천", tap_view: "상세 보기 👆", rank: "순위", guaranteed: "보장", view_details: "상세 정보", reset: "초기화", payout_btn: "당첨금", 
+                  mode_on: "무한 입력 모드 (켜짐)", mode_off: "무한 입력 모드 (꺼짐)", 
+                  reveal: "확인!", row: "가로", col: "세로", diag: "대각선", label_10k: "10k", label_3600: "3.6k", ver_prefix: "업데이트", force_update: "새로고침", region: "한국 시간", sound_on: "소리 켜기", sound_off: "소리 끄기", jackpot: "JACKPOT", lang_select: "언어 선택",
+                  install_btn: "설치 가이드", lang_btn_label: "언어", share: "공유",
                   ios_title: "iOS 설치 방법", android_title: "Android 설치 방법",
-                  ios_step1: "1. 오른쪽 하단 [‧‧‧] 클릭", ios_step2: "2. [공유] 아이콘 클릭", ios_step3: "3. [‧‧‧] 더보기 클릭", ios_step4: "4. '홈 화면에 추가' 선택",
+                  ios_step1: "1. Safari에서 열기", ios_step2: "2. 하단 [공유] 아이콘 클릭", ios_step3: "3. [‧‧‧] 더보기 클릭", ios_step4: "4. '홈 화면에 추가' 선택",
+                  copy_link: "링크 복사", link_copied: "복사됨!",
                   android_btn: "앱 설치", android_hint: "또는 브라우저 메뉴에서 '앱 설치' 선택" }
         };
 
+        // --- Icons ---
         const RefreshCw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>;
         const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
         const Unlock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>;
@@ -273,7 +294,9 @@
         const Volume2 = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
         const VolumeX = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>;
         const Globe = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
+        const ShareIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>;
         const Download = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>;
+        const Copy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>;
 
         const ArrowRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
         const ArrowDown = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>;
@@ -428,7 +451,7 @@
             );
         };
 
-        // ★★★ 新增：安裝教學 Modal (支援 iOS 4步驟 / Android) ★★★
+        // ★★★ 新增：安裝教學 Modal (改為彈出視窗) ★★★
         const InstallModal = ({ isOpen, onClose, t, playSound }) => {
             if (!isOpen) return null;
 
@@ -437,7 +460,6 @@
                 return isIOS ? 'ios' : 'android';
             });
 
-            // Android 安裝事件監聽
             const [installPrompt, setInstallPrompt] = useState(null);
             useEffect(() => {
                 const handler = (e) => { e.preventDefault(); setInstallPrompt(e); };
@@ -453,47 +475,47 @@
                 });
             };
 
+            const handleCopyLink = async () => {
+                try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert(t('link_copied'));
+                } catch (err) {}
+            };
+
             return (
                 <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => { playSound('click'); onClose(); }}>
                     <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden">
                         
-                        {/* Header & Tabs */}
                         <div className="flex border-b border-[#d4af37]/30 bg-black/30">
-                            <button 
-                                onClick={() => { setActiveTab('ios'); playSound('click'); }} 
-                                className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'ios' ? 'text-[#fcd34d] bg-[#d4af37]/10 border-b-2 border-[#fcd34d]' : 'text-[#d4af37]/50 hover:text-[#d4af37]'}`}
-                            >
-                                iOS
-                            </button>
-                            <button 
-                                onClick={() => { setActiveTab('android'); playSound('click'); }} 
-                                className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'android' ? 'text-[#fcd34d] bg-[#d4af37]/10 border-b-2 border-[#fcd34d]' : 'text-[#d4af37]/50 hover:text-[#d4af37]'}`}
-                            >
-                                Android
-                            </button>
+                            <button onClick={() => { setActiveTab('ios'); playSound('click'); }} className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'ios' ? 'text-[#fcd34d] bg-[#d4af37]/10 border-b-2 border-[#fcd34d]' : 'text-[#d4af37]/50 hover:text-[#d4af37]'}`}>iOS</button>
+                            <button onClick={() => { setActiveTab('android'); playSound('click'); }} className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'android' ? 'text-[#fcd34d] bg-[#d4af37]/10 border-b-2 border-[#fcd34d]' : 'text-[#d4af37]/50 hover:text-[#d4af37]'}`}>Android</button>
                             <button onClick={() => { playSound('click'); onClose(); }} className="absolute top-2 right-2 text-[#d4af37]/60 hover:text-white p-1"><X className="w-5 h-5"/></button>
                         </div>
 
-                        {/* Content */}
-                        <div className="p-6 min-h-[200px] flex flex-col justify-center">
+                        <div className="p-6 min-h-[240px] flex flex-col justify-center">
                             {activeTab === 'ios' ? (
                                 <div className="space-y-4">
                                     <h4 className="text-[#fcd34d] font-bold text-center mb-4">{t('ios_title')}</h4>
                                     <div className="space-y-3 text-sm text-zinc-300">
-                                        <div className="flex gap-3 items-start">
-                                            <div className="bg-[#d4af37]/20 p-1.5 rounded shrink-0 mt-0.5 text-[#d4af37] font-bold">1</div>
-                                            <p>{t('ios_step1')}</p>
+                                        <div className="flex flex-col gap-1">
+                                            <div className="flex gap-3 items-start">
+                                                <div className="bg-[#d4af37]/20 p-1.5 rounded shrink-0 mt-0.5 text-[#d4af37] font-bold h-6 w-6 flex items-center justify-center text-xs">1</div>
+                                                <p>{t('ios_step1')}</p>
+                                            </div>
+                                            <button onClick={handleCopyLink} className="ml-9 flex items-center gap-1.5 text-[#d4af37] text-xs border border-[#d4af37]/50 px-2 py-1 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 w-fit">
+                                                <Copy className="w-3 h-3" /> {t('copy_link')}
+                                            </button>
                                         </div>
                                         <div className="flex gap-3 items-start">
-                                            <div className="bg-[#d4af37]/20 p-1.5 rounded shrink-0 mt-0.5 text-[#d4af37] font-bold">2</div>
+                                            <div className="bg-[#d4af37]/20 p-1.5 rounded shrink-0 mt-0.5 text-[#d4af37] font-bold h-6 w-6 flex items-center justify-center text-xs">2</div>
                                             <p>{t('ios_step2')}</p>
                                         </div>
                                         <div className="flex gap-3 items-start">
-                                            <div className="bg-[#d4af37]/20 p-1.5 rounded shrink-0 mt-0.5 text-[#d4af37] font-bold">3</div>
+                                            <div className="bg-[#d4af37]/20 p-1.5 rounded shrink-0 mt-0.5 text-[#d4af37] font-bold h-6 w-6 flex items-center justify-center text-xs">3</div>
                                             <p>{t('ios_step3')}</p>
                                         </div>
                                         <div className="flex gap-3 items-start">
-                                            <div className="bg-[#d4af37]/20 p-1.5 rounded shrink-0 mt-0.5 text-[#d4af37] font-bold">4</div>
+                                            <div className="bg-[#d4af37]/20 p-1.5 rounded shrink-0 mt-0.5 text-[#d4af37] font-bold h-6 w-6 flex items-center justify-center text-xs">4</div>
                                             <p>{t('ios_step4')}</p>
                                         </div>
                                     </div>
@@ -555,6 +577,24 @@
                     try { localStorage.setItem('cactpot_sound', String(newState)); } catch(e) {} 
                     return newState; 
                 }); 
+            };
+
+            const handleShare = async () => {
+                sounds.click();
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: LOCALE[lang].title,
+                            text: LOCALE[lang].description, 
+                            url: window.location.href,
+                        });
+                    } catch (err) {}
+                } else {
+                    try {
+                        await navigator.clipboard.writeText(window.location.href);
+                        alert(LOCALE[lang].link_copied);
+                    } catch (err) {}
+                }
             };
             
             const [solutions, setSolutions] = useState([]);
@@ -707,28 +747,37 @@
                 <AutoUpdateCheck />
 
                 <div className="w-full max-w-md flex justify-between items-start mb-2 px-2 z-40 relative">
-                    <button 
-                        onClick={() => { toggleSound(); setTimeout(() => sounds.toggle(), 0); }}
-                        className="flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37]/60 hover:text-white transition-all active:scale-95"
-                    >
-                        {isSoundOn ? <Volume2 className="w-5 h-5 text-[#d4af37]" /> : <VolumeX className="w-5 h-5 text-zinc-500" />}
-                    </button>
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={() => { toggleSound(); setTimeout(() => sounds.toggle(), 0); }}
+                            className="flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37]/60 hover:text-white transition-all active:scale-95"
+                        >
+                            {isSoundOn ? <Volume2 className="w-5 h-5 text-[#d4af37]" /> : <VolumeX className="w-5 h-5 text-zinc-500" />}
+                        </button>
+
+                        <button 
+                             onClick={handleShare}
+                             className="flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
+                        >
+                             <ShareIcon className="w-4 h-4" />
+                        </button>
+                    </div>
 
                     <div className="flex flex-col gap-2 items-end">
                         <button 
                              onClick={() => { setShowInstallModal(true); playSound('click'); }}
-                             className="flex items-center justify-center gap-1.5 px-3 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95 group"
+                             className="flex items-center justify-center gap-1.5 px-3 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95 w-full min-w-[140px]"
                         >
-                             <Download className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                             <Download className="w-4 h-4" />
                              <span className="text-xs font-bold uppercase">{t('install_btn')}</span>
                         </button>
 
                         <button 
                              onClick={() => { setShowLangMenu(true); setTimeout(() => sounds.click(), 0); }}
-                             className="flex items-center justify-center gap-1.5 px-3 h-8 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
+                             className="flex items-center justify-center gap-1.5 px-3 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95 w-full min-w-[140px]"
                         >
-                             <Globe className="w-3 h-3" />
-                             <span className="text-[10px] font-bold uppercase">{lang.toUpperCase()}</span>
+                             <Globe className="w-4 h-4" />
+                             <span className="text-xs font-bold uppercase">{lang.toUpperCase()} - {t('lang_btn_label')}</span>
                         </button>
                     </div>
                 </div>
