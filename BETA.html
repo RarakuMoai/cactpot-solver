@@ -258,42 +258,56 @@
             return null;
         };
 
-        // ★★★ 更新 Localization：調整 iOS 引導文字 (符合你的要求) ★★★
+        // ★★★ 更新 Localization：精準的三步驟文字 ★★★
         const LOCALE = {
             zh: { app_title: "FF14-仙人微彩", title: "仙人微彩模擬器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", mode_on: "無限填 (已開啟)", mode_off: "無限填 (鎖定中)", reveal: "揭開!", row: "橫排", col: "直排", diag: "對角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新於", force_update: "更新頁面", region: "台北時間", sound_on: "音效開啟", sound_off: "音效關閉", jackpot: "JACKPOT", lang_select: "選擇語言",
-                  install_app: "安裝 App", ios_btn: "點擊分享", 
-                  ios_step1: "1、點擊Safari下方的【分享】按鈕", ios_step2: "2、按下【‧‧‧】【更多】圖示", ios_step3: "3、選擇「加入主畫面」",
-                  safari_hint: "推薦使用 Safari 開啟，可安裝成 APP 較方便使用", copy_link: "複製網址" },
+                  install_app: "安裝 App", 
+                  ios_step1: "1、點擊瀏覽器下方的【分享】按鈕", 
+                  ios_step2: "2、按下【‧‧‧】【更多】圖示", 
+                  ios_step3: "3、選擇「加入主畫面」",
+                  safari_hint: "推薦使用 Safari 開啟，可安裝成 APP 較方便使用", copy_link: "複製網址", share: "分享" },
             
             cn: { app_title: "FF14-仙人微彩", title: "仙人微彩模拟器", sum: "总和", payout_title: "奖金一览表", close_hint: "点击背景关闭", select_num: "选择数字", clear_cell: "清除", analysis_title: "全概率分析", best_pick: "最佳推荐", tap_view: "点击查看详细 👆", rank: "Rank", guaranteed: "保底", view_details: "查看详情", reset: "重置盘面", payout_btn: "奖金表", mode_on: "无限填 (已开启)", mode_off: "无限填 (锁定中)", reveal: "揭开!", row: "横排", col: "竖排", diag: "对角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新于", force_update: "刷新页面", region: "北京时间", sound_on: "音效开启", sound_off: "音效关闭", jackpot: "JACKPOT", lang_select: "选择语言",
-                  install_app: "安装 App", ios_btn: "点击分享", 
-                  ios_step1: "1、点击Safari下方的【分享】按钮", ios_step2: "2、按下【‧‧‧】【更多】图示", ios_step3: "3、选择「加入主画面」",
-                  safari_hint: "推荐使用 Safari 开启，可安装成 APP 较方便使用", copy_link: "复制网址" },
+                  install_app: "安装 App", 
+                  ios_step1: "1、点击浏览器下方的【分享】按钮", 
+                  ios_step2: "2、按下【‧‧‧】【更多】图示", 
+                  ios_step3: "3、选择「加入主画面」",
+                  safari_hint: "推荐使用 Safari 开启，可安装成 APP 较方便使用", copy_link: "复制网址", share: "分享" },
             
             en: { app_title: "FF14-Cactpot", title: "Mini Cactpot Solver", sum: "Sum", payout_title: "Payout Table", close_hint: "Tap background to close", select_num: "Select Number", clear_cell: "Clear", analysis_title: "All Probability", best_pick: "Recommended", tap_view: "Tap for Details 👆", rank: "Rank", guaranteed: "Guaranteed", view_details: "View Details", reset: "Reset Board", payout_btn: "Payouts", mode_on: "Infinite (Active)", mode_off: "Infinite (Locked)", reveal: "Reveal!", row: "Row", col: "Col", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Updated", force_update: "Refresh Page", region: "Taipei Time", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "Select Language",
-                  install_app: "Install App", ios_btn: "Share", 
-                  ios_step1: "1. Tap the Share button", ios_step2: "2. Tap [...] More", ios_step3: "3. Add to Home Screen",
-                  safari_hint: "Recommend opening in Safari to install as an App", copy_link: "Copy Link" },
+                  install_app: "Install App", 
+                  ios_step1: "1. Tap the Share button below", 
+                  ios_step2: "2. Tap [...] More if needed", 
+                  ios_step3: "3. Select 'Add to Home Screen'",
+                  safari_hint: "Recommend opening in Safari to install as an App", copy_link: "Copy Link", share: "Share" },
             
             ja: { app_title: "FF14-くじテンダー", title: "ミニ・くじテンダー", sum: "合計", payout_title: "賞金一覧", close_hint: "背景タップで閉じる", select_num: "数字を選択", clear_cell: "クリア", analysis_title: "全確率分析", best_pick: "推奨", tap_view: "詳細を見る 👆", rank: "順位", guaranteed: "確定", view_details: "詳細を見る", reset: "リセット", payout_btn: "賞金表", mode_on: "無限入力 (編集中)", mode_off: "無限入力 (ロック)", reveal: "めくる!", row: "横", col: "縦", diag: "斜め", label_10k: "10k", label_3600: "3.6k", ver_prefix: "最終更新", force_update: "ページ更新", region: "日本時間", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "言語を選択",
-                  install_app: "アプリをインストール", ios_btn: "共有", 
-                  ios_step1: "1. 下の共有ボタンをタップ", ios_step2: "2. [...] その他をタップ", ios_step3: "3. ホーム画面に追加",
-                  safari_hint: "Safariで開いてアプリとしてインストール推奨", copy_link: "リンクをコピー" },
+                  install_app: "アプリをインストール", 
+                  ios_step1: "1. 下の共有ボタンをタップ", 
+                  ios_step2: "2. 必要なら [...] その他をタップ", 
+                  ios_step3: "3. ホーム画面に追加",
+                  safari_hint: "Safariで開いてアプリとしてインストール推奨", copy_link: "リンクをコピー", share: "共有" },
             
             de: { app_title: "FF14-Glückskaktor", title: "Mini-Glückskaktor", sum: "Summe", payout_title: "Gewinntabelle", close_hint: "Zum Schließen tippen", select_num: "Zahl wählen", clear_cell: "Löschen", analysis_title: "Wahrscheinlichkeit", best_pick: "Empfohlen", tap_view: "Details antippen 👆", rank: "Rang", guaranteed: "Garantiert", view_details: "Details", reset: "Zurücksetzen", payout_btn: "Gewinne", mode_on: "Frei Modus (Ein)", mode_off: "Frei Modus (Aus)", reveal: "Aufdecken!", row: "Reihe", col: "Spalte", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Aktualisiert", force_update: "Aktualisieren", region: "Berlin Zeit", sound_on: "Ton AN", sound_off: "Ton AUS", jackpot: "JACKPOT", lang_select: "Sprache wählen",
-                  install_app: "App installieren", ios_btn: "Teilen", 
-                  ios_step1: "1. Tippe auf Teilen", ios_step2: "2. Tippe auf [...] Mehr", ios_step3: "3. Zum Home-Bildschirm",
-                  safari_hint: "In Safari öffnen, um als App zu installieren", copy_link: "Link kopieren" },
+                  install_app: "App installieren", 
+                  ios_step1: "1. Tippe unten auf Teilen", 
+                  ios_step2: "2. Tippe auf [...] Mehr", 
+                  ios_step3: "3. Zum Home-Bildschirm",
+                  safari_hint: "In Safari öffnen, um als App zu installieren", copy_link: "Link kopieren", share: "Teilen" },
             
             fr: { app_title: "FF14-Mini Cactpot", title: "Mini Cactpot", sum: "Somme", payout_title: "Tableau des gains", close_hint: "Touchez pour fermer", select_num: "Choisir un nombre", clear_cell: "Effacer", analysis_title: "Probabilités", best_pick: "Recommandé", tap_view: "Voir détails 👆", rank: "Rang", guaranteed: "Garanti", view_details: "Détails", reset: "Réinitialiser", payout_btn: "Gains", mode_on: "Mode Libre (Actif)", mode_off: "Mode Libre (Verrou)", reveal: "Révéler!", row: "Rangée", col: "Colonne", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Mise à jour", force_update: "Actualiser", region: "Paris", sound_on: "Son ON", sound_off: "Son OFF", jackpot: "JACKPOT", lang_select: "Choisir la langue",
-                  install_app: "Installer l'app", ios_btn: "Partager", 
-                  ios_step1: "1. Touchez Partager", ios_step2: "2. Touchez [...] Plus", ios_step3: "3. Sur l'écran d'accueil",
-                  safari_hint: "Ouvrir dans Safari pour installer l'app", copy_link: "Copier le lien" },
+                  install_app: "Installer l'app", 
+                  ios_step1: "1. Touchez Partager en bas", 
+                  ios_step2: "2. Touchez [...] Plus si nécessaire", 
+                  ios_step3: "3. Sur l'écran d'accueil",
+                  safari_hint: "Ouvrir dans Safari pour installer l'app", copy_link: "Copier le lien", share: "Partager" },
             
             ko: { app_title: "FF14-미니 텐더", title: "미니 텐더 시뮬레이터", sum: "합계", payout_title: "당첨금 일람", close_hint: "배경을 눌러 닫기", select_num: "숫자 선택", clear_cell: "지우기", analysis_title: "확률 분석", best_pick: "추천", tap_view: "상세 보기 👆", rank: "순위", guaranteed: "보장", view_details: "상세 정보", reset: "초기화", payout_btn: "당첨금", mode_on: "무한 입력 (켜짐)", mode_off: "무한 입력 (꺼짐)", reveal: "확인!", row: "가로", col: "세로", diag: "대각선", label_10k: "10k", label_3600: "3.6k", ver_prefix: "업데이트", force_update: "새로고침", region: "한국 시간", sound_on: "소리 켜기", sound_off: "소리 끄기", jackpot: "JACKPOT", lang_select: "언어 선택",
-                  install_app: "앱 설치", ios_btn: "공유", 
-                  ios_step1: "1. 공유 버튼 클릭", ios_step2: "2. [...] 더보기 클릭", ios_step3: "3. 홈 화면에 추가",
-                  safari_hint: "앱으로 설치하려면 Safari에서 여세요", copy_link: "링크 복사" }
+                  install_app: "앱 설치", 
+                  ios_step1: "1. 하단 공유 버튼 클릭", 
+                  ios_step2: "2. 필요시 [...] 더보기 클릭", 
+                  ios_step3: "3. 홈 화면에 추가",
+                  safari_hint: "앱으로 설치하려면 Safari에서 여세요", copy_link: "링크 복사", share: "공유" }
         };
 
         // --- Icons (Same as before + Share + Copy + Download) ---
@@ -468,41 +482,38 @@
             );
         };
 
-        /* ★★★ 新增：安裝引導元件 (Option C + 強制引導) ★★★ */
+        /* ★★★ 新增：安裝引導元件 (修正：純視覺指引，不包含假按鈕) ★★★ */
         const InstallGuide = ({ t, forceShowIOS, setForceShowIOS }) => {
             const [installPrompt, setInstallPrompt] = useState(null);
             const [showIOSPrompt, setShowIOSPrompt] = useState(false);
             const [showChromeIOSPrompt, setShowChromeIOSPrompt] = useState(false);
 
             useEffect(() => {
-                // 1. Android / Desktop Chrome PWA 安裝事件
                 const handler = (e) => {
                     e.preventDefault();
                     setInstallPrompt(e);
                 };
                 window.addEventListener('beforeinstallprompt', handler);
 
-                // 2. iOS 偵測邏輯
+                // iOS 偵測邏輯
                 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-                // 簡易判斷 Safari: 有 'Safari' 且沒有 'CriOS' (Chrome), 'FxiOS' (Firefox)
                 const isSafari = navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('CriOS') && !navigator.userAgent.includes('FxiOS');
 
                 if (isIOS && !isStandalone) {
                     if (isSafari) {
-                        // iOS Safari: 判斷是否顯示 (Option C: 沒關過 OR 被強制召喚)
                         const hasClosed = localStorage.getItem('cactpot_ios_prompt_closed');
                         if (!hasClosed || forceShowIOS) {
-                            setTimeout(() => setShowIOSPrompt(true), 500); // 稍微延遲
+                            setTimeout(() => setShowIOSPrompt(true), 500); 
                         }
                     } else {
-                        // iOS 非 Safari (Chrome/Edge): 強制顯示 (不存 localStorage)
+                        // 強制顯示非 Safari 警告 (不存 localStorage)
                         setTimeout(() => setShowChromeIOSPrompt(true), 1000);
                     }
                 }
 
                 return () => window.removeEventListener('beforeinstallprompt', handler);
-            }, [forceShowIOS]); // 當 forceShowIOS 變更時重新檢查
+            }, [forceShowIOS]); 
 
             const handleAndroidInstall = () => {
                 if (!installPrompt) return;
@@ -512,15 +523,6 @@
                 });
             };
 
-            /* ★★★ 新增：iOS 內部分享按鈕觸發 ★★★ */
-            const handleIOSShare = async () => {
-                if (navigator.share) {
-                    try { await navigator.share({ title: document.title, url: window.location.href }); } 
-                    catch (err) {}
-                }
-            };
-
-            /* ★★★ 新增：複製網址功能 (給非 Safari 用) ★★★ */
             const handleCopyLink = async () => {
                 try {
                     await navigator.clipboard.writeText(window.location.href);
@@ -531,12 +533,11 @@
             const closeIOS = () => { 
                 setShowIOSPrompt(false); 
                 localStorage.setItem('cactpot_ios_prompt_closed', 'true'); 
-                if(setForceShowIOS) setForceShowIOS(false); // 重置強制狀態
+                if(setForceShowIOS) setForceShowIOS(false); 
             };
-            // 這裡不存 localStorage，確保每次都跳出來煩他
             const closeChromeIOS = () => { setShowChromeIOSPrompt(false); };
 
-            // Render: Android Button (在畫面底部)
+            // Render: Android
             if (installPrompt) {
                 return (
                     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4">
@@ -547,37 +548,35 @@
                 );
             }
 
-            // Render: iOS Safari Guide
+            // Render: iOS Safari Guide (修正版：無效按鈕移除，純文字指引)
             if (showIOSPrompt) {
                 return (
                     <div className="fixed bottom-4 left-4 right-4 z-[100] animate-in slide-in-from-bottom-10 fade-in duration-500">
                         <div className="casino-panel p-4 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-[#d4af37] relative">
                             <button onClick={closeIOS} className="absolute top-2 right-2 text-[#d4af37]/60 hover:text-white p-1"><X className="w-5 h-5" /></button>
-                            <div className="flex gap-4 items-center">
-                                {/* ★★★ iOS 引導內建的分享按鈕 ★★★ */}
-                                <button onClick={handleIOSShare} className="flex flex-col items-center justify-center p-3 bg-black/40 rounded-xl border border-[#d4af37] shrink-0 active:scale-95 transition-transform group">
-                                    <ShareIcon className="w-6 h-6 text-[#d4af37] mb-1" />
-                                    <span className="text-[10px] text-[#d4af37] font-bold uppercase tracking-wide">{t('ios_btn')}</span>
-                                </button>
+                            <div className="flex gap-4 items-start">
+                                {/* 純裝飾圖示 */}
+                                <div className="p-3 bg-black/40 rounded-xl border border-[#d4af37]/30 shrink-0">
+                                    <ShareIcon className="w-6 h-6 text-[#d4af37]" />
+                                </div>
                                 
                                 <div className="flex-1">
-                                    <h4 className="text-[#fcd34d] font-bold text-sm mb-1">{t('install_app')}</h4>
-                                    <p className="text-zinc-300 text-xs leading-relaxed">
-                                        {t('ios_step1')} <br/>
-                                        {t('ios_step2')} <br/>
-                                        {t('ios_step3')} <br/>
-                                        <span className="text-[#d4af37]/80 text-[10px] block mt-1">{t('ios_hint')}</span>
+                                    <h4 className="text-[#fcd34d] font-bold text-sm mb-2">{t('install_app')}</h4>
+                                    <p className="text-zinc-300 text-xs leading-relaxed space-y-1">
+                                        <span className="block">{t('ios_step1')}</span>
+                                        <span className="block">{t('ios_step2')}</span>
+                                        <span className="block">{t('ios_step3')}</span>
                                     </p>
                                 </div>
                             </div>
-                            {/* 向下箭頭 */}
+                            {/* 向下箭頭，指引瀏覽器原生按鈕 */}
                             <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[#d4af37] animate-bounce"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg></div>
                         </div>
                     </div>
                 );
             }
 
-            // Render: iOS Chrome/Edge Hint (強制複製連結)
+            // Render: iOS Chrome/Edge Hint (底部強制顯示)
             if (showChromeIOSPrompt) {
                 return (
                     <div className="fixed bottom-4 left-4 right-4 z-[100] animate-in slide-in-from-bottom-10 fade-in duration-500">
@@ -599,7 +598,6 @@
 
         // Main App
         function MiniCactpotSolver() {
-            // ★★★ 自動語言偵測 ★★★
             const [lang, setLang] = useState(() => {
                 try {
                     const saved = localStorage.getItem('cactpot_lang');
@@ -623,8 +621,6 @@
             const [isFullFillMode, setIsFullFillMode] = useState(false);
             const [showPayouts, setShowPayouts] = useState(false);
             const [showLangMenu, setShowLangMenu] = useState(false);
-            
-            // ★★★ 新增：控制是否強制顯示 iOS 引導 ★★★
             const [forceShowIOS, setForceShowIOS] = useState(false);
             
             const [isSoundOn, setIsSoundOn] = useState(() => { try { const saved = localStorage.getItem('cactpot_sound'); return saved === null ? true : saved === 'true'; } catch(e) { return true; } });
@@ -639,20 +635,15 @@
                 }); 
             };
 
-            /* ★★★ 右上角分享按鈕邏輯：點擊時嘗試召喚引導 ★★★ */
             const handleTopRightShare = async () => {
                 sounds.click();
-                
-                // 1. 偵測是否為 iOS Safari
                 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
                 const isSafari = navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('CriOS') && !navigator.userAgent.includes('FxiOS');
 
                 if (isIOS && !isStandalone && isSafari) {
-                    // 如果是 iOS Safari，強制打開底部引導
                     setForceShowIOS(true);
                 } else {
-                    // 其他情況 (Android, Desktop, iOS Chrome)，直接呼叫原生分享
                     if (navigator.share) {
                         try {
                             await navigator.share({
@@ -662,7 +653,6 @@
                             });
                         } catch (err) {}
                     } else {
-                        // Fallback
                         try {
                             await navigator.clipboard.writeText(window.location.href);
                             alert("Link Copied!");
@@ -829,7 +819,7 @@
                     </button>
 
                     <div className="flex flex-col gap-2 items-end">
-                        {/* ★★★ 右上角分享按鈕 (常駐，點擊 iOS Safari 可叫出底部引導) ★★★ */}
+                        {/* ★★★ 右上角分享按鈕 (點擊呼叫底部引導) ★★★ */}
                         <button 
                              onClick={handleTopRightShare}
                              className="flex items-center justify-center gap-1.5 px-3 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95 group"
