@@ -216,14 +216,14 @@
             return null;
         };
 
-        // ★★★ Localization：更新語言按鈕文字與無限填模式 ★★★
+        // ★★★ Localization：更新 5 步驟 iOS 教學 ★★★
         const LOCALE = {
             zh: { app_title: "FF14-仙人微彩", title: "仙人微彩模擬器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", 
                   mode_on: "無限填數字模式 (已開啟)", mode_off: "無限填數字模式 (鎖定中)", 
                   reveal: "揭開!", row: "橫排", col: "直排", diag: "對角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新於", force_update: "更新頁面", region: "台北時間", sound_on: "音效開啟", sound_off: "音效關閉", jackpot: "JACKPOT", lang_select: "選擇語言",
                   install_btn: "APP安裝教學", lang_btn_label: "語言", share: "分享",
                   ios_title: "iOS 安裝步驟", android_title: "Android 安裝步驟",
-                  ios_step1: "1. 使用 Safari 開啟", ios_step2: "2. 點擊下方【分享】圖示", ios_step3: "3. 點擊【‧‧‧】【更多】圖示", ios_step4: "4. 選擇「加入主畫面」",
+                  ios_step1: "1. 使用 Safari 開啟", ios_step2: "2. 點擊瀏覽器下方【‧‧‧】", ios_step3: "3. 點擊【分享】圖示", ios_step4: "4. 點擊【‧‧‧】【更多】", ios_step5: "5. 選擇「加入主畫面」",
                   copy_link: "複製連結", link_copied: "連結已複製!",
                   android_btn: "點擊安裝 APP", android_hint: "或點擊瀏覽器選單「安裝應用程式」" },
             
@@ -232,7 +232,7 @@
                   reveal: "揭开!", row: "横排", col: "竖排", diag: "对角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新于", force_update: "刷新页面", region: "北京时间", sound_on: "音效开启", sound_off: "音效关闭", jackpot: "JACKPOT", lang_select: "选择语言",
                   install_btn: "APP安装教学", lang_btn_label: "语言", share: "分享",
                   ios_title: "iOS 安装步骤", android_title: "Android 安装步骤",
-                  ios_step1: "1. 使用 Safari 开启", ios_step2: "2. 点击下方【分享】图示", ios_step3: "3. 点击【‧‧‧】【更多】图示", ios_step4: "4. 选择「加入主画面」",
+                  ios_step1: "1. 使用 Safari 开启", ios_step2: "2. 点击浏览器下方【‧‧‧】", ios_step3: "3. 点击【分享】图示", ios_step4: "4. 点击【‧‧‧】【更多】", ios_step5: "5. 选择「加入主画面」",
                   copy_link: "复制链接", link_copied: "链接已复制!",
                   android_btn: "点击安装 APP", android_hint: "或点击浏览器菜单「安装应用程序」" },
             
@@ -241,7 +241,7 @@
                   reveal: "Reveal!", row: "Row", col: "Col", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Updated", force_update: "Refresh Page", region: "Taipei Time", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "Select Language",
                   install_btn: "Install Guide", lang_btn_label: "Language", share: "Share",
                   ios_title: "iOS Installation", android_title: "Android Installation",
-                  ios_step1: "1. Open in Safari", ios_step2: "2. Tap [Share] icon", ios_step3: "3. Tap [‧‧‧] More", ios_step4: "4. Select 'Add to Home Screen'",
+                  ios_step1: "1. Open in Safari", ios_step2: "2. Tap [‧‧‧] at bottom", ios_step3: "3. Tap [Share] icon", ios_step4: "4. Tap [‧‧‧] More", ios_step5: "5. Select 'Add to Home Screen'",
                   copy_link: "Copy Link", link_copied: "Copied!",
                   android_btn: "Install APP", android_hint: "Or check browser menu for 'Install App'" },
             
@@ -250,7 +250,7 @@
                   reveal: "めくる!", row: "横", col: "縦", diag: "斜め", label_10k: "10k", label_3600: "3.6k", ver_prefix: "最終更新", force_update: "ページ更新", region: "日本時間", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "言語を選択",
                   install_btn: "アプリ導入法", lang_btn_label: "言語設定", share: "共有",
                   ios_title: "iOS インストール手順", android_title: "Android インストール手順",
-                  ios_step1: "1. Safariで開く", ios_step2: "2. 下の [共有] をタップ", ios_step3: "3. [‧‧‧] その他をタップ", ios_step4: "4. [ホーム画面に追加] を選択",
+                  ios_step1: "1. Safariで開く", ios_step2: "2. 下の [‧‧‧] をタップ", ios_step3: "3. [共有] をタップ", ios_step4: "4. [‧‧‧] その他をタップ", ios_step5: "5. [ホーム画面に追加] を選択",
                   copy_link: "リンクをコピー", link_copied: "コピーしました!",
                   android_btn: "アプリをインストール", android_hint: "またはメニューから「アプリをインストール」" },
             
@@ -259,7 +259,7 @@
                   reveal: "Aufdecken!", row: "Reihe", col: "Spalte", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Aktualisiert", force_update: "Aktualisieren", region: "Berlin Zeit", sound_on: "Ton AN", sound_off: "Ton AUS", jackpot: "JACKPOT", lang_select: "Sprache wählen",
                   install_btn: "Installationshilfe", lang_btn_label: "Sprache", share: "Teilen",
                   ios_title: "iOS Installation", android_title: "Android Installation",
-                  ios_step1: "1. In Safari öffnen", ios_step2: "2. Tippe auf [Teilen]", ios_step3: "3. Tippe auf [‧‧‧] Mehr", ios_step4: "4. Wähle 'Zum Home-Bildschirm'",
+                  ios_step1: "1. In Safari öffnen", ios_step2: "2. Tippe auf [‧‧‧]", ios_step3: "3. Tippe auf [Teilen]", ios_step4: "4. Tippe auf [‧‧‧] Mehr", ios_step5: "5. Wähle 'Zum Home-Bildschirm'",
                   copy_link: "Link kopieren", link_copied: "Kopiert!",
                   android_btn: "App installieren", android_hint: "Oder im Menü 'App installieren' wählen" },
             
@@ -268,7 +268,7 @@
                   reveal: "Révéler!", row: "Rangée", col: "Colonne", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Mise à jour", force_update: "Actualiser", region: "Paris", sound_on: "Son ON", sound_off: "Son OFF", jackpot: "JACKPOT", lang_select: "Choisir la langue",
                   install_btn: "Guide d'installation", lang_btn_label: "Langue", share: "Partager",
                   ios_title: "Installation iOS", android_title: "Installation Android",
-                  ios_step1: "1. Ouvrir dans Safari", ios_step2: "2. Touchez [Partager]", ios_step3: "3. Touchez [‧‧‧] Plus", ios_step4: "4. Sélectionnez 'Sur l'écran d'accueil'",
+                  ios_step1: "1. Ouvrir dans Safari", ios_step2: "2. Touchez [‧‧‧]", ios_step3: "3. Touchez [Partager]", ios_step4: "4. Touchez [‧‧‧] Plus", ios_step5: "5. Sélectionnez 'Sur l'écran d'accueil'",
                   copy_link: "Copier le lien", link_copied: "Copié!",
                   android_btn: "Installer l'app", android_hint: "Ou via le menu 'Installer l'application'" },
             
@@ -277,7 +277,7 @@
                   reveal: "확인!", row: "가로", col: "세로", diag: "대각선", label_10k: "10k", label_3600: "3.6k", ver_prefix: "업데이트", force_update: "새로고침", region: "한국 시간", sound_on: "소리 켜기", sound_off: "소리 끄기", jackpot: "JACKPOT", lang_select: "언어 선택",
                   install_btn: "설치 가이드", lang_btn_label: "언어", share: "공유",
                   ios_title: "iOS 설치 방법", android_title: "Android 설치 방법",
-                  ios_step1: "1. Safari에서 열기", ios_step2: "2. 하단 [공유] 아이콘 클릭", ios_step3: "3. [‧‧‧] 더보기 클릭", ios_step4: "4. '홈 화면에 추가' 선택",
+                  ios_step1: "1. Safari에서 열기", ios_step2: "2. 하단 [‧‧‧] 클릭", ios_step3: "3. [공유] 아이콘 클릭", ios_step4: "4. [‧‧‧] 더보기 클릭", ios_step5: "5. '홈 화면에 추가' 선택",
                   copy_link: "링크 복사", link_copied: "복사됨!",
                   android_btn: "앱 설치", android_hint: "또는 브라우저 메뉴에서 '앱 설치' 선택" }
         };
@@ -451,7 +451,7 @@
             );
         };
 
-        // ★★★ 新增：安裝教學 Modal (改為彈出視窗) ★★★
+        // ★★★ 新增：安裝教學 Modal (5步驟版本) ★★★
         const InstallModal = ({ isOpen, onClose, t, playSound }) => {
             if (!isOpen) return null;
 
@@ -517,6 +517,10 @@
                                         <div className="flex gap-3 items-start">
                                             <div className="bg-[#d4af37]/20 p-1.5 rounded shrink-0 mt-0.5 text-[#d4af37] font-bold h-6 w-6 flex items-center justify-center text-xs">4</div>
                                             <p>{t('ios_step4')}</p>
+                                        </div>
+                                        <div className="flex gap-3 items-start">
+                                            <div className="bg-[#d4af37]/20 p-1.5 rounded shrink-0 mt-0.5 text-[#d4af37] font-bold h-6 w-6 flex items-center justify-center text-xs">5</div>
+                                            <p>{t('ios_step5')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -588,7 +592,9 @@
                             text: LOCALE[lang].description, 
                             url: window.location.href,
                         });
-                    } catch (err) {}
+                    } catch (err) {
+                        console.log('Share canceled');
+                    }
                 } else {
                     try {
                         await navigator.clipboard.writeText(window.location.href);
@@ -742,12 +748,14 @@
             };
 
             return (
-                <div className="min-h-screen flex flex-col items-center justify-start pt-8 pb-20 px-4 relative">
+                <div className="min-h-screen flex flex-col items-center justify-start pt-5 pb-20 px-4 relative">
                 
                 <AutoUpdateCheck />
 
-                <div className="w-full max-w-md flex justify-between items-start mb-2 px-2 z-40 relative">
+                {/* ★★★ 頂部控制列 (Top Bar) ★★★ */}
+                <div className="w-full max-w-md flex justify-between items-center mb-4 px-2 z-40 relative">
                     <div className="flex gap-2">
+                        {/* 音效 */}
                         <button 
                             onClick={() => { toggleSound(); setTimeout(() => sounds.toggle(), 0); }}
                             className="flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37]/60 hover:text-white transition-all active:scale-95"
@@ -755,6 +763,7 @@
                             {isSoundOn ? <Volume2 className="w-5 h-5 text-[#d4af37]" /> : <VolumeX className="w-5 h-5 text-zinc-500" />}
                         </button>
 
+                        {/* 分享 (無閃爍) */}
                         <button 
                              onClick={handleShare}
                              className="flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
@@ -763,30 +772,32 @@
                         </button>
                     </div>
 
-                    <div className="flex flex-col gap-2 items-end">
+                    <div className="flex gap-2">
+                        {/* 安裝教學 (長按鈕) */}
                         <button 
                              onClick={() => { setShowInstallModal(true); playSound('click'); }}
-                             className="flex items-center justify-center gap-1.5 px-3 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95 w-full min-w-[140px]"
+                             className="flex items-center justify-center gap-1.5 px-3 h-9 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
                         >
-                             <Download className="w-4 h-4" />
-                             <span className="text-xs font-bold uppercase">{t('install_btn')}</span>
+                             <Download className="w-3 h-3" />
+                             <span className="text-[10px] font-bold uppercase whitespace-nowrap">{t('install_btn')}</span>
                         </button>
 
+                        {/* 語言 (長按鈕，樣式統一) */}
                         <button 
                              onClick={() => { setShowLangMenu(true); setTimeout(() => sounds.click(), 0); }}
-                             className="flex items-center justify-center gap-1.5 px-3 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95 w-full min-w-[140px]"
+                             className="flex items-center justify-center gap-1.5 px-3 h-9 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
                         >
-                             <Globe className="w-4 h-4" />
-                             <span className="text-xs font-bold uppercase">{lang.toUpperCase()} - {t('lang_btn_label')}</span>
+                             <Globe className="w-3 h-3" />
+                             <span className="text-[10px] font-bold uppercase whitespace-nowrap">{lang.toUpperCase()} - {t('lang_btn_label')}</span>
                         </button>
                     </div>
                 </div>
 
-                <div className="w-full max-w-md mb-6 text-center relative shrink-0">
+                <div className="w-full max-w-md mb-4 text-center relative shrink-0">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-red-600/30 blur-[80px] rounded-full pointer-events-none mix-blend-screen"></div>
-                    <div className="relative flex flex-col items-center gap-3">
+                    <div className="relative flex flex-col items-center gap-2">
                         <Trophy className="w-8 h-8 text-[#d4af37] drop-shadow-[0_0_10px_rgba(212,175,55,0.8)]" />
-                        <h1 className="text-gold text-3xl md:text-5xl font-game font-extrabold tracking-widest drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] leading-tight py-2 relative z-10">
+                        <h1 className="text-gold text-3xl md:text-5xl font-game font-extrabold tracking-widest drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] leading-tight py-1 relative z-10">
                             {t('title')}
                         </h1>
                         <div className="flex items-center gap-2 opacity-80">
