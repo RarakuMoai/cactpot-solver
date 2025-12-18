@@ -161,8 +161,6 @@
 
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // ★★★ 修正後的音效引擎：加入強制喚醒 (CheckAndResume) ★★★
-        // 這是唯一修改 Javascript 邏輯的地方，解決偶爾沒聲音的問題
         const useSound = (enabled) => {
             const audioCtxRef = useRef(null);
 
@@ -210,7 +208,7 @@
             const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
                 if (!enabled) return;
                 
-                const ctx = checkAndResume(); // 每次播放前強制喚醒
+                const ctx = checkAndResume();
                 if (!ctx) return; 
 
                 try {
@@ -843,9 +841,9 @@
                     </div>
 
                     <div className="flex gap-2">
-                        {/* 安裝教學 (長按鈕) */}
+                        {/* ★★★ 修正點：這裡原本寫錯成 playSound('click')，現在改為 sounds.click() ★★★ */}
                         <button 
-                             onClick={() => { setShowInstallModal(true); playSound('click'); }}
+                             onClick={() => { setShowInstallModal(true); sounds.click(); }}
                              className="flex items-center justify-center gap-1.5 px-3 h-9 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
                         >
                              <Download className="w-3 h-3" />
