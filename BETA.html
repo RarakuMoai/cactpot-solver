@@ -258,31 +258,31 @@
             return null;
         };
 
-        // ★★★ 更新 Localization：調整 iOS 引導文字 ★★★
+        // ★★★ Localization：包含所有引導與錯誤提示 ★★★
         const LOCALE = {
             zh: { app_title: "FF14-仙人微彩", title: "仙人微彩模擬器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", mode_on: "無限填 (已開啟)", mode_off: "無限填 (鎖定中)", reveal: "揭開!", row: "橫排", col: "直排", diag: "對角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新於", force_update: "更新頁面", region: "台北時間", sound_on: "音效開啟", sound_off: "音效關閉", jackpot: "JACKPOT", lang_select: "選擇語言",
-                  install_app: "安裝 App", ios_btn: "點擊分享", ios_step1: "1. 點擊這裡的按鈕", ios_step2: "2. 在選單點擊「加入主畫面」", ios_hint: "找不到? 試著點擊「...更多」", safari_hint: "請使用 Safari 瀏覽器以安裝" },
+                  install_app: "安裝 App", ios_btn: "點擊分享", ios_step1: "1. 點擊這裡的按鈕", ios_step2: "2. 往下滑選「加入主畫面」", ios_hint: "找不到? 試著點擊「...更多」", safari_hint: "請使用 Safari 開啟並安裝", copy_link: "複製網址" },
             
             cn: { app_title: "FF14-仙人微彩", title: "仙人微彩模拟器", sum: "总和", payout_title: "奖金一览表", close_hint: "点击背景关闭", select_num: "选择数字", clear_cell: "清除", analysis_title: "全概率分析", best_pick: "最佳推荐", tap_view: "点击查看详细 👆", rank: "Rank", guaranteed: "保底", view_details: "查看详情", reset: "重置盘面", payout_btn: "奖金表", mode_on: "无限填 (已开启)", mode_off: "无限填 (锁定中)", reveal: "揭开!", row: "横排", col: "竖排", diag: "对角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新于", force_update: "刷新页面", region: "北京时间", sound_on: "音效开启", sound_off: "音效关闭", jackpot: "JACKPOT", lang_select: "选择语言",
-                  install_app: "安装 App", ios_btn: "点击分享", ios_step1: "1. 点击这里的按钮", ios_step2: "2. 在菜单点击「加入主画面」", ios_hint: "找不到? 试着点击「...更多」", safari_hint: "请使用 Safari 浏览器以安装" },
+                  install_app: "安装 App", ios_btn: "点击分享", ios_step1: "1. 点击这里的按钮", ios_step2: "2. 往下滑选「加入主画面」", ios_hint: "找不到? 试着点击「...更多」", safari_hint: "请使用 Safari 开启并安装", copy_link: "复制网址" },
             
             en: { app_title: "FF14-Cactpot", title: "Mini Cactpot Solver", sum: "Sum", payout_title: "Payout Table", close_hint: "Tap background to close", select_num: "Select Number", clear_cell: "Clear", analysis_title: "All Probability", best_pick: "Recommended", tap_view: "Tap for Details 👆", rank: "Rank", guaranteed: "Guaranteed", view_details: "View Details", reset: "Reset Board", payout_btn: "Payouts", mode_on: "Infinite (Active)", mode_off: "Infinite (Locked)", reveal: "Reveal!", row: "Row", col: "Col", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Updated", force_update: "Refresh Page", region: "Taipei Time", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "Select Language",
-                  install_app: "Install App", ios_btn: "Share", ios_step1: "1. Tap this button", ios_step2: "2. Select 'Add to Home Screen'", ios_hint: "Can't find it? Try '... More'", safari_hint: "Please open in Safari to install" },
+                  install_app: "Install App", ios_btn: "Share", ios_step1: "1. Tap this button", ios_step2: "2. Select 'Add to Home Screen'", ios_hint: "Can't find it? Try '... More'", safari_hint: "Please open in Safari to install", copy_link: "Copy Link" },
             
             ja: { app_title: "FF14-くじテンダー", title: "ミニ・くじテンダー", sum: "合計", payout_title: "賞金一覧", close_hint: "背景タップで閉じる", select_num: "数字を選択", clear_cell: "クリア", analysis_title: "全確率分析", best_pick: "推奨", tap_view: "詳細を見る 👆", rank: "順位", guaranteed: "確定", view_details: "詳細を見る", reset: "リセット", payout_btn: "賞金表", mode_on: "無限入力 (編集中)", mode_off: "無限入力 (ロック)", reveal: "めくる!", row: "横", col: "縦", diag: "斜め", label_10k: "10k", label_3600: "3.6k", ver_prefix: "最終更新", force_update: "ページ更新", region: "日本時間", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "言語を選択",
-                  install_app: "アプリをインストール", ios_btn: "共有する", ios_step1: "1. このボタンをタップ", ios_step2: "2. 「ホーム画面に追加」を選択", ios_hint: "ない場合は「...その他」を確認", safari_hint: "Safariで開いてインストール" },
+                  install_app: "アプリをインストール", ios_btn: "共有", ios_step1: "1. このボタンをタップ", ios_step2: "2. 「ホーム画面に追加」を選択", ios_hint: "ない場合は「...その他」を確認", safari_hint: "Safariで開いてインストール", copy_link: "リンクをコピー" },
             
             de: { app_title: "FF14-Glückskaktor", title: "Mini-Glückskaktor", sum: "Summe", payout_title: "Gewinntabelle", close_hint: "Zum Schließen tippen", select_num: "Zahl wählen", clear_cell: "Löschen", analysis_title: "Wahrscheinlichkeit", best_pick: "Empfohlen", tap_view: "Details antippen 👆", rank: "Rang", guaranteed: "Garantiert", view_details: "Details", reset: "Zurücksetzen", payout_btn: "Gewinne", mode_on: "Frei Modus (Ein)", mode_off: "Frei Modus (Aus)", reveal: "Aufdecken!", row: "Reihe", col: "Spalte", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Aktualisiert", force_update: "Aktualisieren", region: "Berlin Zeit", sound_on: "Ton AN", sound_off: "Ton AUS", jackpot: "JACKPOT", lang_select: "Sprache wählen",
-                  install_app: "App installieren", ios_btn: "Teilen", ios_step1: "1. Tippe auf den Button", ios_step2: "2. Wähle 'Zum Home-Bildschirm'", ios_hint: "Nicht gefunden? Tippe auf '... Mehr'", safari_hint: "In Safari öffnen zum Installieren" },
+                  install_app: "App installieren", ios_btn: "Teilen", ios_step1: "1. Tippe auf den Button", ios_step2: "2. Wähle 'Zum Home-Bildschirm'", ios_hint: "Nicht gefunden? Tippe auf '... Mehr'", safari_hint: "In Safari öffnen zum Installieren", copy_link: "Link kopieren" },
             
             fr: { app_title: "FF14-Mini Cactpot", title: "Mini Cactpot", sum: "Somme", payout_title: "Tableau des gains", close_hint: "Touchez pour fermer", select_num: "Choisir un nombre", clear_cell: "Effacer", analysis_title: "Probabilités", best_pick: "Recommandé", tap_view: "Voir détails 👆", rank: "Rang", guaranteed: "Garanti", view_details: "Détails", reset: "Réinitialiser", payout_btn: "Gains", mode_on: "Mode Libre (Actif)", mode_off: "Mode Libre (Verrou)", reveal: "Révéler!", row: "Rangée", col: "Colonne", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Mise à jour", force_update: "Actualiser", region: "Paris", sound_on: "Son ON", sound_off: "Son OFF", jackpot: "JACKPOT", lang_select: "Choisir la langue",
-                  install_app: "Installer l'app", ios_btn: "Partager", ios_step1: "1. Touchez ce bouton", ios_step2: "2. Sélectionnez 'Sur l'écran d'accueil'", ios_hint: "Introuvable? Touchez '... Plus'", safari_hint: "Ouvrir dans Safari pour installer" },
+                  install_app: "Installer l'app", ios_btn: "Partager", ios_step1: "1. Touchez ce bouton", ios_step2: "2. Sélectionnez 'Sur l'écran d'accueil'", ios_hint: "Introuvable? Touchez '... Plus'", safari_hint: "Ouvrir dans Safari pour installer", copy_link: "Copier le lien" },
             
             ko: { app_title: "FF14-미니 텐더", title: "미니 텐더 시뮬레이터", sum: "합계", payout_title: "당첨금 일람", close_hint: "배경을 눌러 닫기", select_num: "숫자 선택", clear_cell: "지우기", analysis_title: "확률 분석", best_pick: "추천", tap_view: "상세 보기 👆", rank: "순위", guaranteed: "보장", view_details: "상세 정보", reset: "초기화", payout_btn: "당첨금", mode_on: "무한 입력 (켜짐)", mode_off: "무한 입력 (꺼짐)", reveal: "확인!", row: "가로", col: "세로", diag: "대각선", label_10k: "10k", label_3600: "3.6k", ver_prefix: "업데이트", force_update: "새로고침", region: "한국 시간", sound_on: "소리 켜기", sound_off: "소리 끄기", jackpot: "JACKPOT", lang_select: "언어 선택",
-                  install_app: "앱 설치", ios_btn: "공유", ios_step1: "1. 버튼을 누르세요", ios_step2: "2. '홈 화면에 추가' 선택", ios_hint: "없으면 '... 더보기' 확인", safari_hint: "설치하려면 Safari에서 여세요" }
+                  install_app: "앱 설치", ios_btn: "공유", ios_step1: "1. 버튼을 누르세요", ios_step2: "2. '홈 화면에 추가' 선택", ios_hint: "없으면 '... 더보기' 확인", safari_hint: "설치하려면 Safari에서 여세요", copy_link: "링크 복사" }
         };
 
-        // --- Icons ---
+        // --- Icons (Same as before + Share + Copy + Download) ---
         const RefreshCw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>;
         const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
         const Unlock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>;
@@ -294,10 +294,9 @@
         const Volume2 = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
         const VolumeX = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>;
         const Globe = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
-        // Share Icon
         const ShareIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>;
-        // Download Icon
         const Download = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>;
+        const Copy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>;
 
         const ArrowRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
         const ArrowDown = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>;
@@ -452,8 +451,8 @@
             );
         };
 
-        /* ★★★ 新增：安裝引導元件 (支援 Android/iOS/Chrome) ★★★ */
-        const InstallGuide = ({ t }) => {
+        /* ★★★ 新增：安裝引導元件 (Option C + 強制引導) ★★★ */
+        const InstallGuide = ({ t, forceShowIOS, setForceShowIOS }) => {
             const [installPrompt, setInstallPrompt] = useState(null);
             const [showIOSPrompt, setShowIOSPrompt] = useState(false);
             const [showChromeIOSPrompt, setShowChromeIOSPrompt] = useState(false);
@@ -474,18 +473,19 @@
 
                 if (isIOS && !isStandalone) {
                     if (isSafari) {
-                        // iOS Safari: 顯示底部引導
+                        // iOS Safari: 判斷是否顯示 (Option C: 沒關過 OR 被強制召喚)
                         const hasClosed = localStorage.getItem('cactpot_ios_prompt_closed');
-                        if (!hasClosed) setTimeout(() => setShowIOSPrompt(true), 2000);
+                        if (!hasClosed || forceShowIOS) {
+                            setTimeout(() => setShowIOSPrompt(true), 500); // 稍微延遲
+                        }
                     } else {
-                        // iOS 非 Safari (Chrome/Edge): 顯示「請用 Safari」提示
-                        const hasClosed = localStorage.getItem('cactpot_chrome_ios_closed');
-                        if (!hasClosed) setTimeout(() => setShowChromeIOSPrompt(true), 2000);
+                        // iOS 非 Safari (Chrome/Edge): 強制顯示 (不存 localStorage)
+                        setTimeout(() => setShowChromeIOSPrompt(true), 1000);
                     }
                 }
 
                 return () => window.removeEventListener('beforeinstallprompt', handler);
-            }, []);
+            }, [forceShowIOS]); // 當 forceShowIOS 變更時重新檢查
 
             const handleAndroidInstall = () => {
                 if (!installPrompt) return;
@@ -503,8 +503,21 @@
                 }
             };
 
-            const closeIOS = () => { setShowIOSPrompt(false); localStorage.setItem('cactpot_ios_prompt_closed', 'true'); };
-            const closeChromeIOS = () => { setShowChromeIOSPrompt(false); localStorage.setItem('cactpot_chrome_ios_closed', 'true'); };
+            /* ★★★ 新增：複製網址功能 (給非 Safari 用) ★★★ */
+            const handleCopyLink = async () => {
+                try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert("Link Copied!");
+                } catch (err) {}
+            };
+
+            const closeIOS = () => { 
+                setShowIOSPrompt(false); 
+                localStorage.setItem('cactpot_ios_prompt_closed', 'true'); 
+                if(setForceShowIOS) setForceShowIOS(false); // 重置強制狀態
+            };
+            // 這裡不存 localStorage，確保每次都跳出來煩他
+            const closeChromeIOS = () => { setShowChromeIOSPrompt(false); };
 
             // Render: Android Button (在畫面底部)
             if (installPrompt) {
@@ -539,18 +552,25 @@
                                     </p>
                                 </div>
                             </div>
+                            {/* 向下箭頭 */}
+                            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[#d4af37] animate-bounce"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg></div>
                         </div>
                     </div>
                 );
             }
 
-            // Render: iOS Chrome/Edge Hint
+            // Render: iOS Chrome/Edge Hint (強制複製連結)
             if (showChromeIOSPrompt) {
                 return (
                     <div className="fixed top-20 left-4 right-4 z-[100] animate-in slide-in-from-top-4 fade-in duration-500">
-                        <div className="casino-panel p-4 rounded-xl shadow-lg border border-red-900/50 bg-black/90 flex items-center justify-between gap-3">
-                            <span className="text-xs text-[#d4af37]">{t('safari_hint')}</span>
-                            <button onClick={closeChromeIOS} className="text-zinc-500 hover:text-white"><X className="w-4 h-4" /></button>
+                        <div className="casino-panel p-4 rounded-xl shadow-lg border border-red-900/50 bg-black/90 flex flex-col gap-3">
+                            <div className="flex justify-between items-start">
+                                <span className="text-xs text-[#d4af37] font-bold">{t('safari_hint')}</span>
+                                <button onClick={closeChromeIOS} className="text-zinc-500 hover:text-white"><X className="w-4 h-4" /></button>
+                            </div>
+                            <button onClick={handleCopyLink} className="flex items-center justify-center gap-2 w-full py-2 bg-[#d4af37]/10 border border-[#d4af37] rounded text-[#d4af37] text-xs font-bold active:bg-[#d4af37]/20">
+                                <Copy className="w-4 h-4" /> {t('copy_link')}
+                            </button>
                         </div>
                     </div>
                 );
@@ -561,6 +581,7 @@
 
         // Main App
         function MiniCactpotSolver() {
+            // ★★★ 自動語言偵測 ★★★
             const [lang, setLang] = useState(() => {
                 try {
                     const saved = localStorage.getItem('cactpot_lang');
@@ -585,6 +606,9 @@
             const [showPayouts, setShowPayouts] = useState(false);
             const [showLangMenu, setShowLangMenu] = useState(false);
             
+            // ★★★ 新增：控制是否強制顯示 iOS 引導 ★★★
+            const [forceShowIOS, setForceShowIOS] = useState(false);
+            
             const [isSoundOn, setIsSoundOn] = useState(() => { try { const saved = localStorage.getItem('cactpot_sound'); return saved === null ? true : saved === 'true'; } catch(e) { return true; } });
             
             const sounds = useSound(isSoundOn);
@@ -595,6 +619,38 @@
                     try { localStorage.setItem('cactpot_sound', String(newState)); } catch(e) {} 
                     return newState; 
                 }); 
+            };
+
+            /* ★★★ 右上角分享按鈕邏輯：點擊時嘗試召喚引導 ★★★ */
+            const handleTopRightShare = async () => {
+                sounds.click();
+                
+                // 1. 偵測是否為 iOS Safari
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+                const isSafari = navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('CriOS') && !navigator.userAgent.includes('FxiOS');
+
+                if (isIOS && !isStandalone && isSafari) {
+                    // 如果是 iOS Safari，強制打開底部引導
+                    setForceShowIOS(true);
+                } else {
+                    // 其他情況 (Android, Desktop, iOS Chrome)，直接呼叫原生分享
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: LOCALE[lang].title,
+                                text: LOCALE[lang].description, 
+                                url: window.location.href,
+                            });
+                        } catch (err) {}
+                    } else {
+                        // Fallback
+                        try {
+                            await navigator.clipboard.writeText(window.location.href);
+                            alert("Link Copied!");
+                        } catch (err) {}
+                    }
+                }
             };
             
             const [solutions, setSolutions] = useState([]);
@@ -754,13 +810,25 @@
                         {isSoundOn ? <Volume2 className="w-5 h-5 text-[#d4af37]" /> : <VolumeX className="w-5 h-5 text-zinc-500" />}
                     </button>
 
-                    <button 
-                         onClick={() => { setShowLangMenu(true); setTimeout(() => sounds.click(), 0); }}
-                         className="flex items-center justify-center gap-1.5 px-3 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
-                    >
-                         <Globe className="w-4 h-4" />
-                         <span className="text-xs font-bold uppercase">{lang.toUpperCase()}</span>
-                    </button>
+                    <div className="flex gap-2">
+                        {/* ★★★ 右上角分享按鈕 (常駐) ★★★ */}
+                        <button 
+                             onClick={handleTopRightShare}
+                             className="flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95 relative group"
+                        >
+                             <ShareIcon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                             {/* 呼吸燈效果 */}
+                             <span className="absolute inset-0 rounded-full border border-[#d4af37] opacity-0 group-hover:opacity-100 animate-ping"></span>
+                        </button>
+
+                        <button 
+                             onClick={() => { setShowLangMenu(true); setTimeout(() => sounds.click(), 0); }}
+                             className="flex items-center justify-center gap-1.5 px-3 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
+                        >
+                             <Globe className="w-4 h-4" />
+                             <span className="text-xs font-bold uppercase">{lang.toUpperCase()}</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="w-full max-w-md mb-6 text-center relative shrink-0">
@@ -813,8 +881,8 @@
                 
                 <LanguageModal isOpen={showLangMenu} onClose={() => setShowLangMenu(false)} currentLang={lang} setLang={setLang} t={t} playSound={sounds.click} />
                 
-                {/* ★★★ 新增：跨平台安裝引導 ★★★ */}
-                <InstallGuide t={t} />
+                {/* ★★★ 新增：跨平台安裝引導 (綁定 forceShowIOS state) ★★★ */}
+                <InstallGuide t={t} forceShowIOS={forceShowIOS} setForceShowIOS={setForceShowIOS} />
                 </div>
             );
         }
