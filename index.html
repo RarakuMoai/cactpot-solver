@@ -43,6 +43,29 @@
             --casino-black: #0f0f11;
         }
 
+        /* ★★★ 第一層 Loading (CSS)：黑底 + 文字 ★★★ */
+        /* 解決 iOS 白屏，並確保電腦版可以捲動 (移除了 overflow: hidden) */
+        html {
+            background-color: #0f0f11; /* 強制黑底 */
+            height: 100%;
+        }
+        
+        /* 預設載入文字 (系統字體，秒開) */
+        html::before {
+            content: "Loading...";
+            position: fixed;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #d4af37;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 14px;
+            letter-spacing: 4px;
+            opacity: 0.8;
+            z-index: -1;
+        }
+
         body { 
             -webkit-tap-highlight-color: transparent; 
             font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; 
@@ -50,9 +73,12 @@
             background-image: radial-gradient(circle at center top, #7f1d1d 0%, var(--casino-red) 40%, #000000 100%);
             background-size: 100% 100%;
             background-attachment: fixed;
-            overscroll-behavior-y: none;
+            /* overscroll-behavior-y: none;  <-- 電腦版建議註解掉這行，避免影響捲動體驗，手機版通常沒差 */
             overflow-x: hidden; 
             color: #fff;
+            min-height: 100%;
+            position: relative;
+            z-index: 1; 
         }
         
         .font-game { font-family: 'Cinzel', serif; }
@@ -135,11 +161,12 @@
             animation: shimmer 3s linear infinite;
         }
 
-        /* 載入動畫 */
+        /* ★★★ 第二層 Loading (JS)：金色轉圈圈，文字樣式對齊第一層 ★★★ */
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .loading-spinner { width: 50px; height: 50px; border: 4px solid rgba(212, 175, 55, 0.2); border-top: 4px solid #fcd34d; border-radius: 50%; animation: spin 1s linear infinite; filter: drop-shadow(0 0 10px #fcd34d); }
-        .loading-text { font-family: 'Cinzel', serif; color: #d4af37; font-size: 14px; letter-spacing: 4px; margin-top: 20px; animation: pulse 2s infinite; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        /* 這裡強制使用 sans-serif，確保跟 CSS Loading 文字一模一樣 */
+        .loading-text { font-family: sans-serif; color: #d4af37; font-size: 14px; letter-spacing: 4px; margin-top: 20px; animation: pulse 2s infinite; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
     </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden font-sans">
@@ -155,6 +182,7 @@
     </div>
 
     <script type="text/babel">
+        // 時區統一：UTC+8
         const getBuildTime = () => {
             try {
                 const lastMod = new Date(document.lastModified);
@@ -272,6 +300,7 @@
             return null;
         };
 
+        // 7 國語言全配
         const LOCALE = {
             zh: { app_title: "FF14-仙人微彩計算器", title: "仙人微彩計算器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", 
                   mode_on: "無限填數字模式 (已開啟)", mode_off: "無限填數字模式 (鎖定中)", 
@@ -649,15 +678,37 @@
             );
         };
 
-        // ★★★ 新增：關於作者 Modal ★★★
+        // ★★★ 關於作者 Modal (v1.04 優化版：點擊自動複製 Email) ★★★
         const AboutModal = ({ isOpen, onClose, t, playSound }) => {
+            const [copyStatus, setCopyStatus] = useState(null); 
+
             if (!isOpen) return null;
+
+            const handleContact = () => {
+                playSound('click');
+                const email = "yayoi991331@gmail.com";
+                
+                // 1. 嘗試複製到剪貼簿
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(email).then(() => {
+                        setCopyStatus('copied');
+                        setTimeout(() => setCopyStatus(null), 2000); 
+                    }).catch(() => {});
+                }
+
+                // 2. 嘗試開啟系統郵件軟體 (給手機用)
+                window.location.href = `mailto:${email}`;
+            };
+
+            // 判斷是否為中文語系，顯示對應的複製提示
+            const isChinese = t('contact_label').includes('寄信') || t('contact_label').includes('信');
+            const copiedText = isChinese ? "Email 已複製！" : "Email Copied!";
+
             return (
                 <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => { playSound('click'); onClose(); }}>
                     <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden">
                         <div className="p-4 border-b border-[#d4af37]/30 flex items-center justify-between bg-black/30">
                             <h3 className="text-gold font-bold text-lg flex items-center gap-2">
-                                {/* 這裡用一個愛心圖示代表溫度 */}
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#d4af37]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                                 {t('about_title')}
                             </h3>
@@ -670,12 +721,25 @@
                                 <p className="text-xs text-[#d4af37]/90">{t('about_desc2')}</p>
                             </div>
                             
-                            {/* ★★★ 這裡設定你的聯繫方式 ★★★ */}
-                            <a href="mailto:yayoi991331@gmail.com" target="_blank" rel="noopener noreferrer" 
-                               onClick={() => playSound('click')}
-                               className="flex items-center justify-center gap-2 w-full py-3 mt-2 rounded-xl bg-[#d4af37] text-black font-bold shadow-lg hover:bg-[#fcd34d] transition-transform active:scale-95">
-                                <span>✉️ {t('contact_label')}</span>
-                            </a>
+                            {/* ★★★ 修改後的按鈕：具備複製功能 ★★★ */}
+                            <button 
+                               onClick={handleContact}
+                               className={`flex items-center justify-center gap-2 w-full py-3 mt-2 rounded-xl font-bold shadow-lg transition-all active:scale-95 border ${copyStatus === 'copied' ? 'bg-green-600 text-white border-green-400' : 'bg-[#d4af37] text-black border-[#fcd34d] hover:bg-[#fcd34d]'}`}>
+                                {copyStatus === 'copied' ? (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                        <span>{copiedText}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>✉️ {t('contact_label')}</span>
+                                    </>
+                                )}
+                            </button>
+                            {/* 顯示明碼 Email 方便電腦版使用者手動選取 */}
+                            <div className="text-center text-[10px] text-[#d4af37]/50 font-mono select-all cursor-text">
+                                yayoi991331@gmail.com
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -972,7 +1036,9 @@
                 <div className="mt-12 flex flex-col items-center gap-4 pb-12 opacity-80 transition-opacity">
                     {/* 關於作者按鈕 */}
                     <button onClick={() => { setShowAboutModal(true); sounds.click(); }} className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-[#d4af37]/30 bg-black/20 text-[#d4af37] text-xs font-bold hover:bg-[#d4af37]/10 transition-all">
-                        <span className="text-sm">👋</span> {t('about_btn')}
+                        {/* 這裡換成了金色的人像 SVG */}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        {t('about_btn')}
                     </button>
 
                     <div className="flex flex-col items-center gap-1">
