@@ -7,7 +7,6 @@
     <title>FF14 仙人微彩計算器 (Mini Cactpot Solver) - 每日 MGP 必中攻略 & 機率分析</title>
     
     <meta name="description" content="FF14 / FFXIV 仙人微彩計算器 (Mini Cactpot Solver)。支援繁中、簡中、英文、日文等多國語言。提供每日仙人彩最佳路徑與期望值分析，幫助你輕鬆獲得最高 MGP 獎勵，金碟遊樂場必備攻略工具。">
-    <meta name="keywords" content="FF14, FFXIV, 仙人微彩, 仙人彩, Mini Cactpot, Solver, 計算器, 計算機, 解題器, 攻略, MGP, 金碟遊樂場">
     
     <meta name="apple-mobile-web-app-title" content="FF14 Solver">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,131 +26,56 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --gold-primary: #d4af37; --gold-light: #fcd34d; --gold-dark: #927215; --casino-red: #4a0404; --casino-black: #0f0f11; }
+        body { -webkit-tap-highlight-color: transparent; font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; background-color: var(--casino-black); background-image: radial-gradient(circle at center top, #7f1d1d 0%, var(--casino-red) 40%, #000000 100%); background-size: 100% 100%; background-attachment: fixed; overscroll-behavior-y: none; overflow-x: hidden; color: #fff; }
+        .font-game { font-family: 'Cinzel', serif; }
+        .casino-pattern { background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l15 30-15 30-15-30z' fill='%23d4af37' fill-opacity='0.05'/%3E%3C/svg%3E"); background-size: 60px 60px; opacity: 0.3; mix-blend-mode: overlay; }
+        .select-none { user-select: none; -webkit-user-select: none; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; } .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .btn-3d { transition: all 0.1s; box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2); border-bottom: none; } .btn-3d:active { transform: translateY(4px); box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .text-gold { background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary), var(--gold-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.8)); }
+        .casino-panel { background: linear-gradient(135deg, rgba(74, 4, 4, 0.9), rgba(15, 15, 17, 0.95)); backdrop-filter: blur(8px); border: 2px solid var(--gold-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(212, 175, 55, 0.1); position: relative; } .casino-panel::after { content: ''; position: absolute; inset: -4px; border: 1px solid var(--gold-light); border-radius: inherit; opacity: 0.3; pointer-events: none; }
+        .circle-cell { border-radius: 50%; background: radial-gradient(circle at 30% 30%, #4a0404, #000); border: 3px solid var(--gold-primary); box-shadow: inset 0 0 20px rgba(0,0,0,1), 0 4px 10px rgba(0,0,0,0.5); position: relative; overflow: hidden; touch-action: manipulation; } .circle-cell.filled { background: radial-gradient(circle at 30% 30%, var(--gold-light), var(--gold-primary), #b45309); border-color: var(--gold-light); color: #451a03; text-shadow: 0 1px 0 rgba(255,255,255,0.4); box-shadow: inset 0 0 10px rgba(255,255,0,0.5), 0 0 20px rgba(212, 175, 55, 0.6); }
+        @keyframes rainbow-pulse { 0% { box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,165,0,0.5); } 25% { box-shadow: 0 0 20px rgba(255,255,0,0.8), 0 0 40px rgba(0,255,0,0.5); } 50% { box-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(0,0,255,0.5); } 75% { box-shadow: 0 0 20px rgba(128,0,128,0.8), 0 0 40px rgba(255,0,255,0.5); } 100% { box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,165,0,0.5); } }
+        .circle-cell.suggested { border-color: #fff; animation: rainbow-pulse 3s linear infinite; z-index: 10; }
+        @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        .jackpot-row-bg { background: linear-gradient(90deg, rgba(212,175,55,0.05), rgba(252,211,77,0.35), rgba(255,255,255,0.5), rgba(252,211,77,0.35), rgba(212,175,55,0.05)); background-size: 200% auto; animation: shimmer 3s linear infinite; }
+
+        /* 載入動畫 (Unified Loading) */
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .loading-spinner { width: 50px; height: 50px; border: 4px solid rgba(212, 175, 55, 0.2); border-top: 4px solid #fcd34d; border-radius: 50%; animation: spin 1s linear infinite; filter: drop-shadow(0 0 10px #fcd34d); }
+        .loading-text { font-family: 'Cinzel', serif; color: #d4af37; font-size: 14px; letter-spacing: 4px; margin-top: 20px; animation: pulse 2s infinite; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden font-sans">
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NL7CSVDZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     
+    <div class="fixed inset-0 casino-pattern pointer-events-none z-0"></div>
+
+    <div id="root" class="relative z-10">
+        <div style="position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:50;">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --gold-primary: #d4af37;
-            --gold-light: #fcd34d;
-            --gold-dark: #927215;
-            --casino-red: #4a0404;
-            --casino-black: #0f0f11;
-        }
-
-        body { 
-            -webkit-tap-highlight-color: transparent; 
-            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; 
-            background-color: var(--casino-black);
-            background-image: radial-gradient(circle at center top, #7f1d1d 0%, var(--casino-red) 40%, #000000 100%);
-            background-size: 100% 100%;
-            background-attachment: fixed;
-            overscroll-behavior-y: none;
-            overflow-x: hidden; 
-            color: #fff;
-        }
-        
-        .font-game { font-family: 'Cinzel', serif; }
-
-        .casino-pattern {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l15 30-15 30-15-30z' fill='%23d4af37' fill-opacity='0.05'/%3E%3C/svg%3E");
-            background-size: 60px 60px;
-            opacity: 0.3;
-            mix-blend-mode: overlay;
-        }
-
-        .select-none { user-select: none; -webkit-user-select: none; }
-        
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .btn-3d {
-            transition: all 0.1s;
-            box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
-            border-bottom: none;
-        }
-        .btn-3d:active {
-            transform: translateY(4px);
-            box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-        
-        .text-gold {
-            background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary), var(--gold-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.8));
-        }
-
-        .casino-panel {
-            background: linear-gradient(135deg, rgba(74, 4, 4, 0.9), rgba(15, 15, 17, 0.95));
-            backdrop-filter: blur(8px);
-            border: 2px solid var(--gold-primary);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(212, 175, 55, 0.1);
-            position: relative;
-        }
-        .casino-panel::after {
-            content: ''; position: absolute; inset: -4px; border: 1px solid var(--gold-light); border-radius: inherit; opacity: 0.3; pointer-events: none;
-        }
-
-        .circle-cell {
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #4a0404, #000);
-            border: 3px solid var(--gold-primary);
-            box-shadow: inset 0 0 20px rgba(0,0,0,1), 0 4px 10px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-            touch-action: manipulation;
-        }
-        .circle-cell.filled {
-            background: radial-gradient(circle at 30% 30%, var(--gold-light), var(--gold-primary), #b45309);
-            border-color: var(--gold-light);
-            color: #451a03;
-            text-shadow: 0 1px 0 rgba(255,255,255,0.4);
-            box-shadow: inset 0 0 10px rgba(255,255,0,0.5), 0 0 20px rgba(212, 175, 55, 0.6);
-        }
-        @keyframes rainbow-pulse {
-            0% { box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,165,0,0.5); }
-            25% { box-shadow: 0 0 20px rgba(255,255,0,0.8), 0 0 40px rgba(0,255,0,0.5); }
-            50% { box-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(0,0,255,0.5); }
-            75% { box-shadow: 0 0 20px rgba(128,0,128,0.8), 0 0 40px rgba(255,0,255,0.5); }
-            100% { box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,165,0,0.5); }
-        }
-        .circle-cell.suggested {
-            border-color: #fff;
-            animation: rainbow-pulse 3s linear infinite;
-            z-index: 10;
-        }
-        @keyframes shimmer {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
-        }
-        .jackpot-row-bg {
-            background: linear-gradient(90deg, rgba(212,175,55,0.05), rgba(252,211,77,0.35), rgba(255,255,255,0.5), rgba(252,211,77,0.35), rgba(212,175,55,0.05));
-            background-size: 200% auto;
-            animation: shimmer 3s linear infinite;
-        }
-    </style>
-</head>
-<body class="min-h-screen relative overflow-x-hidden font-sans">
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NL7CSVDZ"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    
-    <div class="fixed inset-0 casino-pattern pointer-events-none z-0"></div>
-
-    <div id="root" class="relative z-10"></div>
-
     <script type="text/babel">
+        // 統一強制台北時間 UTC+8
         const getBuildTime = () => {
             try {
                 const lastMod = new Date(document.lastModified);
                 if(isNaN(lastMod.getTime())) return "剛剛更新";
                 return lastMod.toLocaleString('zh-TW', {
+                    timeZone: 'Asia/Taipei',
                     year: 'numeric', month: '2-digit', day: '2-digit',
                     hour: '2-digit', minute: '2-digit', hour12: false
                 });
@@ -207,7 +131,6 @@
 
             const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
                 if (!enabled) return;
-                
                 const ctx = checkAndResume();
                 if (!ctx) return; 
 
@@ -267,7 +190,7 @@
         const LOCALE = {
             zh: { app_title: "FF14-仙人微彩計算器", title: "仙人微彩計算器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", 
                   mode_on: "無限填數字模式 (已開啟)", mode_off: "無限填數字模式 (鎖定中)", 
-                  reveal: "揭開!", row: "橫排", col: "直排", diag: "對角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新於", force_update: "更新頁面", region: "台北時間", sound_on: "音效開啟", sound_off: "音效關閉", jackpot: "JACKPOT", lang_select: "選擇語言",
+                  reveal: "揭開!", row: "橫排", col: "直排", diag: "對角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新於", force_update: "更新頁面", region: "UTC+8", sound_on: "音效開啟", sound_off: "音效關閉", jackpot: "JACKPOT", lang_select: "選擇語言",
                   install_btn: "APP安裝教學", share: "分享",
                   ios_title: "iOS 安裝步驟", android_title: "Android 安裝步驟",
                   ios_step1: "使用 Safari 開啟", ios_step2: "點擊瀏覽器下方【‧‧‧】", ios_step3: "點擊【分享】圖示", ios_step4: "點擊【‧‧‧】【更多】", ios_step5: "選擇「加入主畫面」",
@@ -276,7 +199,7 @@
             
             cn: { app_title: "FF14-仙人微彩计算器", title: "仙人微彩计算器", sum: "总和", payout_title: "奖金一览表", close_hint: "点击背景关闭", select_num: "选择数字", clear_cell: "清除", analysis_title: "全概率分析", best_pick: "最佳推荐", tap_view: "点击查看详细 👆", rank: "Rank", guaranteed: "保底", view_details: "查看详情", reset: "重置盘面", payout_btn: "奖金表", 
                   mode_on: "无限填数字模式 (已开启)", mode_off: "无限填数字模式 (锁定中)", 
-                  reveal: "揭开!", row: "横排", col: "竖排", diag: "对角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新于", force_update: "刷新页面", region: "北京时间", sound_on: "音效开启", sound_off: "音效关闭", jackpot: "JACKPOT", lang_select: "选择语言",
+                  reveal: "揭开!", row: "横排", col: "竖排", diag: "对角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新于", force_update: "刷新页面", region: "UTC+8", sound_on: "音效开启", sound_off: "音效关闭", jackpot: "JACKPOT", lang_select: "选择语言",
                   install_btn: "APP安装教学", share: "分享",
                   ios_title: "iOS 安装步骤", android_title: "Android 安装步骤",
                   ios_step1: "使用 Safari 开启", ios_step2: "点击浏览器下方【‧‧‧】", ios_step3: "点击【分享】图示", ios_step4: "点击【‧‧‧】【更多】", ios_step5: "选择「加入主画面」",
@@ -285,7 +208,7 @@
             
             en: { app_title: "FF14-Cactpot Solver", title: "Mini Cactpot Solver", sum: "Sum", payout_title: "Payout Table", close_hint: "Tap background to close", select_num: "Select Number", clear_cell: "Clear", analysis_title: "All Probability", best_pick: "Recommended", tap_view: "Tap for Details 👆", rank: "Rank", guaranteed: "Guaranteed", view_details: "View Details", reset: "Reset Board", payout_btn: "Payouts", 
                   mode_on: "Infinite Fill Mode (Active)", mode_off: "Infinite Fill Mode (Locked)", 
-                  reveal: "Reveal!", row: "Row", col: "Col", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Updated", force_update: "Refresh Page", region: "Taipei Time", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "Select Language",
+                  reveal: "Reveal!", row: "Row", col: "Col", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Updated", force_update: "Refresh Page", region: "UTC+8", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "Select Language",
                   install_btn: "Install Guide", share: "Share",
                   ios_title: "iOS Installation", android_title: "Android Installation",
                   ios_step1: "Open in Safari", ios_step2: "Tap [‧‧‧] at bottom", ios_step3: "Tap [Share] icon", ios_step4: "Tap [‧‧‧] More", ios_step5: "Select 'Add to Home Screen'",
@@ -294,7 +217,7 @@
             
             ja: { app_title: "FF14-くじテンダー計算機", title: "ミニ・くじテンダー計算機", sum: "合計", payout_title: "賞金一覧", close_hint: "背景タップで閉じる", select_num: "数字を選択", clear_cell: "クリア", analysis_title: "全確率分析", best_pick: "推奨", tap_view: "詳細を見る 👆", rank: "順位", guaranteed: "確定", view_details: "詳細を見る", reset: "リセット", payout_btn: "賞金表", 
                   mode_on: "無限入力モード (編集中)", mode_off: "無限入力モード (ロック)", 
-                  reveal: "めくる!", row: "横", col: "縦", diag: "斜め", label_10k: "10k", label_3600: "3.6k", ver_prefix: "最終更新", force_update: "ページ更新", region: "日本時間", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "言語を選択",
+                  reveal: "めくる!", row: "横", col: "縦", diag: "斜め", label_10k: "10k", label_3600: "3.6k", ver_prefix: "最終更新", force_update: "ページ更新", region: "UTC+8", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "言語を選択",
                   install_btn: "アプリ導入法", share: "共有",
                   ios_title: "iOS インストール手順", android_title: "Android インストール手順",
                   ios_step1: "Safariで開く", ios_step2: "下の [‧‧‧] をタップ", ios_step3: "[共有] をタップ", ios_step4: "[‧‧‧] その他をタップ", ios_step5: "[ホーム画面に追加] を選択",
@@ -303,7 +226,7 @@
             
             de: { app_title: "FF14-Glückskaktor Solver", title: "Mini-Glückskaktor Solver", sum: "Summe", payout_title: "Gewinntabelle", close_hint: "Zum Schließen tippen", select_num: "Zahl wählen", clear_cell: "Löschen", analysis_title: "Wahrscheinlichkeit", best_pick: "Empfohlen", tap_view: "Details antippen 👆", rank: "Rang", guaranteed: "Garantiert", view_details: "Details", reset: "Zurücksetzen", payout_btn: "Gewinne", 
                   mode_on: "Frei-Eingabe-Modus (Ein)", mode_off: "Frei-Eingabe-Modus (Aus)", 
-                  reveal: "Aufdecken!", row: "Reihe", col: "Spalte", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Aktualisiert", force_update: "Aktualisieren", region: "Berlin Zeit", sound_on: "Ton AN", sound_off: "Ton AUS", jackpot: "JACKPOT", lang_select: "Sprache wählen",
+                  reveal: "Aufdecken!", row: "Reihe", col: "Spalte", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Aktualisiert", force_update: "Aktualisieren", region: "UTC+8", sound_on: "Ton AN", sound_off: "Ton AUS", jackpot: "JACKPOT", lang_select: "Sprache wählen",
                   install_btn: "Installationshilfe", share: "Teilen",
                   ios_title: "iOS Installation", android_title: "Android Installation",
                   ios_step1: "In Safari öffnen", ios_step2: "Tippe auf [‧‧‧]", ios_step3: "Tippe auf [Teilen]", ios_step4: "Tippe auf [‧‧‧] Mehr", ios_step5: "Wähle 'Zum Home-Bildschirm'",
@@ -312,7 +235,7 @@
             
             fr: { app_title: "FF14-Mini Cactpot Solver", title: "Mini Cactpot Solver", sum: "Somme", payout_title: "Tableau des gains", close_hint: "Touchez pour fermer", select_num: "Choisir un nombre", clear_cell: "Effacer", analysis_title: "Probabilités", best_pick: "Recommandé", tap_view: "Voir détails 👆", rank: "Rang", guaranteed: "Garanti", view_details: "Détails", reset: "Réinitialiser", payout_btn: "Gains", 
                   mode_on: "Mode Saisie Libre (Actif)", mode_off: "Mode Saisie Libre (Verrou)", 
-                  reveal: "Révéler!", row: "Rangée", col: "Colonne", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Mise à jour", force_update: "Actualiser", region: "Paris", sound_on: "Son ON", sound_off: "Son OFF", jackpot: "JACKPOT", lang_select: "Choisir la langue",
+                  reveal: "Révéler!", row: "Rangée", col: "Colonne", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Mise à jour", force_update: "Actualiser", region: "UTC+8", sound_on: "Son ON", sound_off: "Son OFF", jackpot: "JACKPOT", lang_select: "Choisir la langue",
                   install_btn: "Guide d'installation", share: "Partager",
                   ios_title: "Installation iOS", android_title: "Installation Android",
                   ios_step1: "Ouvrir dans Safari", ios_step2: "Touchez [‧‧‧]", ios_step3: "Touchez [Partager]", ios_step4: "Touchez [‧‧‧] Plus", ios_step5: "Sélectionnez 'Sur l'écran d'accueil'",
@@ -321,7 +244,7 @@
             
             ko: { app_title: "FF14-미니 텐더 계산기", title: "미니 텐더 계산기", sum: "합계", payout_title: "당첨금 일람", close_hint: "배경을 눌러 닫기", select_num: "숫자 선택", clear_cell: "지우기", analysis_title: "확률 분석", best_pick: "추천", tap_view: "상세 보기 👆", rank: "순위", guaranteed: "보장", view_details: "상세 정보", reset: "초기화", payout_btn: "당첨금", 
                   mode_on: "무한 입력 모드 (켜짐)", mode_off: "무한 입력 모드 (꺼짐)", 
-                  reveal: "확인!", row: "가로", col: "세로", diag: "대각선", label_10k: "10k", label_3600: "3.6k", ver_prefix: "업데이트", force_update: "새로고침", region: "한국 시간", sound_on: "소리 켜기", sound_off: "소리 끄기", jackpot: "JACKPOT", lang_select: "언어 선택",
+                  reveal: "확인!", row: "가로", col: "세로", diag: "대각선", label_10k: "10k", label_3600: "3.6k", ver_prefix: "업데이트", force_update: "새로고침", region: "UTC+8", sound_on: "소리 켜기", sound_off: "소리 끄기", jackpot: "JACKPOT", lang_select: "언어 선택",
                   install_btn: "설치 가이드", share: "공유",
                   ios_title: "iOS 설치 방법", android_title: "Android 설치 방법",
                   ios_step1: "Safari에서 열기", ios_step2: "하단 [‧‧‧] 클릭", ios_step3: "[공유] 아이콘 클릭", ios_step4: "[‧‧‧] 더보기 클릭", ios_step5: "'홈 화면에 추가' 선택",
@@ -499,7 +422,6 @@
             );
         };
 
-        // ★★★ 新增：安裝教學 Modal (雙模式 - Android 純文字修正版) ★★★
         const InstallModal = ({ isOpen, onClose, t, playSound }) => {
             if (!isOpen) return null;
 
@@ -516,7 +438,6 @@
             };
 
             const handleOpenChrome = () => {
-                // 嘗試用 intent 開啟 Chrome (Android only)
                 const currentUrl = window.location.href.replace('https://', '').replace('http://', '');
                 const intentUrl = `intent://${currentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
                 window.location.href = intentUrl;
@@ -526,21 +447,17 @@
                 <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => { playSound('click'); onClose(); }}>
                     <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden">
                         
-                        {/* Header Tabs */}
                         <div className="flex border-b border-[#d4af37]/30 bg-black/30">
                             <button onClick={() => { setActiveTab('ios'); playSound('click'); }} className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'ios' ? 'text-[#fcd34d] bg-[#d4af37]/10 border-b-2 border-[#fcd34d]' : 'text-[#d4af37]/50 hover:text-[#d4af37]'}`}>iOS</button>
                             <button onClick={() => { setActiveTab('android'); playSound('click'); }} className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'android' ? 'text-[#fcd34d] bg-[#d4af37]/10 border-b-2 border-[#fcd34d]' : 'text-[#d4af37]/50 hover:text-[#d4af37]'}`}>Android</button>
                             <button onClick={() => { playSound('click'); onClose(); }} className="absolute top-2 right-2 text-[#d4af37]/60 hover:text-white p-1"><X className="w-5 h-5"/></button>
                         </div>
 
-                        {/* Content Area */}
                         <div className="p-6 min-h-[240px] flex flex-col justify-center">
                             {activeTab === 'ios' ? (
                                 <div className="space-y-4">
                                     <h4 className="text-[#fcd34d] font-bold text-center mb-4">{t('ios_title')}</h4>
                                     <div className="space-y-2 text-sm text-zinc-300">
-                                        
-                                        {/* iOS Step 1 */}
                                         <div className="flex flex-col gap-2 p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
                                             <div className="flex gap-3 items-center">
                                                 <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">1</div>
@@ -550,8 +467,6 @@
                                                 <Copy className="w-3 h-3" /> {t('copy_link')}
                                             </button>
                                         </div>
-
-                                        {/* iOS Step 2-5 */}
                                         <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
                                             <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">2</div>
                                             <p className="flex-1 font-medium">{t('ios_step2')}</p>
@@ -574,8 +489,6 @@
                                 <div className="space-y-4">
                                     <h4 className="text-[#fcd34d] font-bold text-center mb-4">{t('android_title')}</h4>
                                     <div className="space-y-2 text-sm text-zinc-300">
-                                        
-                                        {/* Android Step 1 */}
                                         <div className="flex flex-col gap-2 p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
                                             <div className="flex gap-3 items-center">
                                                 <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">1</div>
@@ -585,14 +498,11 @@
                                                 <button onClick={handleCopyLink} className="flex items-center gap-1.5 text-[#d4af37] text-[10px] font-bold border border-[#d4af37]/50 px-2 py-1 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 w-fit transition-colors">
                                                     <Copy className="w-3 h-3" /> {t('copy_link')}
                                                 </button>
-                                                {/* Android 專用：開啟 Chrome 按鈕 */}
                                                 <button onClick={handleOpenChrome} className="flex items-center gap-1.5 text-[#d4af37] text-[10px] font-bold border border-[#d4af37]/50 px-2 py-1 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 w-fit transition-colors">
                                                     <ExternalLink className="w-3 h-3" /> {t('android_open_chrome')}
                                                 </button>
                                             </div>
                                         </div>
-
-                                        {/* Android Step 2-4 */}
                                         <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
                                             <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">2</div>
                                             <p className="flex-1 font-medium">{t('android_step2')}</p>
@@ -841,7 +751,7 @@
                     </div>
 
                     <div className="flex gap-2">
-                        {/* ★★★ 修正點：這裡原本寫錯成 playSound('click')，現在改為 sounds.click() ★★★ */}
+                        {/* 安裝教學 (長按鈕) */}
                         <button 
                              onClick={() => { setShowInstallModal(true); sounds.click(); }}
                              className="flex items-center justify-center gap-1.5 px-3 h-9 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
@@ -901,7 +811,14 @@
                 <AnalysisList />
 
                 <div className="mt-12 flex flex-col items-center gap-2 pb-8 opacity-60 hover:opacity-100 transition-opacity">
-                    <div className="text-[#d4af37] text-xs font-mono">{t('ver_prefix')} {BUILD_TIMESTAMP} ({t('region')}) {t('force_update').replace('页面','').replace('頁面','').replace('Refresh Page','').replace('Aktualisieren','').replace('Actualiser','').replace('새로고침','').replace('ページ更新','')}</div>
+                    <div className="text-[#d4af37] text-xs font-mono">{t('ver_prefix')} {BUILD_TIMESTAMP} ({t('region')})</div>
+                    
+                    <div className="text-[#d4af37]/40 text-[10px] scale-90 mt-1 select-none cursor-default">
+                        {lang === 'zh' || lang === 'cn' 
+                            ? '本站僅使用 GA 進行匿名流量統計，不蒐集個人個資' 
+                            : 'Anonymous usage data is collected via Google Analytics.'}
+                    </div>
+
                     <button onClick={handleForceUpdate} className="text-xs text-[#d4af37] underline flex items-center gap-1 hover:text-white"><RotateCcw className="w-3 h-3" /> {t('force_update')}</button>
                 </div>
 
