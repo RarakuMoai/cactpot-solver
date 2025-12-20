@@ -942,8 +942,8 @@
             const getLineName = (index) => {
                 if (index <= 2) return `${t('row')} ${index + 1}`;
                 if (index <= 5) return `${t('col')} ${index - 2}`;
-                if (index === 6) return `${t('diag')} ↘`;
-                if (index === 7) return `${t('diag')} ↙`;
+                if (index === 6) return `${t('diag')} 1`; 
+                if (index === 7) return `${t('diag')} 2`;
                 return "";
             };
 
