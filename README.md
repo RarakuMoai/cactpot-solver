@@ -38,7 +38,7 @@
 * **Creator / UI / Logic Integration:** **Raraku**
 * **Co-Developer:** **Gemini AI** (Refactoring, PWA implementation, Multilingual support)
 * **Core Algorithm:**
-    * 核心演算法參考並移植自 **Yuryu** 的 [PerfectCactpot](https://github.com/super-aardvark/ff14-cactpot) 邏輯。
+    * 核心演算法參考並移植自 **Yuryu** 的 [FFXIV Cactpot Solver](https://super-aardvark.github.io/yuryu/) 邏輯。
     * *The core algorithm logic represents a port based on Yuryu's PerfectCactpot.*
 
 ## 📲 如何安裝 PWA App
@@ -76,3 +76,4 @@
 ---
 
 **Made with ❤️ by Raraku in Taiwan.**
+
