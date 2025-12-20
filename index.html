@@ -397,6 +397,7 @@
         };
 
         // 7 國語言全配
+        // 7 國語言全配 (已加入 Yuryu 致謝)
         const LOCALE = {
             zh: { app_title: "FF14-仙人微彩計算器", title: "仙人微彩計算器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", 
                   mode_on: "無限填數字模式 (已開啟)", mode_off: "無限填數字模式 (鎖定中)", 
@@ -411,7 +412,8 @@
                   about_btn: "關於作者",
                   about_title: "嗨！我是來自台灣的 Raraku ٩(ˊᗜˋ*)و",
                   about_desc1: "這是我基於興趣製作的非營利小工具，希望能幫各位光之戰士在金碟遊樂場輕鬆賺大錢！✨",
-                  about_desc2: "這個專案是我與 Gemini AI 一起協作開發完成的喔！( • ̀ω•́ )✧ 如果你發現任何 Bug 或有什麼好建議，歡迎隨時寫信告訴我～",
+                  // 修改點：使用「參考並移植」
+                  about_desc2: "本專案由 Gemini AI 協作開發。核心演算法參考並移植自 Yuryu 的 PerfectCactpot 邏輯。如有任何建議，歡迎隨時寫信告訴我～",
                   contact_label: "寄信給 Raraku"
             },
             
@@ -428,7 +430,8 @@
                   about_btn: "关于作者",
                   about_title: "嗨！我是来自台湾的 Raraku ٩(ˊᗜˋ*)و",
                   about_desc1: "这是我基于兴趣制作的非营利小工具，希望能帮各位光之战士在金碟游乐场轻松赚大钱！✨",
-                  about_desc2: "这个专案是我与 Gemini AI 一起协作开发完成的喔！( • ̀ω•́ )✧ 如果你发现任何 Bug 或有什么好建议，欢迎随时写信告诉我～",
+                  // 修改點：使用「参考并移植」
+                  about_desc2: "本专案由 Gemini AI 协作开发。核心算法参考并移植自 Yuryu 的 PerfectCactpot 逻辑。如有任何建议，欢迎随时写信告诉我～",
                   contact_label: "寄信给 Raraku"
             },
             
@@ -445,7 +448,8 @@
                   about_btn: "About Author",
                   about_title: "Hi! I'm Raraku from Taiwan ٩(ˊᗜˋ*)و",
                   about_desc1: "Just a hobby project made with love! Hope this helps all Warriors of Light earn big MGP at the Gold Saucer! ✨",
-                  about_desc2: "This project was co-coded with Gemini AI! ( • ̀ω•́ )✧ If you find any bugs or have suggestions, feel free to let me know!",
+                  // 修改點：使用 "Core logic based on/ported from"
+                  about_desc2: "Co-coded with Gemini AI. Core algorithm logic is based on Yuryu's PerfectCactpot. Feel free to contact me for any suggestions!",
                   contact_label: "Email Raraku"
             },
             
@@ -459,7 +463,10 @@
                   android_step1: "Chromeで開く", android_step2: "右上のメニュー [⋮] をタップ", android_step3: "「ホーム画面に追加」を選択", android_step4: "「追加」をタップ",
                   copy_link: "リンクをコピー", link_copied: "コピーしました!", android_open_chrome: "Chromeで開く",
                   // About
-                  about_btn: "作者について", about_title: "Hi! 台湾出身の Raraku です ٩(ˊᗜˋ*)و", about_desc1: "趣味で作った非営利ツールです。光の戦士の皆さんがMGPを稼ぐのにお役に立てば嬉しいです！✨", about_desc2: "Gemini AIと共同開発しました！( • ̀ω•́ )✧ 不具合や提案があれば、気軽にメールしてください！", contact_label: "Rarakuにメール"
+                  about_btn: "作者について", about_title: "Hi! 台湾出身の Raraku です ٩(ˊᗜˋ*)و", about_desc1: "趣味で作った非営利ツールです。光の戦士の皆さんがMGPを稼ぐのにお役に立てば嬉しいです！✨", 
+                  // 修改點：使用 "参考・移植しました"
+                  about_desc2: "Gemini AIと共同開発しました！コアアルゴリズムはYuryu氏のPerfectCactpotを参考にしています。不具合や提案があれば、気軽にメールしてください！", 
+                  contact_label: "Rarakuにメール"
             },
             
             de: { app_title: "FF14-Glückskaktor Solver", title: "Mini-Glückskaktor Solver", sum: "Summe", payout_title: "Gewinntabelle", close_hint: "Zum Schließen tippen", select_num: "Zahl wählen", clear_cell: "Löschen", analysis_title: "Wahrscheinlichkeit", best_pick: "Empfohlen", tap_view: "Details antippen 👆", rank: "Rang", guaranteed: "Garantiert", view_details: "Details", reset: "Zurücksetzen", payout_btn: "Gewinne", 
@@ -472,7 +479,10 @@
                   android_step1: "In Chrome öffnen", android_step2: "Tippe oben rechts auf [⋮]", android_step3: "Wähle 'Zum Startbildschirm'", android_step4: "Tippe auf 'Hinzufügen'",
                   copy_link: "Link kopieren", link_copied: "Kopiert!", android_open_chrome: "In Chrome öffnen",
                   // About
-                  about_btn: "Über den Autor", about_title: "Hallo! Ich bin Raraku aus Taiwan ٩(ˊᗜˋ*)و", about_desc1: "Ein nicht-kommerzielles Hobbyprojekt! Ich hoffe, es hilft allen Kriegern des Lichts, MGP zu verdienen! ✨", about_desc2: "Programmiert mit Gemini AI! ( • ̀ω•́ )✧ Bei Bugs oder Vorschlägen einfach melden!", contact_label: "Email an Raraku"
+                  about_btn: "Über den Autor", about_title: "Hallo! Ich bin Raraku aus Taiwan ٩(ˊᗜˋ*)و", about_desc1: "Ein nicht-kommerzielles Hobbyprojekt! Ich hoffe, es hilft allen Kriegern des Lichts, MGP zu verdienen! ✨", 
+                  // 修改點：使用 "basiert auf"
+                  about_desc2: "Programmiert mit Gemini AI! Der Kernalgorithmus basiert auf Yuryus PerfectCactpot. Bei Bugs oder Vorschlägen einfach melden!", 
+                  contact_label: "Email an Raraku"
             },
             
             fr: { app_title: "FF14-Mini Cactpot Solver", title: "Mini Cactpot Solver", sum: "Somme", payout_title: "Tableau des gains", close_hint: "Touchez pour fermer", select_num: "Choisir un nombre", clear_cell: "Effacer", analysis_title: "Probabilités", best_pick: "Recommandé", tap_view: "Voir détails 👆", rank: "Rang", guaranteed: "Garanti", view_details: "Détails", reset: "Réinitialiser", payout_btn: "Gains", 
@@ -485,7 +495,10 @@
                   android_step1: "Ouvrir dans Chrome", android_step2: "Touchez [⋮] en haut à droite", android_step3: "Sélectionnez 'Ajouter à l'écran d'accueil'", android_step4: "Touchez 'Ajouter'",
                   copy_link: "Copier le lien", link_copied: "Copié!", android_open_chrome: "Ouvrir dans Chrome",
                   // About
-                  about_btn: "À propos de l'auteur", about_title: "Salut ! Je suis Raraku de Taïwan ٩(ˊᗜˋ*)و", about_desc1: "Un projet amateur à but non lucratif ! J'espère que cela aidera les Guerriers de la Lumière à gagner des MGP ! ✨", about_desc2: "Codé avec Gemini AI ! ( • ̀ω•́ )✧ Si vous trouvez des bugs, contactez-moi !", contact_label: "Email à Raraku"
+                  about_btn: "À propos de l'auteur", about_title: "Salut ! Je suis Raraku de Taïwan ٩(ˊᗜˋ*)و", about_desc1: "Un projet amateur à but non lucratif ! J'espère que cela aidera les Guerriers de la Lumière à gagner des MGP ! ✨", 
+                  // 修改點：使用 "basé sur"
+                  about_desc2: "Codé avec Gemini AI ! L'algorithme principal est basé sur le PerfectCactpot de Yuryu. Si vous trouvez des bugs, contactez-moi !", 
+                  contact_label: "Email à Raraku"
             },
             
             ko: { app_title: "FF14-미니 텐더 계산기", title: "미니 텐더 계산기", sum: "합계", payout_title: "당첨금 일람", close_hint: "배경을 눌러 닫기", select_num: "숫자 선택", clear_cell: "지우기", analysis_title: "확률 분석", best_pick: "추천", tap_view: "상세 보기 👆", rank: "순위", guaranteed: "보장", view_details: "상세 정보", reset: "초기화", payout_btn: "당첨금", 
@@ -498,7 +511,10 @@
                   android_step1: "Chrome에서 열기", android_step2: "오른쪽 상단 [⋮] 클릭", android_step3: "'홈 화면에 추가' 선택", android_step4: "'추가' 클릭",
                   copy_link: "링크 복사", link_copied: "복사됨!", android_open_chrome: "Chrome에서 열기",
                   // About
-                  about_btn: "제작자 소개", about_title: "안녕! 대만의 Raraku 입니다 ٩(ˊᗜˋ*)و", about_desc1: "취미로 만든 비영리 도구입니다. 빛의 전사 여러분이 MGP를 버는 데 도움이 되기를 바랍니다! ✨", about_desc2: "Gemini AI와 공동 개발했습니다! ( • ̀ω•́ )✧ 버그나 제안 사항이 있으면 메일 주세요!", contact_label: "Raraku에게 메일 보내기"
+                  about_btn: "제작자 소개", about_title: "안녕! 대만의 Raraku 입니다 ٩(ˊᗜˋ*)و", about_desc1: "취미로 만든 비영리 도구입니다. 빛의 전사 여러분이 MGP를 버는 데 도움이 되기를 바랍니다! ✨", 
+                  // 修改點：使用 "기반으로 합니다" (Based on)
+                  about_desc2: "Gemini AI와 공동 개발했습니다! 핵심 알고리즘은 Yuryu의 PerfectCactpot을 기반으로 합니다. 버그나 제안 사항이 있으면 메일 주세요!", 
+                  contact_label: "Raraku에게 메일 보내기"
             }
         };
 
