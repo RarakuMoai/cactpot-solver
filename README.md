@@ -13,6 +13,9 @@
 
 不同於傳統的網頁計算器，本專案採用 **PWA (Progressive Web App)** 技術，專為手機體驗優化。一旦開啟過一次，即可**離線使用**，並能像原生 App 一樣安裝在手機桌面上，擁有全螢幕沈浸體驗與精美的動畫音效。
 
+
+
+　　
 ## ✨ 核心特色 (Features)
 
 * **🧠 雙核心最強運算 (Hybrid Algorithm)**：
@@ -23,6 +26,9 @@
 * **🌍 多國語言支援**：內建 7 國語言 (繁中 / 简中 / EN / JA / DE / FR / KO)，隨系統自動切換。
 * **🎨 精美 UI 設計**：黑金配色 (Dark/Gold Theme)，完美契合金碟遊樂場的奢華氛圍。
 
+
+
+　　
 ## 🛠️ 技術架構 (Tech Stack)
 
 * **Core:** HTML5, CSS3, JavaScript (ES6+)
@@ -31,6 +37,9 @@
 * **PWA:** Service Worker + Web App Manifest
 * **Fonts:** Cinzel (Google Fonts)
 
+
+
+　　
 ## 🤝 致謝與授權 (Credits & Acknowledgments)
 
 本專案是一個基於熱愛的非營利開源作品。
@@ -41,32 +50,7 @@
     * 核心演算法參考並移植自 **Yuryu** 的 [FFXIV Cactpot Solver](https://super-aardvark.github.io/yuryu/) 邏輯。
     * *The core algorithm logic represents a port based on Yuryu's PerfectCactpot.*
 
-## 📲 如何安裝 PWA App
-
-本工具支援 **PWA**，可以安裝到您的手機桌面，享受無網址列的全螢幕體驗：
-
-### 🍎 iOS (Safari)
-1.  使用 Safari 打開網頁。
-2.  點擊下方分享按鈕 (Share Icon)。
-3.  往下滑，選擇 **「加入主畫面」 (Add to Home Screen)**。
-
-### 🤖 Android (Chrome)
-1.  使用 Chrome 打開網頁。
-2.  點擊右上角選單 (三點)。
-3.  選擇 **「加到主畫面」 (Add to Home screen)** 或 **「安裝應用程式」**。
-
----
-
-## 🚀 如何部署 (Deployment)
-
-本專案為純靜態網頁 (Static Web Page)，無需後端伺服器。
-
-1.  將 `index.html`, `sw.js`, `manifest.json`, `icon.png` 放入任意靜態空間 (如 GitHub Pages, Vercel, Netlify)。
-2.  確保 `sw.js` 與 `index.html` 位於**同一層目錄**。
-3.  完成！
-
----
-
+　　
 ## 📜 免責聲明 (Disclaimer)
 
 * 本工具僅為數據計算輔助，不涉及任何遊戲封包修改或自動化操作，符合 FFXIV 使用規範。
@@ -74,6 +58,4 @@
 * 本站僅使用 Google Analytics 進行匿名流量統計，不蒐集任何個人資料。
 
 ---
-
-**Made with ❤️ by Raraku in Taiwan.**
 
