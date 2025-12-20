@@ -17,6 +17,7 @@
 
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
 
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -44,14 +45,11 @@
             --casino-black: #0f0f11;
         }
 
-        /* ★★★ 第一層 Loading (CSS)：黑底 + 文字 ★★★ */
-        /* 解決 iOS 白屏，並確保電腦版可以捲動 (移除了 overflow: hidden) */
         html {
-            background-color: #0f0f11; /* 強制黑底 */
+            background-color: #0f0f11;
             height: 100%;
         }
         
-        /* 預設載入文字 (系統字體，秒開) */
         html::before {
             content: "Loading...";
             position: fixed;
@@ -74,7 +72,6 @@
             background-image: radial-gradient(circle at center top, #7f1d1d 0%, var(--casino-red) 40%, #000000 100%);
             background-size: 100% 100%;
             background-attachment: fixed;
-            /* overscroll-behavior-y: none;  <-- 電腦版建議註解掉這行，避免影響捲動體驗，手機版通常沒差 */
             overflow-x: hidden; 
             color: #fff;
             min-height: 100%;
@@ -82,7 +79,7 @@
             z-index: 1; 
         }
         
-        .font-game { font-family: 'Cinzel', serif; }
+        .font-game { font-family: 'Cinzel', sans-serif; }
 
         .casino-pattern {
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l15 30-15 30-15-30z' fill='%23d4af37' fill-opacity='0.05'/%3E%3C/svg%3E");
@@ -162,11 +159,9 @@
             animation: shimmer 3s linear infinite;
         }
 
-        /* ★★★ 第二層 Loading (JS)：金色轉圈圈，文字樣式對齊第一層 ★★★ */
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .loading-spinner { width: 50px; height: 50px; border: 4px solid rgba(212, 175, 55, 0.2); border-top: 4px solid #fcd34d; border-radius: 50%; animation: spin 1s linear infinite; filter: drop-shadow(0 0 10px #fcd34d); }
-        /* 這裡強制使用 sans-serif，確保跟 CSS Loading 文字一模一樣 */
         .loading-text { font-family: sans-serif; color: #d4af37; font-size: 14px; letter-spacing: 4px; margin-top: 20px; animation: pulse 2s infinite; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
     </style>
 </head>
@@ -183,6 +178,106 @@
     </div>
 
     <script type="text/babel">
+        // -----------------------------------------------------------
+        // ★★★ 核心運算移植區 (Core Logic Transplant) ★★★
+        // -----------------------------------------------------------
+        
+        // --- 直接搬移原始碼數據 ---
+        var payout = [NaN, NaN, NaN, NaN, NaN, NaN, 10000, 36, 720, 360, 80, 252, 108, 72, 54, 180, 72, 180, 119, 36, 306, 1080, 144, 1800, 3600];
+        var EPS = 0.00001;
+
+        var PerfectCactpot = {
+            openings: {"100000000":[1677.7854166666664,[false,false,true,false,false,false,true,false,false]],"200000000":[1665.8127976190476,[false,false,true,false,false,false,true,false,false]],"300000000":[1662.504761904762,[false,false,true,false,false,false,true,false,false]],"400000000":[1365.0047619047618,[false,false,false,false,true,false,false,false,false]],"500000000":[1359.5589285714286,[false,false,false,false,true,false,false,false,false]],"600000000":[1364.3044642857142,[false,false,false,false,true,false,false,false,false]],"700000000":[1454.5455357142855,[false,false,false,false,true,false,false,false,false]],"800000000":[1527.0875,[false,false,true,false,true,false,true,false,false]],"900000000":[1517.7214285714285,[false,false,true,false,true,false,true,false,false]],"010000000":[1411.3541666666665,[false,false,false,false,true,false,false,false,false]],"020000000":[1414.9401785714288,[false,false,false,false,true,false,false,false,false]],"030000000":[1406.4190476190477,[false,false,false,false,true,false,false,false,false]],"040000000":[1443.3062499999999,[false,false,false,false,false,false,true,false,true]],"050000000":[1444.3172619047618,[false,false,false,false,true,false,true,false,true]],"060000000":[1441.3663690476192,[false,false,false,false,true,false,false,false,false]],"070000000":[1485.6839285714286,[false,false,false,false,true,false,false,false,false]],"080000000":[1512.927976190476,[true,false,true,false,false,false,false,false,false]],"090000000":[1518.466369047619,[true,false,true,false,false,false,false,false,false]],"001000000":[1677.7854166666664,[true,false,false,false,false,false,false,false,true]],"002000000":[1665.8127976190476,[true,false,false,false,false,false,false,false,true]],"003000000":[1662.504761904762,[true,false,false,false,false,false,false,false,true]],"004000000":[1365.0047619047618,[false,false,false,false,true,false,false,false,false]],"005000000":[1359.5589285714286,[false,false,false,false,true,false,false,false,false]],"006000000":[1364.3044642857142,[false,false,false,false,true,false,false,false,false]],"007000000":[1454.5455357142855,[false,false,false,false,true,false,false,false,false]],"008000000":[1527.0875,[true,false,false,false,true,false,false,false,true]],"009000000":[1517.7214285714285,[true,false,false,false,true,false,false,false,true]],"000100000":[1411.3541666666665,[false,false,false,false,true,false,false,false,false]],"000200000":[1414.9401785714288,[false,false,false,false,true,false,false,false,false]],"000300000":[1406.4190476190477,[false,false,false,false,true,false,false,false,false]],"000400000":[1443.3062499999999,[false,false,true,false,false,false,false,false,true]],"000500000":[1444.3172619047618,[false,false,true,false,true,false,false,false,true]],"000600000":[1441.3663690476192,[false,false,false,false,true,false,false,false,false]],"000700000":[1485.6839285714286,[false,false,false,false,true,false,false,false,false]],"000800000":[1512.927976190476,[true,false,false,false,false,false,true,false,false]],"000900000":[1518.466369047619,[true,false,false,false,false,false,true,false,false]],"000010000":[1860.4401785714285,[true,false,true,false,false,false,true,false,true]],"000020000":[1832.5413690476191,[true,false,true,false,false,false,true,false,true]],"000030000":[1834.179761904762,[true,false,true,false,false,false,true,false,true]],"000040000":[1171.9669642857143,[true,false,true,false,false,false,true,false,true]],"000050000":[1176.2047619047619,[true,false,true,false,false,false,true,false,true]],"000060000":[1234.6142857142856,[true,false,true,false,false,false,true,false,true]],"000070000":[1427.3583333333331,[true,false,true,false,false,false,true,false,true]],"000080000":[1544.7607142857144,[true,false,true,false,false,false,true,false,true]],"000090000":[1509.197619047619,[true,false,true,false,false,false,true,false,true]],"000001000":[1411.3541666666665,[false,false,false,false,true,false,false,false,false]],"000002000":[1414.9401785714288,[false,false,false,false,true,false,false,false,false]],"000003000":[1406.4190476190477,[false,false,false,false,true,false,false,false,false]],"000004000":[1443.3062499999999,[true,false,false,false,false,false,true,false,false]],"000005000":[1444.3172619047618,[true,false,false,false,true,false,true,false,false]],"000006000":[1441.3663690476192,[false,false,false,false,true,false,false,false,false]],"000007000":[1485.6839285714286,[false,false,false,false,true,false,false,false,false]],"000008000":[1512.927976190476,[false,false,true,false,false,false,false,false,true]],"000009000":[1518.466369047619,[false,false,true,false,false,false,false,false,true]],"000000100":[1677.7854166666664,[true,false,false,false,false,false,false,false,true]],"000000200":[1665.8127976190476,[true,false,false,false,false,false,false,false,true]],"000000300":[1662.504761904762,[true,false,false,false,false,false,false,false,true]],"000000400":[1365.0047619047618,[false,false,false,false,true,false,false,false,false]],"000000500":[1359.5589285714286,[false,false,false,false,true,false,false,false,false]],"000000600":[1364.3044642857142,[false,false,false,false,true,false,false,false,false]],"000000700":[1454.5455357142855,[false,false,false,false,true,false,false,false,false]],"000000800":[1527.0875,[true,false,false,false,true,false,false,false,true]],"000000900":[1517.7214285714285,[true,false,false,false,true,false,false,false,true]],"000000010":[1411.3541666666665,[false,false,false,false,true,false,false,false,false]],"000000020":[1414.9401785714288,[false,false,false,false,true,false,false,false,false]],"000000030":[1406.4190476190477,[false,false,false,false,true,false,false,false,false]],"000000040":[1443.3062499999999,[true,false,true,false,false,false,false,false,false]],"000000050":[1444.3172619047618,[true,false,true,false,true,false,false,false,false]],"000000060":[1441.3663690476192,[false,false,false,false,true,false,false,false,false]],"000000070":[1485.6839285714286,[false,false,false,false,true,false,false,false,false]],"000000080":[1512.927976190476,[false,false,false,false,false,false,true,false,true]],"000000090":[1518.466369047619,[false,false,false,false,false,false,true,false,true]],"000000001":[1677.7854166666664,[false,false,true,false,false,false,true,false,false]],"000000002":[1665.8127976190476,[false,false,true,false,false,false,true,false,false]],"000000003":[1662.504761904762,[false,false,true,false,false,false,true,false,false]],"000000004":[1365.0047619047618,[false,false,false,false,true,false,false,false,false]],"000000005":[1359.5589285714286,[false,false,false,false,true,false,false,false,false]],"000000006":[1364.3044642857142,[false,false,false,false,true,false,false,false,false]],"000000007":[1454.5455357142855,[false,false,false,false,true,false,false,false,false]],"000000008":[1527.0875,[false,false,true,false,true,false,true,false,false]],"000000009":[1517.7214285714285,[false,false,true,false,true,false,true,false,false]]},
+
+            solve: function(state) {
+                var revealed = state.filter(v => v > 0).length;
+                if (revealed === 0) return [true, false, true, false, false, false, true, false, true];
+                if (revealed === 1) {
+                    var key = state.join('');
+                    if (this.openings[key]) return this.openings[key][1];
+                }
+                var options = Array(9).fill(false);
+                this.solve_any(state, payout, options);
+                return options;
+            },
+
+            solve_any: function(state, rewards, options) {
+                var dummy = [], unknowns = [], ids = [], has = [], tot_win = [];
+                for (var i = 0; i < 9; i++) {
+                    if (!state[i]) { ids.push(i); tot_win.push(0); }
+                    else { has[state[i]] = 1; }
+                }
+                for (var i = 1; i <= 9; i++) { if (!has[i]) unknowns.push(i); }
+                
+                if (9 - ids.length >= 4) {
+                    var perms = 0, win_sums = Array(8).fill(0);
+                    this.permute(unknowns, p => {
+                        perms++;
+                        var s = [...state]; ids.forEach((id, idx) => s[id] = p[idx]);
+                        win_sums[0] += rewards[s[0]+s[1]+s[2]]; win_sums[1] += rewards[s[3]+s[4]+s[5]];
+                        win_sums[2] += rewards[s[6]+s[7]+s[8]]; win_sums[3] += rewards[s[0]+s[3]+s[6]];
+                        win_sums[4] += rewards[s[1]+s[4]+s[7]]; win_sums[5] += rewards[s[2]+s[5]+s[8]];
+                        win_sums[6] += rewards[s[0]+s[4]+s[8]]; win_sums[7] += rewards[s[2]+s[4]+s[6]];
+                    });
+                    var max = Math.max(...win_sums);
+                    win_sums.forEach((v, i) => { if(v === max) options[i] = true; });
+                    return max / perms;
+                } else {
+                    ids.forEach((id, idx) => {
+                        unknowns.forEach(val => {
+                            var s = [...state]; s[id] = val;
+                            tot_win[idx] += this.solve_any(s, rewards, dummy);
+                        });
+                    });
+                    var max = Math.max(...tot_win);
+                    tot_win.forEach((v, i) => { if(v > max - EPS) options[ids[i]] = true; });
+                    return max / unknowns.length;
+                }
+            },
+
+            permute: function(a, cb) {
+                var n = a.length, c = Array(n).fill(0), i = 1; cb(a);
+                while (i < n) {
+                    if (c[i] < i) {
+                        var k = i % 2 && c[i]; [a[i], a[k]] = [a[k], a[i]];
+                        cb(a); c[i]++; i = 1;
+                    } else { c[i] = 0; i++; }
+                }
+            }
+        };
+
+        var Solver = {
+            solve: function(table, payout) {
+                var used = Array(10).fill(false), res = Array(8).fill(0), count = 0;
+                table.flat().forEach(v => { if(v>0) used[v] = true; });
+                
+                var backtrack = (r, c) => {
+                    if (r === 3) {
+                        count++;
+                        res[0] += payout[table[0][0]+table[0][1]+table[0][2]];
+                        res[1] += payout[table[1][0]+table[1][1]+table[1][2]];
+                        res[2] += payout[table[2][0]+table[2][1]+table[2][2]];
+                        res[3] += payout[table[0][0]+table[1][0]+table[2][0]];
+                        res[4] += payout[table[0][1]+table[1][1]+table[2][1]];
+                        res[5] += payout[table[0][2]+table[1][2]+table[2][2]];
+                        res[6] += payout[table[0][0]+table[1][1]+table[2][2]];
+                        res[7] += payout[table[0][2]+table[1][1]+table[2][0]];
+                        return;
+                    }
+                    var nextC = (c + 1) % 3, nextR = r + (c === 2 ? 1 : 0);
+                    if (table[r][c] > 0) return backtrack(nextR, nextC);
+                    for (var i = 1; i <= 9; i++) {
+                        if (used[i]) continue;
+                        used[i] = true; table[r][c] = i;
+                        backtrack(nextR, nextC);
+                        used[i] = false; table[r][c] = 0;
+                    }
+                };
+                backtrack(0, 0);
+                return res.map(v => v / count);
+            }
+        };
+
         // 時區統一：UTC+8
         const getBuildTime = () => {
             try {
@@ -414,7 +509,10 @@
         const Lock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
         const BookOpen = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
         const X = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
+        
+        // ★★★ 修正後的星星 (Sparkles) 圖示：還原為單顆星星 ★★★
         const Sparkles = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
+
         const RotateCcw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
         const Volume2 = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
         const VolumeX = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>;
@@ -679,7 +777,6 @@
             );
         };
 
-        // ★★★ 關於作者 Modal (v1.04 優化版：點擊自動複製 Email) ★★★
         const AboutModal = ({ isOpen, onClose, t, playSound }) => {
             const [copyStatus, setCopyStatus] = useState(null); 
 
@@ -689,19 +786,15 @@
                 playSound('click');
                 const email = "yayoi991331@gmail.com";
                 
-                // 1. 嘗試複製到剪貼簿
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(email).then(() => {
                         setCopyStatus('copied');
                         setTimeout(() => setCopyStatus(null), 2000); 
                     }).catch(() => {});
                 }
-
-                // 2. 嘗試開啟系統郵件軟體 (給手機用)
                 window.location.href = `mailto:${email}`;
             };
 
-            // 判斷是否為中文語系，顯示對應的複製提示
             const isChinese = t('contact_label').includes('寄信') || t('contact_label').includes('信');
             const copiedText = isChinese ? "Email 已複製！" : "Email Copied!";
 
@@ -722,7 +815,6 @@
                                 <p className="text-xs text-[#d4af37]/90">{t('about_desc2')}</p>
                             </div>
                             
-                            {/* ★★★ 修改後的按鈕：具備複製功能 ★★★ */}
                             <button 
                                onClick={handleContact}
                                className={`flex items-center justify-center gap-2 w-full py-3 mt-2 rounded-xl font-bold shadow-lg transition-all active:scale-95 border ${copyStatus === 'copied' ? 'bg-green-600 text-white border-green-400' : 'bg-[#d4af37] text-black border-[#fcd34d] hover:bg-[#fcd34d]'}`}>
@@ -737,7 +829,6 @@
                                     </>
                                 )}
                             </button>
-                            {/* 顯示明碼 Email 方便電腦版使用者手動選取 */}
                             <div className="text-center text-[10px] text-[#d4af37]/50 font-mono select-all cursor-text">
                                 yayoi991331@gmail.com
                             </div>
@@ -765,7 +856,28 @@
                 } catch(e) { return 'zh'; }
             });
 
-            useEffect(() => { try { localStorage.setItem('cactpot_lang', lang); } catch(e) {} const currentTitle = LOCALE[lang]['app_title']; document.title = currentTitle; const metaTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if (metaTitle) metaTitle.setAttribute('content', currentTitle); }, [lang]);
+            // ★★★ 核心修改：動態切換字型，解決簡體中文顯示不一致的問題 ★★★
+            useEffect(() => { 
+                try { 
+                    localStorage.setItem('cactpot_lang', lang); 
+                } catch(e) {} 
+                
+                const currentTitle = LOCALE[lang]['app_title']; 
+                document.title = currentTitle; 
+                const metaTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]'); 
+                if (metaTitle) metaTitle.setAttribute('content', currentTitle); 
+
+                // 動態設定 HTML lang 屬性與字體
+                document.documentElement.lang = lang === 'cn' ? 'zh-CN' : (lang === 'zh' ? 'zh-TW' : lang);
+                
+                if (lang === 'cn') {
+                    // 簡體中文模式：優先使用微軟雅黑、蘋方
+                    document.body.style.fontFamily = '"Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif';
+                } else {
+                    // 預設模式 (繁體中文等)：優先使用微軟正黑體
+                    document.body.style.fontFamily = '"Segoe UI", "Microsoft JhengHei", sans-serif';
+                }
+            }, [lang]);
 
             const [board, setBoard] = useState(Array(9).fill(null));
             const [openSelectorIndex, setOpenSelectorIndex] = useState(null);
@@ -773,7 +885,7 @@
             const [showPayouts, setShowPayouts] = useState(false);
             const [showLangMenu, setShowLangMenu] = useState(false);
             const [showInstallModal, setShowInstallModal] = useState(false);
-            const [showAboutModal, setShowAboutModal] = useState(false); // 新增
+            const [showAboutModal, setShowAboutModal] = useState(false); 
             
             const [isSoundOn, setIsSoundOn] = useState(() => { try { const saved = localStorage.getItem('cactpot_sound'); return saved === null ? true : saved === 'true'; } catch(e) { return true; } });
             
@@ -829,12 +941,19 @@
             }, [board]);
             const usedNumbersSet = useMemo(() => new Set(board.filter((n) => n !== null)), [board]);
 
+            // ★★★ 重寫後的 useEffect：整合 Golden Logic 核心 ★★★
             useEffect(() => {
+                // 1. 轉換 React 盤面 (null) 為核心邏輯盤面 (0)
+                const solverState = board.map(val => val === null ? 0 : val);
+                const solverRevealedCount = solverState.filter(v => v > 0).length;
+
+                // 2. 準備數據
                 const emptyIndices = board.map((val, idx) => (val === null ? idx : -1)).filter((idx) => idx !== -1);
                 const perms = getPermutations(availableNumbers);
                 const lineStats = LINES.map(() => ({ totalMGP: 0, chance10k: 0, chance3600: 0, counts: 0, payoutDist: {} }));
-                const cellImpactScore = Array(9).fill(0); 
-
+                
+                // 3. 執行排列組合計算 (僅為了生成機率分佈表，如 10k: 30%)
+                // 因為提供的 Core Code 沒有返回分佈細節，所以必須保留這段邏輯以維持 UI 功能
                 perms.forEach((perm) => {
                     const tempBoard = [...board];
                     perm.forEach((val, i) => tempBoard[emptyIndices[i]] = val);
@@ -844,28 +963,58 @@
                         lineStats[lineId].totalMGP += payout; lineStats[lineId].counts++; lineStats[lineId].payoutDist[payout] = (lineStats[lineId].payoutDist[payout] || 0) + 1;
                         if (sum === 6) lineStats[lineId].chance10k++;
                         if (sum === 24) lineStats[lineId].chance3600++;
-                        if (isSelectionPhase) { lineIndices.forEach(cellIdx => { if (board[cellIdx] === null) { cellImpactScore[cellIdx] += payout; } }); }
                     });
                 });
 
+                // 4. 基礎結果封裝
                 const results = lineStats.map(stat => {
                     if (stat.counts === 0) return { ev: 0, chance10k: 0, chance3600: 0, allProbs: [] };
                     const allProbs = Object.entries(stat.payoutDist).map(([mgp, count]) => ({ mgp: parseInt(mgp), percent: (count / stat.counts) * 100 })).filter(p => p.percent > 0).sort((a, b) => b.mgp - a.mgp); 
-                    return { ev: Math.floor(stat.totalMGP / stat.counts), chance10k: (stat.chance10k / stat.counts) * 100, chance3600: (stat.chance3600 / stat.counts) * 100, allProbs: allProbs };
+                    return { 
+                        ev: Math.floor(stat.totalMGP / stat.counts), // 預設使用遍歷平均值
+                        chance10k: (stat.chance10k / stat.counts) * 100, 
+                        chance3600: (stat.chance3600 / stat.counts) * 100, 
+                        allProbs: allProbs 
+                    };
                 });
+
+                // 5. 【核心整合】：使用 PerfectCactpot 決定 "最佳推薦格 (Suggestions)"
+                let suggestions = [];
+                if (solverRevealedCount < 4) {
+                    // 使用 PerfectCactpot.solve 取得推薦陣列 [bool, bool, ...]
+                    const recs = PerfectCactpot.solve(solverState);
+                    suggestions = recs.map((isRec, idx) => isRec ? idx : -1).filter(i => i !== -1);
+                }
+                
+                // 6. 【核心整合】：若已揭示 4 格，使用 Solver.solve 計算 "精確期望值 (EV)" 並覆蓋原有結果
+                // 這樣確保數值與核心邏輯 100% 一致
+                if (solverRevealedCount === 4) {
+                     const table = [[0,0,0],[0,0,0],[0,0,0]];
+                     for(let i=0; i<9; i++) table[Math.floor(i/3)][i%3] = solverState[i];
+                     
+                     // 呼叫 Solver 核心
+                     const exactEVs = Solver.solve(table, payout); 
+                     
+                     // 覆蓋 results 中的 ev
+                     exactEVs.forEach((ev, idx) => {
+                         if (results[idx]) results[idx].ev = ev;
+                     });
+                }
+
                 setSolutions(results);
+                
+                // 設定推薦格子 (完全依賴核心)
+                // 修改說明：當 filledCount === 0 時，不顯示推薦，因為遊戲一開始是隨機給一個數字，玩家無法選擇。
+                if (filledCount < 4 && filledCount > 0) {
+                     setSuggestedCellIndices(suggestions);
+                } else {
+                     setSuggestedCellIndices([]);
+                }
+
                 const maxEV = Math.max(...results.map(r => r.ev));
                 setBestLineIndices(results.map((r, i) => r.ev === maxEV ? i : -1).filter(i => i !== -1));
 
-                if (filledCount < 4 && filledCount > 0) {
-                    let maxScore = -1;
-                    cellImpactScore.forEach((score, idx) => { if (board[idx] === null && score > maxScore) maxScore = score; });
-                    const bestCells = [];
-                    if (maxScore > 0) { cellImpactScore.forEach((score, idx) => { if (board[idx] === null && score === maxScore) { bestCells.push(idx); } }); }
-                    if (bestCells.length === 0) { const priority = [4, 0, 2, 6, 8, 1, 3, 5, 7]; const fallback = priority.find(idx => board[idx] === null); if (fallback !== undefined) bestCells.push(fallback); }
-                    setSuggestedCellIndices(bestCells);
-                } else { setSuggestedCellIndices([]); }
-            }, [board, availableNumbers, filledCount, isSelectionPhase, isFullFillMode]);
+            }, [board, availableNumbers, filledCount, isFullFillMode]);
 
             const handleSelect = (val) => {
                 const newBoard = [...board];
@@ -881,7 +1030,7 @@
                 if (!solutions[lineId]) return <div className="w-12 h-12"></div>;
                 const { ev, chance10k, chance3600 } = solutions[lineId];
                 const isBest = showAnalysis && bestLineIndices.includes(lineId);
-                const displayEv = ev >= 1000 ? (ev/1000).toFixed(1).replace('.0','') + 'k' : ev;
+                const displayEv = ev >= 1000 ? (ev/1000).toFixed(1).replace('.0','') + 'k' : Math.floor(ev);
                 let bestInfo = null;
                 if (isBest) {
                     if (chance10k > 0) bestInfo = (<div className="flex flex-col items-center"><span className="text-[9px] text-yellow-200 leading-none">{t('label_10k')}</span><span className="text-[10px] font-bold text-white leading-none">{Math.round(chance10k)}%</span></div>);
@@ -954,10 +1103,8 @@
                 
                 <AutoUpdateCheck />
 
-                {/* ★★★ 頂部控制列 (Top Bar) ★★★ */}
                 <div className="w-full max-w-md flex justify-between items-center mb-4 px-2 z-40 relative">
                     <div className="flex gap-2">
-                        {/* 音效 */}
                         <button 
                             onClick={() => { toggleSound(); setTimeout(() => sounds.toggle(), 0); }}
                             className="flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37]/60 hover:text-white transition-all active:scale-95"
@@ -965,7 +1112,6 @@
                             {isSoundOn ? <Volume2 className="w-5 h-5 text-[#d4af37]" /> : <VolumeX className="w-5 h-5 text-zinc-500" />}
                         </button>
 
-                        {/* 分享 (無閃爍) */}
                         <button 
                              onClick={handleShare}
                              className="flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
@@ -975,7 +1121,6 @@
                     </div>
 
                     <div className="flex gap-2">
-                        {/* 安裝教學 (長按鈕) */}
                         <button 
                              onClick={() => { setShowInstallModal(true); sounds.click(); }}
                              className="flex items-center justify-center gap-1.5 px-3 h-9 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
@@ -984,7 +1129,6 @@
                              <span className="text-[10px] font-bold uppercase whitespace-nowrap">{t('install_btn')}</span>
                         </button>
 
-                        {/* 語言 (簡潔版) */}
                         <button 
                              onClick={() => { setShowLangMenu(true); setTimeout(() => sounds.click(), 0); }}
                              className="flex items-center justify-center gap-1.5 px-3 h-9 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
@@ -1035,9 +1179,7 @@
                 <AnalysisList />
 
                 <div className="mt-12 flex flex-col items-center gap-4 pb-12 opacity-80 transition-opacity">
-                    {/* 關於作者按鈕 */}
                     <button onClick={() => { setShowAboutModal(true); sounds.click(); }} className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-[#d4af37]/30 bg-black/20 text-[#d4af37] text-xs font-bold hover:bg-[#d4af37]/10 transition-all">
-                        {/* 這裡換成了金色的人像 SVG */}
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         {t('about_btn')}
                     </button>
@@ -1067,6 +1209,19 @@
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<MiniCactpotSolver />);
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful:', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed:', err);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
