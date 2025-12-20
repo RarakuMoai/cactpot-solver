@@ -19,881 +19,274 @@
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="manifest" href="manifest.json">
 
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-NL7CSVDZ');</script>
-    
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
-
     <style>
-        :root {
-            --gold-primary: #d4af37;
-            --gold-light: #fcd34d;
-            --gold-dark: #927215;
-            --casino-red: #4a0404;
-            --casino-black: #0f0f11;
-        }
-
-        html {
-            background-color: #0f0f11;
-            height: 100%;
-        }
-        
-        html::before {
-            content: "Loading...";
-            position: fixed;
-            top: 60%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #d4af37;
-            font-family: sans-serif;
-            font-weight: bold;
-            font-size: 14px;
-            letter-spacing: 4px;
-            opacity: 0.8;
-            z-index: -1;
-        }
-
-        body { 
-            -webkit-tap-highlight-color: transparent; 
-            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; 
-            background-color: var(--casino-black);
-            background-image: radial-gradient(circle at center top, #7f1d1d 0%, var(--casino-red) 40%, #000000 100%);
-            background-size: 100% 100%;
-            background-attachment: fixed;
-            overflow-x: hidden; 
-            color: #fff;
-            min-height: 100%;
-            position: relative;
-            z-index: 1; 
-        }
-        
-        .font-game { font-family: 'Cinzel', sans-serif; }
-
-        .casino-pattern {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l15 30-15 30-15-30z' fill='%23d4af37' fill-opacity='0.05'/%3E%3C/svg%3E");
-            background-size: 60px 60px;
-            opacity: 0.3;
-            mix-blend-mode: overlay;
-        }
-
+        :root { --gold-primary: #d4af37; --gold-light: #fcd34d; --gold-dark: #927215; --casino-red: #4a0404; --casino-black: #0f0f11; }
+        html { background-color: #0f0f11; height: 100%; }
+        /* 純 CSS Loading 遮罩 */
+        #loading-overlay { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; background-color: var(--casino-black); background-image: radial-gradient(circle at center top, #7f1d1d 0%, var(--casino-red) 40%, #000000 100%); transition: opacity 0.5s ease-out; }
+        body { -webkit-tap-highlight-color: transparent; font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; background-color: var(--casino-black); background-image: radial-gradient(circle at center top, #7f1d1d 0%, var(--casino-red) 40%, #000000 100%); background-size: 100% 100%; background-attachment: fixed; overflow-x: hidden; color: #fff; min-height: 100%; position: relative; z-index: 1; }
+        .font-game { font-family: 'Cinzel', serif; }
+        .casino-pattern { background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l15 30-15 30-15-30z' fill='%23d4af37' fill-opacity='0.05'/%3E%3C/svg%3E"); background-size: 60px 60px; opacity: 0.3; mix-blend-mode: overlay; }
         .select-none { user-select: none; -webkit-user-select: none; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .btn-3d {
-            transition: all 0.1s;
-            box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
-            border-bottom: none;
-        }
-        .btn-3d:active {
-            transform: translateY(4px);
-            box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-        
-        .text-gold {
-            background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary), var(--gold-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.8));
-        }
-
-        .casino-panel {
-            background: linear-gradient(135deg, rgba(74, 4, 4, 0.9), rgba(15, 15, 17, 0.95));
-            backdrop-filter: blur(8px);
-            border: 2px solid var(--gold-primary);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(212, 175, 55, 0.1);
-            position: relative;
-        }
-        .casino-panel::after {
-            content: ''; position: absolute; inset: -4px; border: 1px solid var(--gold-light); border-radius: inherit; opacity: 0.3; pointer-events: none;
-        }
-
-        .circle-cell {
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #4a0404, #000);
-            border: 3px solid var(--gold-primary);
-            box-shadow: inset 0 0 20px rgba(0,0,0,1), 0 4px 10px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-            touch-action: manipulation;
-        }
-        .circle-cell.filled {
-            background: radial-gradient(circle at 30% 30%, var(--gold-light), var(--gold-primary), #b45309);
-            border-color: var(--gold-light);
-            color: #451a03;
-            text-shadow: 0 1px 0 rgba(255,255,255,0.4);
-            box-shadow: inset 0 0 10px rgba(255,255,0,0.5), 0 0 20px rgba(212, 175, 55, 0.6);
-        }
-        @keyframes rainbow-pulse {
-            0% { box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,165,0,0.5); }
-            25% { box-shadow: 0 0 20px rgba(255,255,0,0.8), 0 0 40px rgba(0,255,0,0.5); }
-            50% { box-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(0,0,255,0.5); }
-            75% { box-shadow: 0 0 20px rgba(128,0,128,0.8), 0 0 40px rgba(255,0,255,0.5); }
-            100% { box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,165,0,0.5); }
-        }
-        .circle-cell.suggested {
-            border-color: #fff;
-            animation: rainbow-pulse 3s linear infinite;
-            z-index: 10;
-        }
-        @keyframes shimmer {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
-        }
-        .jackpot-row-bg {
-            background: linear-gradient(90deg, rgba(212,175,55,0.05), rgba(252,211,77,0.35), rgba(255,255,255,0.5), rgba(252,211,77,0.35), rgba(212,175,55,0.05));
-            background-size: 200% auto;
-            animation: shimmer 3s linear infinite;
-        }
-
+        .btn-3d { transition: all 0.1s; box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2); border-bottom: none; }
+        .btn-3d:active { transform: translateY(4px); box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .text-gold { background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary), var(--gold-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.8)); }
+        .casino-panel { background: linear-gradient(135deg, rgba(74, 4, 4, 0.9), rgba(15, 15, 17, 0.95)); backdrop-filter: blur(8px); border: 2px solid var(--gold-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(212, 175, 55, 0.1); position: relative; }
+        .casino-panel::after { content: ''; position: absolute; inset: -4px; border: 1px solid var(--gold-light); border-radius: inherit; opacity: 0.3; pointer-events: none; }
+        .circle-cell { border-radius: 50%; background: radial-gradient(circle at 30% 30%, #4a0404, #000); border: 3px solid var(--gold-primary); box-shadow: inset 0 0 20px rgba(0,0,0,1), 0 4px 10px rgba(0,0,0,0.5); position: relative; overflow: hidden; touch-action: manipulation; }
+        .circle-cell.filled { background: radial-gradient(circle at 30% 30%, var(--gold-light), var(--gold-primary), #b45309); border-color: var(--gold-light); color: #451a03; text-shadow: 0 1px 0 rgba(255,255,255,0.4); box-shadow: inset 0 0 10px rgba(255,255,0,0.5), 0 0 20px rgba(212, 175, 55, 0.6); }
+        @keyframes rainbow-pulse { 0% { box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,165,0,0.5); } 25% { box-shadow: 0 0 20px rgba(255,255,0,0.8), 0 0 40px rgba(0,255,0,0.5); } 50% { box-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(0,0,255,0.5); } 75% { box-shadow: 0 0 20px rgba(128,0,128,0.8), 0 0 40px rgba(255,0,255,0.5); } 100% { box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,165,0,0.5); } }
+        .circle-cell.suggested { border-color: #fff; animation: rainbow-pulse 3s linear infinite; z-index: 10; }
+        @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        .jackpot-row-bg { background: linear-gradient(90deg, rgba(212,175,55,0.05), rgba(252,211,77,0.35), rgba(255,255,255,0.5), rgba(252,211,77,0.35), rgba(212,175,55,0.05)); background-size: 200% auto; animation: shimmer 3s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .loading-spinner { width: 50px; height: 50px; border: 4px solid rgba(212, 175, 55, 0.2); border-top: 4px solid #fcd34d; border-radius: 50%; animation: spin 1s linear infinite; filter: drop-shadow(0 0 10px #fcd34d); }
         .loading-text { font-family: sans-serif; color: #d4af37; font-size: 14px; letter-spacing: 4px; margin-top: 20px; animation: pulse 2s infinite; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
     </style>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 </head>
 <body class="min-h-screen relative overflow-x-hidden font-sans">
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NL7CSVDZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     
     <div class="fixed inset-0 casino-pattern pointer-events-none z-0"></div>
 
-    <div id="root" class="relative z-10">
-        <div style="position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:50;">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Loading...</div>
-        </div>
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
     </div>
 
-    <script type="text/babel">
-        // -----------------------------------------------------------
-        // ★★★ 核心運算移植區 (Core Logic Transplant) ★★★
-        // -----------------------------------------------------------
-        
-        // --- 直接搬移原始碼數據 ---
+    <div id="root" class="relative z-10"></div>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+
+    <script>
+        setTimeout(function(){
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-NL7CSVDZ');
+        }, 500);
+    </script>
+
+    <script>
+        // 隱藏 Loading
+        const hideLoading = () => {
+            const loader = document.getElementById('loading-overlay');
+            if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }
+        };
+
+        // --- Core Data ---
         var payout = [NaN, NaN, NaN, NaN, NaN, NaN, 10000, 36, 720, 360, 80, 252, 108, 72, 54, 180, 72, 180, 119, 36, 306, 1080, 144, 1800, 3600];
         var EPS = 0.00001;
+        var PerfectCactpot={openings:{"100000000":[1677.7854166666664,[!1,!1,!0,!1,!1,!1,!0,!1,!1]],"200000000":[1665.8127976190476,[!1,!1,!0,!1,!1,!1,!0,!1,!1]],"300000000":[1662.504761904762,[!1,!1,!0,!1,!1,!1,!0,!1,!1]],"400000000":[1365.0047619047618,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"500000000":[1359.5589285714286,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"600000000":[1364.3044642857142,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"700000000":[1454.5455357142855,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"800000000":[1527.0875,[!1,!1,!0,!1,!0,!1,!0,!1,!1]],"900000000":[1517.7214285714285,[!1,!1,!0,!1,!0,!1,!0,!1,!1]],"010000000":[1411.3541666666665,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"020000000":[1414.9401785714288,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"030000000":[1406.4190476190477,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"040000000":[1443.3062499999999,[!1,!1,!1,!1,!1,!1,!0,!1,!0]],"050000000":[1444.3172619047618,[!1,!1,!1,!1,!0,!1,!0,!1,!0]],"060000000":[1441.3663690476192,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"070000000":[1485.6839285714286,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"080000000":[1512.927976190476,[!0,!1,!0,!1,!1,!1,!1,!1,!1]],"090000000":[1518.466369047619,[!0,!1,!0,!1,!1,!1,!1,!1,!1]],"001000000":[1677.7854166666664,[!0,!1,!1,!1,!1,!1,!1,!1,!0]],"002000000":[1665.8127976190476,[!0,!1,!1,!1,!1,!1,!1,!1,!0]],"003000000":[1662.504761904762,[!0,!1,!1,!1,!1,!1,!1,!1,!0]],"004000000":[1365.0047619047618,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"005000000":[1359.5589285714286,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"006000000":[1364.3044642857142,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"007000000":[1454.5455357142855,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"008000000":[1527.0875,[!0,!1,!1,!1,!0,!1,!1,!1,!0]],"009000000":[1517.7214285714285,[!0,!1,!1,!1,!0,!1,!1,!1,!0]],"000100000":[1411.3541666666665,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000200000":[1414.9401785714288,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000300000":[1406.4190476190477,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000400000":[1443.3062499999999,[!1,!1,!0,!1,!1,!1,!1,!1,!0]],"000500000":[1444.3172619047618,[!1,!1,!0,!1,!0,!1,!1,!1,!0]],"000600000":[1441.3663690476192,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000700000":[1485.6839285714286,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000800000":[1512.927976190476,[!0,!1,!1,!1,!1,!1,!0,!1,!1]],"000900000":[1518.466369047619,[!0,!1,!1,!1,!1,!1,!0,!1,!1]],"000010000":[1860.4401785714285,[!0,!1,!0,!1,!1,!1,!0,!1,!0]],"000020000":[1832.5413690476191,[!0,!1,!0,!1,!1,!1,!0,!1,!0]],"000030000":[1834.179761904762,[!0,!1,!0,!1,!1,!1,!0,!1,!0]],"000040000":[1171.9669642857143,[!0,!1,!0,!1,!1,!1,!0,!1,!0]],"000050000":[1176.2047619047619,[!0,!1,!0,!1,!1,!1,!0,!1,!0]],"000060000":[1234.6142857142856,[!0,!1,!0,!1,!1,!1,!0,!1,!0]],"000070000":[1427.3583333333331,[!0,!1,!0,!1,!1,!1,!0,!1,!0]],"000080000":[1544.7607142857144,[!0,!1,!0,!1,!1,!1,!0,!1,!0]],"000090000":[1509.197619047619,[!0,!1,!0,!1,!1,!1,!0,!1,!0]],"000001000":[1411.3541666666665,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000002000":[1414.9401785714288,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000003000":[1406.4190476190477,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000004000":[1443.3062499999999,[!0,!1,!1,!1,!1,!1,!0,!1,!1]],"000005000":[1444.3172619047618,[!0,!1,!1,!1,!0,!1,!0,!1,!1]],"000006000":[1441.3663690476192,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000007000":[1485.6839285714286,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000008000":[1512.927976190476,[!1,!1,!0,!1,!1,!1,!1,!1,!0]],"000009000":[1518.466369047619,[!1,!1,!0,!1,!1,!1,!1,!1,!0]],"000000100":[1677.7854166666664,[!0,!1,!1,!1,!1,!1,!1,!1,!0]],"000000200":[1665.8127976190476,[!0,!1,!1,!1,!1,!1,!1,!1,!0]],"000000300":[1662.504761904762,[!0,!1,!1,!1,!1,!1,!1,!1,!0]],"000000400":[1365.0047619047618,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000500":[1359.5589285714286,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000600":[1364.3044642857142,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000700":[1454.5455357142855,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000800":[1527.0875,[!0,!1,!1,!1,!0,!1,!1,!1,!0]],"000000900":[1517.7214285714285,[!0,!1,!1,!1,!0,!1,!1,!1,!0]],"000000010":[1411.3541666666665,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000020":[1414.9401785714288,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000030":[1406.4190476190477,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000040":[1443.3062499999999,[!0,!1,!0,!1,!1,!1,!1,!1,!1]],"000000050":[1444.3172619047618,[!0,!1,!0,!1,!0,!1,!1,!1,!1]],"000000060":[1441.3663690476192,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000070":[1485.6839285714286,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000080":[1512.927976190476,[!1,!1,!1,!1,!1,!1,!0,!1,!0]],"000000090":[1518.466369047619,[!1,!1,!1,!1,!1,!1,!0,!1,!0]],"000000001":[1677.7854166666664,[!1,!1,!0,!1,!1,!1,!0,!1,!1]],"000000002":[1665.8127976190476,[!1,!1,!0,!1,!1,!1,!0,!1,!1]],"000000003":[1662.504761904762,[!1,!1,!0,!1,!1,!1,!0,!1,!1]],"000000004":[1365.0047619047618,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000005":[1359.5589285714286,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000006":[1364.3044642857142,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000007":[1454.5455357142855,[!1,!1,!1,!1,!0,!1,!1,!1,!1]],"000000008":[1527.0875,[!1,!1,!0,!1,!0,!1,!0,!1,!1]],"000000009":[1517.7214285714285,[!1,!1,!0,!1,!0,!1,!0,!1,!1]]},solve:function(s){var r=s.filter(function(v){return v>0}).length;if(r===0)return[!0,!1,!0,!1,!1,!1,!0,!1,!0];if(r===1){var k=s.join('');if(this.openings[k])return this.openings[k][1]}var o=Array(9).fill(!1);this.solve_any(s,payout,o);return o},solve_any:function(s,r,o){var d=[],u=[],ids=[],has=[];for(var i=0;i<9;i++){if(!s[i]){ids.push(i);d.push(0)}else has[s[i]]=1}for(var i=1;i<=9;i++)if(!has[i])u.push(i);if(9-ids.length>=4){var perms=0,ws=Array(8).fill(0);this.permute(u,function(p){perms++;var S=[...s];ids.forEach(function(id,idx){S[id]=p[idx]});ws[0]+=r[S[0]+S[1]+S[2]];ws[1]+=r[S[3]+S[4]+S[5]];ws[2]+=r[S[6]+S[7]+S[8]];ws[3]+=r[S[0]+S[3]+S[6]];ws[4]+=r[S[1]+S[4]+S[7]];ws[5]+=r[S[2]+S[5]+S[8]];ws[6]+=r[S[0]+S[4]+S[8]];ws[7]+=r[S[2]+S[4]+S[6]]});var m=Math.max(...ws);ws.forEach(function(v,i){if(v===m)o[i]=!0});return m/perms}else{var tot_win=[];ids.forEach(function(id,idx){u.forEach(function(val){var S=[...s];S[id]=val;tot_win[idx]=(tot_win[idx]||0)+PerfectCactpot.solve_any(S,r,d)})});var m=Math.max(...tot_win);tot_win.forEach(function(v,i){if(v>m-EPS)o[ids[i]]=!0});return m/u.length}},permute:function(a,cb){var n=a.length,c=Array(n).fill(0),i=1;cb(a);while(i<n){if(c[i]<i){var k=i%2&&c[i];var t=a[i];a[i]=a[k];a[k]=t;cb(a);c[i]++;i=1}else{c[i]=0;i++}}}};
+        var Solver={solve:function(t,p){var u=Array(10).fill(!1),r=Array(8).fill(0),c=0;t.flat().forEach(function(v){if(v>0)u[v]=!0});var bt=function(row,col){if(row===3){c++;r[0]+=p[t[0][0]+t[0][1]+t[0][2]];r[1]+=p[t[1][0]+t[1][1]+t[1][2]];r[2]+=p[t[2][0]+t[2][1]+t[2][2]];r[3]+=p[t[0][0]+t[1][0]+t[2][0]];r[4]+=p[t[0][1]+t[1][1]+t[2][1]];r[5]+=p[t[0][2]+t[1][2]+t[2][2]];r[6]+=p[t[0][0]+t[1][1]+t[2][2]];r[7]+=p[t[0][2]+t[1][1]+t[2][0]];return}var nc=(col+1)%3,nr=row+(col===2?1:0);if(t[row][col]>0)return bt(nr,nc);for(var i=1;i<=9;i++){if(u[i])continue;u[i]=!0;t[row][col]=i;bt(nr,nc);u[i]=!1;t[row][col]=0}};bt(0,0);return r.map(function(v){return v/c})}};
 
-        var PerfectCactpot = {
-            openings: {"100000000":[1677.7854166666664,[false,false,true,false,false,false,true,false,false]],"200000000":[1665.8127976190476,[false,false,true,false,false,false,true,false,false]],"300000000":[1662.504761904762,[false,false,true,false,false,false,true,false,false]],"400000000":[1365.0047619047618,[false,false,false,false,true,false,false,false,false]],"500000000":[1359.5589285714286,[false,false,false,false,true,false,false,false,false]],"600000000":[1364.3044642857142,[false,false,false,false,true,false,false,false,false]],"700000000":[1454.5455357142855,[false,false,false,false,true,false,false,false,false]],"800000000":[1527.0875,[false,false,true,false,true,false,true,false,false]],"900000000":[1517.7214285714285,[false,false,true,false,true,false,true,false,false]],"010000000":[1411.3541666666665,[false,false,false,false,true,false,false,false,false]],"020000000":[1414.9401785714288,[false,false,false,false,true,false,false,false,false]],"030000000":[1406.4190476190477,[false,false,false,false,true,false,false,false,false]],"040000000":[1443.3062499999999,[false,false,false,false,false,false,true,false,true]],"050000000":[1444.3172619047618,[false,false,false,false,true,false,true,false,true]],"060000000":[1441.3663690476192,[false,false,false,false,true,false,false,false,false]],"070000000":[1485.6839285714286,[false,false,false,false,true,false,false,false,false]],"080000000":[1512.927976190476,[true,false,true,false,false,false,false,false,false]],"090000000":[1518.466369047619,[true,false,true,false,false,false,false,false,false]],"001000000":[1677.7854166666664,[true,false,false,false,false,false,false,false,true]],"002000000":[1665.8127976190476,[true,false,false,false,false,false,false,false,true]],"003000000":[1662.504761904762,[true,false,false,false,false,false,false,false,true]],"004000000":[1365.0047619047618,[false,false,false,false,true,false,false,false,false]],"005000000":[1359.5589285714286,[false,false,false,false,true,false,false,false,false]],"006000000":[1364.3044642857142,[false,false,false,false,true,false,false,false,false]],"007000000":[1454.5455357142855,[false,false,false,false,true,false,false,false,false]],"008000000":[1527.0875,[true,false,false,false,true,false,false,false,true]],"009000000":[1517.7214285714285,[true,false,false,false,true,false,false,false,true]],"000100000":[1411.3541666666665,[false,false,false,false,true,false,false,false,false]],"000200000":[1414.9401785714288,[false,false,false,false,true,false,false,false,false]],"000300000":[1406.4190476190477,[false,false,false,false,true,false,false,false,false]],"000400000":[1443.3062499999999,[false,false,true,false,false,false,false,false,true]],"000500000":[1444.3172619047618,[false,false,true,false,true,false,false,false,true]],"000600000":[1441.3663690476192,[false,false,false,false,true,false,false,false,false]],"000700000":[1485.6839285714286,[false,false,false,false,true,false,false,false,false]],"000800000":[1512.927976190476,[true,false,false,false,false,false,true,false,false]],"000900000":[1518.466369047619,[true,false,false,false,false,false,true,false,false]],"000010000":[1860.4401785714285,[true,false,true,false,false,false,true,false,true]],"000020000":[1832.5413690476191,[true,false,true,false,false,false,true,false,true]],"000030000":[1834.179761904762,[true,false,true,false,false,false,true,false,true]],"000040000":[1171.9669642857143,[true,false,true,false,false,false,true,false,true]],"000050000":[1176.2047619047619,[true,false,true,false,false,false,true,false,true]],"000060000":[1234.6142857142856,[true,false,true,false,false,false,true,false,true]],"000070000":[1427.3583333333331,[true,false,true,false,false,false,true,false,true]],"000080000":[1544.7607142857144,[true,false,true,false,false,false,true,false,true]],"000090000":[1509.197619047619,[true,false,true,false,false,false,true,false,true]],"000001000":[1411.3541666666665,[false,false,false,false,true,false,false,false,false]],"000002000":[1414.9401785714288,[false,false,false,false,true,false,false,false,false]],"000003000":[1406.4190476190477,[false,false,false,false,true,false,false,false,false]],"000004000":[1443.3062499999999,[true,false,false,false,false,false,true,false,false]],"000005000":[1444.3172619047618,[true,false,false,false,true,false,true,false,false]],"000006000":[1441.3663690476192,[false,false,false,false,true,false,false,false,false]],"000007000":[1485.6839285714286,[false,false,false,false,true,false,false,false,false]],"000008000":[1512.927976190476,[false,false,true,false,false,false,false,false,true]],"000009000":[1518.466369047619,[false,false,true,false,false,false,false,false,true]],"000000100":[1677.7854166666664,[true,false,false,false,false,false,false,false,true]],"000000200":[1665.8127976190476,[true,false,false,false,false,false,false,false,true]],"000000300":[1662.504761904762,[true,false,false,false,false,false,false,false,true]],"000000400":[1365.0047619047618,[false,false,false,false,true,false,false,false,false]],"000000500":[1359.5589285714286,[false,false,false,false,true,false,false,false,false]],"000000600":[1364.3044642857142,[false,false,false,false,true,false,false,false,false]],"000000700":[1454.5455357142855,[false,false,false,false,true,false,false,false,false]],"000000800":[1527.0875,[true,false,false,false,true,false,false,false,true]],"000000900":[1517.7214285714285,[true,false,false,false,true,false,false,false,true]],"000000010":[1411.3541666666665,[false,false,false,false,true,false,false,false,false]],"000000020":[1414.9401785714288,[false,false,false,false,true,false,false,false,false]],"000000030":[1406.4190476190477,[false,false,false,false,true,false,false,false,false]],"000000040":[1443.3062499999999,[true,false,true,false,false,false,false,false,false]],"000000050":[1444.3172619047618,[true,false,true,false,true,false,false,false,false]],"000000060":[1441.3663690476192,[false,false,false,false,true,false,false,false,false]],"000000070":[1485.6839285714286,[false,false,false,false,true,false,false,false,false]],"000000080":[1512.927976190476,[false,false,false,false,false,false,true,false,true]],"000000090":[1518.466369047619,[false,false,false,false,false,false,true,false,true]],"000000001":[1677.7854166666664,[false,false,true,false,false,false,true,false,false]],"000000002":[1665.8127976190476,[false,false,true,false,false,false,true,false,false]],"000000003":[1662.504761904762,[false,false,true,false,false,false,true,false,false]],"000000004":[1365.0047619047618,[false,false,false,false,true,false,false,false,false]],"000000005":[1359.5589285714286,[false,false,false,false,true,false,false,false,false]],"000000006":[1364.3044642857142,[false,false,false,false,true,false,false,false,false]],"000000007":[1454.5455357142855,[false,false,false,false,true,false,false,false,false]],"000000008":[1527.0875,[false,false,true,false,true,false,true,false,false]],"000000009":[1517.7214285714285,[false,false,true,false,true,false,true,false,false]]},
-
-            solve: function(state) {
-                var revealed = state.filter(v => v > 0).length;
-                if (revealed === 0) return [true, false, true, false, false, false, true, false, true];
-                if (revealed === 1) {
-                    var key = state.join('');
-                    if (this.openings[key]) return this.openings[key][1];
-                }
-                var options = Array(9).fill(false);
-                this.solve_any(state, payout, options);
-                return options;
-            },
-
-            solve_any: function(state, rewards, options) {
-                var dummy = [], unknowns = [], ids = [], has = [], tot_win = [];
-                for (var i = 0; i < 9; i++) {
-                    if (!state[i]) { ids.push(i); tot_win.push(0); }
-                    else { has[state[i]] = 1; }
-                }
-                for (var i = 1; i <= 9; i++) { if (!has[i]) unknowns.push(i); }
-                
-                if (9 - ids.length >= 4) {
-                    var perms = 0, win_sums = Array(8).fill(0);
-                    this.permute(unknowns, p => {
-                        perms++;
-                        var s = [...state]; ids.forEach((id, idx) => s[id] = p[idx]);
-                        win_sums[0] += rewards[s[0]+s[1]+s[2]]; win_sums[1] += rewards[s[3]+s[4]+s[5]];
-                        win_sums[2] += rewards[s[6]+s[7]+s[8]]; win_sums[3] += rewards[s[0]+s[3]+s[6]];
-                        win_sums[4] += rewards[s[1]+s[4]+s[7]]; win_sums[5] += rewards[s[2]+s[5]+s[8]];
-                        win_sums[6] += rewards[s[0]+s[4]+s[8]]; win_sums[7] += rewards[s[2]+s[4]+s[6]];
-                    });
-                    var max = Math.max(...win_sums);
-                    win_sums.forEach((v, i) => { if(v === max) options[i] = true; });
-                    return max / perms;
-                } else {
-                    ids.forEach((id, idx) => {
-                        unknowns.forEach(val => {
-                            var s = [...state]; s[id] = val;
-                            tot_win[idx] += this.solve_any(s, rewards, dummy);
-                        });
-                    });
-                    var max = Math.max(...tot_win);
-                    tot_win.forEach((v, i) => { if(v > max - EPS) options[ids[i]] = true; });
-                    return max / unknowns.length;
-                }
-            },
-
-            permute: function(a, cb) {
-                var n = a.length, c = Array(n).fill(0), i = 1; cb(a);
-                while (i < n) {
-                    if (c[i] < i) {
-                        var k = i % 2 && c[i]; [a[i], a[k]] = [a[k], a[i]];
-                        cb(a); c[i]++; i = 1;
-                    } else { c[i] = 0; i++; }
-                }
-            }
-        };
-
-        var Solver = {
-            solve: function(table, payout) {
-                var used = Array(10).fill(false), res = Array(8).fill(0), count = 0;
-                table.flat().forEach(v => { if(v>0) used[v] = true; });
-                
-                var backtrack = (r, c) => {
-                    if (r === 3) {
-                        count++;
-                        res[0] += payout[table[0][0]+table[0][1]+table[0][2]];
-                        res[1] += payout[table[1][0]+table[1][1]+table[1][2]];
-                        res[2] += payout[table[2][0]+table[2][1]+table[2][2]];
-                        res[3] += payout[table[0][0]+table[1][0]+table[2][0]];
-                        res[4] += payout[table[0][1]+table[1][1]+table[2][1]];
-                        res[5] += payout[table[0][2]+table[1][2]+table[2][2]];
-                        res[6] += payout[table[0][0]+table[1][1]+table[2][2]];
-                        res[7] += payout[table[0][2]+table[1][1]+table[2][0]];
-                        return;
-                    }
-                    var nextC = (c + 1) % 3, nextR = r + (c === 2 ? 1 : 0);
-                    if (table[r][c] > 0) return backtrack(nextR, nextC);
-                    for (var i = 1; i <= 9; i++) {
-                        if (used[i]) continue;
-                        used[i] = true; table[r][c] = i;
-                        backtrack(nextR, nextC);
-                        used[i] = false; table[r][c] = 0;
-                    }
-                };
-                backtrack(0, 0);
-                return res.map(v => v / count);
-            }
-        };
-
-        // 時區統一：UTC+8
-        const getBuildTime = () => {
-            try {
-                const lastMod = new Date(document.lastModified);
-                if(isNaN(lastMod.getTime())) return "剛剛更新";
-                return lastMod.toLocaleString('zh-TW', {
-                    timeZone: 'Asia/Taipei',
-                    year: 'numeric', month: '2-digit', day: '2-digit',
-                    hour: '2-digit', minute: '2-digit', hour12: false
-                });
-            } catch(e) { return "Unknown Time"; }
-        };
+        const getBuildTime = () => { try { const d = new Date(document.lastModified); if(isNaN(d.getTime())) return "剛剛更新"; return d.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }); } catch(e) { return "Unknown Time"; } };
         const BUILD_TIMESTAMP = getBuildTime();
 
+        // --- React Logic with e (createElement) ---
+        const e = React.createElement;
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
         const useSound = (enabled) => {
-            const audioCtxRef = useRef(null);
-
-            const getCtx = useCallback(() => {
-                if (!audioCtxRef.current) {
-                    const Ctx = window.AudioContext || window.webkitAudioContext;
-                    if (Ctx) {
-                        audioCtxRef.current = new Ctx();
-                    }
-                }
-                return audioCtxRef.current;
-            }, []);
-
-            const checkAndResume = useCallback(() => {
-                const ctx = getCtx();
-                if (ctx && ctx.state === 'suspended') {
-                    ctx.resume().catch(e => console.error("Audio resume failed:", e));
-                }
-                return ctx;
-            }, [getCtx]);
-
+            const ctxRef = useRef(null);
+            const getCtx = useCallback(() => { if (!ctxRef.current) { const Ctx = window.AudioContext || window.webkitAudioContext; if (Ctx) ctxRef.current = new Ctx(); } return ctxRef.current; }, []);
+            const check = useCallback(() => { const c = getCtx(); if (c && c.state === 'suspended') c.resume().catch(console.error); return c; }, [getCtx]);
             useEffect(() => {
-                const handleInteraction = () => {
-                    const ctx = checkAndResume();
-                    if (ctx) {
-                        try {
-                            const buffer = ctx.createBuffer(1, 1, 22050);
-                            const source = ctx.createBufferSource();
-                            source.buffer = buffer;
-                            source.connect(ctx.destination);
-                            source.start(0);
-                        } catch(e) {}
-                    }
-                    window.removeEventListener('click', handleInteraction, true);
-                    window.removeEventListener('touchstart', handleInteraction, true);
-                };
-                window.addEventListener('click', handleInteraction, true);
-                window.addEventListener('touchstart', handleInteraction, true);
-                return () => {
-                    window.removeEventListener('click', handleInteraction, true);
-                    window.removeEventListener('touchstart', handleInteraction, true);
-                };
-            }, [checkAndResume]);
-
-            const playTone = useCallback((freq, type, duration, vol = 0.1, startTime = 0) => {
-                if (!enabled) return;
-                const ctx = checkAndResume();
-                if (!ctx) return; 
-
-                try {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = type;
-                    osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
-                    gain.gain.setValueAtTime(vol, ctx.currentTime + startTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + startTime + duration);
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start(ctx.currentTime + startTime);
-                    osc.stop(ctx.currentTime + startTime + duration);
-                } catch (e) {
-                    console.error("Play tone error:", e);
-                }
-            }, [enabled, checkAndResume]);
-
-            const sounds = useMemo(() => ({
-                click: () => playTone(800, 'sine', 0.1, 0.1),
-                reset: () => { 
-                    playTone(400, 'square', 0.05, 0.05, 0); 
-                    playTone(500, 'square', 0.05, 0.05, 0.05); 
-                    playTone(600, 'square', 0.05, 0.05, 0.1); 
-                },
-                toggle: () => { 
-                    checkAndResume(); 
-                    playTone(300, 'square', 0.1, 0.05); 
-                },
-                cash: () => { 
-                    playTone(2000, 'sine', 0.4, 0.1, 0); 
-                    playTone(2500, 'sine', 0.4, 0.1, 0.05); 
-                    playTone(3000, 'sine', 0.5, 0.08, 0.1); 
-                    playTone(4000, 'triangle', 0.2, 0.05, 0.15); 
-                },
-                reveal: () => { 
-                    playTone(523.25, 'sine', 0.2, 0.1); 
-                    setTimeout(() => playTone(1046.50, 'sine', 0.3, 0.1), 50); 
-                }
-            }), [playTone, checkAndResume]);
-
-            return sounds;
+                const h = () => { const c = check(); if(c){ try{const b=c.createBuffer(1,1,22050);const s=c.createBufferSource();s.buffer=b;s.connect(c.destination);s.start(0)}catch(e){}} window.removeEventListener('click',h,!0);window.removeEventListener('touchstart',h,!0) };
+                window.addEventListener('click',h,!0);window.addEventListener('touchstart',h,!0); return () => { window.removeEventListener('click',h,!0);window.removeEventListener('touchstart',h,!0); };
+            }, [check]);
+            const play = useCallback((f,t,d,v=0.1,st=0) => {
+                if(!enabled)return; const c=check(); if(!c)return;
+                try{ const o=c.createOscillator(); const g=c.createGain(); o.type=t; o.frequency.setValueAtTime(f,c.currentTime+st); g.gain.setValueAtTime(v,c.currentTime+st); g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+st+d); o.connect(g); g.connect(c.destination); o.start(c.currentTime+st); o.stop(c.currentTime+st+d); }catch(e){}
+            }, [enabled, check]);
+            return useMemo(() => ({
+                click: () => play(800, 'sine', 0.1, 0.1),
+                reset: () => { play(400,'square',0.05,0.05,0); play(500,'square',0.05,0.05,0.05); play(600,'square',0.05,0.05,0.1); },
+                toggle: () => { check(); play(300,'square',0.1,0.05); },
+                cash: () => { play(2000,'sine',0.4,0.1,0); play(2500,'sine',0.4,0.1,0.05); play(3000,'sine',0.5,0.08,0.1); play(4000,'triangle',0.2,0.05,0.15); },
+                reveal: () => { play(523.25,'sine',0.2,0.1); setTimeout(() => play(1046.5,'sine',0.3,0.1),50); }
+            }), [play, check]);
         };
 
         const AutoUpdateCheck = () => {
-            useEffect(() => {
-                const savedVersion = localStorage.getItem('cactpot_version');
-                if (savedVersion !== BUILD_TIMESTAMP) {
-                    localStorage.setItem('cactpot_version', BUILD_TIMESTAMP);
-                    if (savedVersion) window.location.reload(true);
-                }
-            }, []);
+            useEffect(() => { const v = localStorage.getItem('cactpot_version'); if (v !== BUILD_TIMESTAMP) { localStorage.setItem('cactpot_version', BUILD_TIMESTAMP); if(v) window.location.reload(true); } }, []);
             return null;
         };
 
-        // 7 國語言全配
-        // 7 國語言全配 (已加入 Yuryu 致謝)
         const LOCALE = {
-            zh: { app_title: "FF14-仙人微彩計算器", title: "仙人微彩計算器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", 
-                  mode_on: "無限填數字模式 (已開啟)", mode_off: "無限填數字模式 (鎖定中)", 
-                  reveal: "揭開!", row: "橫排", col: "直排", diag: "對角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新於", force_update: "更新頁面", region: "UTC+8", 
-                  sound_on: "音效開啟", sound_off: "音效關閉", jackpot: "JACKPOT", lang_select: "選擇語言",
-                  install_btn: "APP安裝教學", share: "分享",
-                  ios_title: "iOS 安裝步驟", android_title: "Android 安裝步驟",
-                  ios_step1: "使用 Safari 開啟", ios_step2: "點擊瀏覽器下方【‧‧‧】", ios_step3: "點擊【分享】圖示", ios_step4: "點擊【‧‧‧】【更多】", ios_step5: "選擇「加入主畫面」",
-                  android_step1: "使用 Chrome 開啟", android_step2: "點擊右上角選單【⋮】", android_step3: "選擇「加到主畫面」", android_step4: "點擊「新增」",
-                  copy_link: "複製連結", link_copied: "連結已複製!", android_open_chrome: "用 Chrome 開啟",
-                  // 關於
-                  about_btn: "關於作者",
-                  about_title: "嗨！我是來自台灣的 Raraku ٩(ˊᗜˋ*)و",
-                  about_desc1: "這是我基於興趣製作的非營利小工具，希望能幫各位光之戰士在金碟遊樂場輕鬆賺大錢！✨",
-                  // 修改點：使用「參考並移植」
-                  about_desc2: "本專案由 Gemini AI 協作開發。核心演算法參考並移植自 Yuryu 的 PerfectCactpot 邏輯。如有任何建議，歡迎隨時寫信告訴我～",
-                  contact_label: "寄信給 Raraku"
-            },
-            
-            cn: { app_title: "FF14-仙人微彩计算器", title: "仙人微彩计算器", sum: "总和", payout_title: "奖金一览表", close_hint: "点击背景关闭", select_num: "选择数字", clear_cell: "清除", analysis_title: "全概率分析", best_pick: "最佳推荐", tap_view: "点击查看详细 👆", rank: "Rank", guaranteed: "保底", view_details: "查看详情", reset: "重置盘面", payout_btn: "奖金表", 
-                  mode_on: "无限填数字模式 (已开启)", mode_off: "无限填数字模式 (锁定中)", 
-                  reveal: "揭开!", row: "横排", col: "竖排", diag: "对角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新于", force_update: "刷新页面", region: "UTC+8", 
-                  sound_on: "音效开启", sound_off: "音效关闭", jackpot: "JACKPOT", lang_select: "选择语言",
-                  install_btn: "APP安装教学", share: "分享",
-                  ios_title: "iOS 安装步骤", android_title: "Android 安装步骤",
-                  ios_step1: "使用 Safari 开启", ios_step2: "点击浏览器下方【‧‧‧】", ios_step3: "点击【分享】图示", ios_step4: "点击【‧‧‧】【更多】", ios_step5: "选择「加入主画面」",
-                  android_step1: "使用 Chrome 开启", android_step2: "点击右上角菜单【⋮】", android_step3: "选择「加到主画面」", android_step4: "点击「新增」",
-                  copy_link: "复制链接", link_copied: "链接已复制!", android_open_chrome: "用 Chrome 开启",
-                  // 關於
-                  about_btn: "关于作者",
-                  about_title: "嗨！我是来自台湾的 Raraku ٩(ˊᗜˋ*)و",
-                  about_desc1: "这是我基于兴趣制作的非营利小工具，希望能帮各位光之战士在金碟游乐场轻松赚大钱！✨",
-                  // 修改點：使用「参考并移植」
-                  about_desc2: "本专案由 Gemini AI 协作开发。核心算法参考并移植自 Yuryu 的 PerfectCactpot 逻辑。如有任何建议，欢迎随时写信告诉我～",
-                  contact_label: "寄信给 Raraku"
-            },
-            
-            en: { app_title: "FF14-Cactpot Solver", title: "Mini Cactpot Solver", sum: "Sum", payout_title: "Payout Table", close_hint: "Tap background to close", select_num: "Select Number", clear_cell: "Clear", analysis_title: "All Probability", best_pick: "Recommended", tap_view: "Tap for Details 👆", rank: "Rank", guaranteed: "Guaranteed", view_details: "View Details", reset: "Reset Board", payout_btn: "Payouts", 
-                  mode_on: "Infinite Fill Mode (Active)", mode_off: "Infinite Fill Mode (Locked)", 
-                  reveal: "Reveal!", row: "Row", col: "Col", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Updated", force_update: "Refresh Page", region: "UTC+8", 
-                  sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "Select Language",
-                  install_btn: "Install Guide", share: "Share",
-                  ios_title: "iOS Installation", android_title: "Android Installation",
-                  ios_step1: "Open in Safari", ios_step2: "Tap [‧‧‧] at bottom", ios_step3: "Tap [Share] icon", ios_step4: "Tap [‧‧‧] More", ios_step5: "Select 'Add to Home Screen'",
-                  android_step1: "Open in Chrome", android_step2: "Tap menu [⋮] at top right", android_step3: "Select 'Add to Home screen'", android_step4: "Tap 'Add'",
-                  copy_link: "Copy Link", link_copied: "Copied!", android_open_chrome: "Open in Chrome",
-                  // About
-                  about_btn: "About Author",
-                  about_title: "Hi! I'm Raraku from Taiwan ٩(ˊᗜˋ*)و",
-                  about_desc1: "Just a hobby project made with love! Hope this helps all Warriors of Light earn big MGP at the Gold Saucer! ✨",
-                  // 修改點：使用 "Core logic based on/ported from"
-                  about_desc2: "Co-coded with Gemini AI. Core algorithm logic is based on Yuryu's PerfectCactpot. Feel free to contact me for any suggestions!",
-                  contact_label: "Email Raraku"
-            },
-            
-            ja: { app_title: "FF14-くじテンダー計算機", title: "ミニ・くじテンダー計算機", sum: "合計", payout_title: "賞金一覧", close_hint: "背景タップで閉じる", select_num: "数字を選択", clear_cell: "クリア", analysis_title: "全確率分析", best_pick: "推奨", tap_view: "詳細を見る 👆", rank: "順位", guaranteed: "確定", view_details: "詳細を見る", reset: "リセット", payout_btn: "賞金表", 
-                  mode_on: "無限入力モード (編集中)", mode_off: "無限入力モード (ロック)", 
-                  reveal: "めくる!", row: "横", col: "縦", diag: "斜め", label_10k: "10k", label_3600: "3.6k", ver_prefix: "最終更新", force_update: "ページ更新", region: "UTC+8", 
-                  sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "言語を選択",
-                  install_btn: "アプリ導入法", share: "共有",
-                  ios_title: "iOS インストール手順", android_title: "Android インストール手順",
-                  ios_step1: "Safariで開く", ios_step2: "下の [‧‧‧] をタップ", ios_step3: "[共有] をタップ", ios_step4: "[‧‧‧] その他をタップ", ios_step5: "[ホーム画面に追加] を選択",
-                  android_step1: "Chromeで開く", android_step2: "右上のメニュー [⋮] をタップ", android_step3: "「ホーム画面に追加」を選択", android_step4: "「追加」をタップ",
-                  copy_link: "リンクをコピー", link_copied: "コピーしました!", android_open_chrome: "Chromeで開く",
-                  // About
-                  about_btn: "作者について", about_title: "Hi! 台湾出身の Raraku です ٩(ˊᗜˋ*)و", about_desc1: "趣味で作った非営利ツールです。光の戦士の皆さんがMGPを稼ぐのにお役に立てば嬉しいです！✨", 
-                  // 修改點：使用 "参考・移植しました"
-                  about_desc2: "Gemini AIと共同開発しました！コアアルゴリズムはYuryu氏のPerfectCactpotを参考にしています。不具合や提案があれば、気軽にメールしてください！", 
-                  contact_label: "Rarakuにメール"
-            },
-            
-            de: { app_title: "FF14-Glückskaktor Solver", title: "Mini-Glückskaktor Solver", sum: "Summe", payout_title: "Gewinntabelle", close_hint: "Zum Schließen tippen", select_num: "Zahl wählen", clear_cell: "Löschen", analysis_title: "Wahrscheinlichkeit", best_pick: "Empfohlen", tap_view: "Details antippen 👆", rank: "Rang", guaranteed: "Garantiert", view_details: "Details", reset: "Zurücksetzen", payout_btn: "Gewinne", 
-                  mode_on: "Frei-Eingabe-Modus (Ein)", mode_off: "Frei-Eingabe-Modus (Aus)", 
-                  reveal: "Aufdecken!", row: "Reihe", col: "Spalte", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Aktualisiert", force_update: "Aktualisieren", region: "UTC+8", 
-                  sound_on: "Ton AN", sound_off: "Ton AUS", jackpot: "JACKPOT", lang_select: "Sprache wählen",
-                  install_btn: "Installationshilfe", share: "Teilen",
-                  ios_title: "iOS Installation", android_title: "Android Installation",
-                  ios_step1: "In Safari öffnen", ios_step2: "Tippe auf [‧‧‧]", ios_step3: "Tippe auf [Teilen]", ios_step4: "Tippe auf [‧‧‧] Mehr", ios_step5: "Wähle 'Zum Home-Bildschirm'",
-                  android_step1: "In Chrome öffnen", android_step2: "Tippe oben rechts auf [⋮]", android_step3: "Wähle 'Zum Startbildschirm'", android_step4: "Tippe auf 'Hinzufügen'",
-                  copy_link: "Link kopieren", link_copied: "Kopiert!", android_open_chrome: "In Chrome öffnen",
-                  // About
-                  about_btn: "Über den Autor", about_title: "Hallo! Ich bin Raraku aus Taiwan ٩(ˊᗜˋ*)و", about_desc1: "Ein nicht-kommerzielles Hobbyprojekt! Ich hoffe, es hilft allen Kriegern des Lichts, MGP zu verdienen! ✨", 
-                  // 修改點：使用 "basiert auf"
-                  about_desc2: "Programmiert mit Gemini AI! Der Kernalgorithmus basiert auf Yuryus PerfectCactpot. Bei Bugs oder Vorschlägen einfach melden!", 
-                  contact_label: "Email an Raraku"
-            },
-            
-            fr: { app_title: "FF14-Mini Cactpot Solver", title: "Mini Cactpot Solver", sum: "Somme", payout_title: "Tableau des gains", close_hint: "Touchez pour fermer", select_num: "Choisir un nombre", clear_cell: "Effacer", analysis_title: "Probabilités", best_pick: "Recommandé", tap_view: "Voir détails 👆", rank: "Rang", guaranteed: "Garanti", view_details: "Détails", reset: "Réinitialiser", payout_btn: "Gains", 
-                  mode_on: "Mode Saisie Libre (Actif)", mode_off: "Mode Saisie Libre (Verrou)", 
-                  reveal: "Révéler!", row: "Rangée", col: "Colonne", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Mise à jour", force_update: "Actualiser", region: "UTC+8", 
-                  sound_on: "Son ON", sound_off: "Son OFF", jackpot: "JACKPOT", lang_select: "Choisir la langue",
-                  install_btn: "Guide d'installation", share: "Partager",
-                  ios_title: "Installation iOS", android_title: "Installation Android",
-                  ios_step1: "Ouvrir dans Safari", ios_step2: "Touchez [‧‧‧]", ios_step3: "Touchez [Partager]", ios_step4: "Touchez [‧‧‧] Plus", ios_step5: "Sélectionnez 'Sur l'écran d'accueil'",
-                  android_step1: "Ouvrir dans Chrome", android_step2: "Touchez [⋮] en haut à droite", android_step3: "Sélectionnez 'Ajouter à l'écran d'accueil'", android_step4: "Touchez 'Ajouter'",
-                  copy_link: "Copier le lien", link_copied: "Copié!", android_open_chrome: "Ouvrir dans Chrome",
-                  // About
-                  about_btn: "À propos de l'auteur", about_title: "Salut ! Je suis Raraku de Taïwan ٩(ˊᗜˋ*)و", about_desc1: "Un projet amateur à but non lucratif ! J'espère que cela aidera les Guerriers de la Lumière à gagner des MGP ! ✨", 
-                  // 修改點：使用 "basé sur"
-                  about_desc2: "Codé avec Gemini AI ! L'algorithme principal est basé sur le PerfectCactpot de Yuryu. Si vous trouvez des bugs, contactez-moi !", 
-                  contact_label: "Email à Raraku"
-            },
-            
-            ko: { app_title: "FF14-미니 텐더 계산기", title: "미니 텐더 계산기", sum: "합계", payout_title: "당첨금 일람", close_hint: "배경을 눌러 닫기", select_num: "숫자 선택", clear_cell: "지우기", analysis_title: "확률 분석", best_pick: "추천", tap_view: "상세 보기 👆", rank: "순위", guaranteed: "보장", view_details: "상세 정보", reset: "초기화", payout_btn: "당첨금", 
-                  mode_on: "무한 입력 모드 (켜짐)", mode_off: "무한 입력 모드 (꺼짐)", 
-                  reveal: "확인!", row: "가로", col: "세로", diag: "대각선", label_10k: "10k", label_3600: "3.6k", ver_prefix: "업데이트", force_update: "새로고침", region: "UTC+8", 
-                  sound_on: "소리 켜기", sound_off: "소리 끄기", jackpot: "JACKPOT", lang_select: "언어 선택",
-                  install_btn: "설치 가이드", share: "공유",
-                  ios_title: "iOS 설치 방법", android_title: "Android 설치 방법",
-                  ios_step1: "Safari에서 열기", ios_step2: "하단 [‧‧‧] 클릭", ios_step3: "[공유] 아이콘 클릭", ios_step4: "[‧‧‧] 더보기 클릭", ios_step5: "'홈 화면에 추가' 선택",
-                  android_step1: "Chrome에서 열기", android_step2: "오른쪽 상단 [⋮] 클릭", android_step3: "'홈 화면에 추가' 선택", android_step4: "'추가' 클릭",
-                  copy_link: "링크 복사", link_copied: "복사됨!", android_open_chrome: "Chrome에서 열기",
-                  // About
-                  about_btn: "제작자 소개", about_title: "안녕! 대만의 Raraku 입니다 ٩(ˊᗜˋ*)و", about_desc1: "취미로 만든 비영리 도구입니다. 빛의 전사 여러분이 MGP를 버는 데 도움이 되기를 바랍니다! ✨", 
-                  // 修改點：使用 "기반으로 합니다" (Based on)
-                  about_desc2: "Gemini AI와 공동 개발했습니다! 핵심 알고리즘은 Yuryu의 PerfectCactpot을 기반으로 합니다. 버그나 제안 사항이 있으면 메일 주세요!", 
-                  contact_label: "Raraku에게 메일 보내기"
-            }
+            zh: { app_title: "FF14-仙人微彩計算器", title: "仙人微彩計算器", sum: "總和", payout_title: "獎金一覽表", close_hint: "點擊背景關閉", select_num: "選擇數字", clear_cell: "清除", analysis_title: "全部機率分析", best_pick: "最佳推薦", tap_view: "點擊查看詳細 👆", rank: "Rank", guaranteed: "保底", view_details: "查看詳情", reset: "重置盤面", payout_btn: "獎金表", mode_on: "無限填數字模式 (已開啟)", mode_off: "無限填數字模式 (鎖定中)", reveal: "揭開!", row: "橫排", col: "直排", diag: "對角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新於", force_update: "更新頁面", region: "UTC+8", sound_on: "音效開啟", sound_off: "音效關閉", jackpot: "JACKPOT", lang_select: "選擇語言", install_btn: "APP安裝教學", share: "分享", ios_title: "iOS 安裝步驟", android_title: "Android 安裝步驟", ios_step1: "使用 Safari 開啟", ios_step2: "點擊瀏覽器下方【‧‧‧】", ios_step3: "點擊【分享】圖示", ios_step4: "點擊【‧‧‧】【更多】", ios_step5: "選擇「加入主畫面」", android_step1: "使用 Chrome 開啟", android_step2: "點擊右上角選單【⋮】", android_step3: "選擇「加到主畫面」", android_step4: "點擊「新增」", copy_link: "複製連結", link_copied: "連結已複製!", android_open_chrome: "用 Chrome 開啟", about_btn: "關於作者", about_title: "嗨！我是來自台灣的 Raraku ٩(ˊᗜˋ*)و", about_desc1: "這是我基於興趣製作的非營利小工具，希望能幫各位光之戰士在金碟遊樂場輕鬆賺大錢！✨", about_desc2: "本專案由 Gemini AI 協作開發。核心演算法參考並移植自 Yuryu 的 PerfectCactpot 邏輯。如有任何建議，歡迎隨時寫信告訴我～", contact_label: "寄信給 Raraku" },
+            cn: { app_title: "FF14-仙人微彩计算器", title: "仙人微彩计算器", sum: "总和", payout_title: "奖金一览表", close_hint: "点击背景关闭", select_num: "选择数字", clear_cell: "清除", analysis_title: "全概率分析", best_pick: "最佳推荐", tap_view: "点击查看详细 👆", rank: "Rank", guaranteed: "保底", view_details: "查看详情", reset: "重置盘面", payout_btn: "奖金表", mode_on: "无限填数字模式 (已开启)", mode_off: "无限填数字模式 (锁定中)", reveal: "揭开!", row: "横排", col: "竖排", diag: "对角", label_10k: "10k", label_3600: "3.6k", ver_prefix: "版本更新于", force_update: "刷新页面", region: "UTC+8", sound_on: "音效开启", sound_off: "音效关闭", jackpot: "JACKPOT", lang_select: "选择语言", install_btn: "APP安装教学", share: "分享", ios_title: "iOS 安装步骤", android_title: "Android 安装步骤", ios_step1: "使用 Safari 开启", ios_step2: "点击浏览器下方【‧‧‧】", ios_step3: "点击【分享】图示", ios_step4: "点击【‧‧‧】【更多】", ios_step5: "选择「加入主画面」", android_step1: "使用 Chrome 开启", android_step2: "点击右上角菜单【⋮】", android_step3: "选择「加到主画面」", android_step4: "点击「新增」", copy_link: "复制链接", link_copied: "链接已复制!", android_open_chrome: "用 Chrome 开启", about_btn: "关于作者", about_title: "嗨！我是来自台湾的 Raraku ٩(ˊᗜˋ*)و", about_desc1: "这是我基于兴趣制作的非营利小工具，希望能帮各位光之战士在金碟游乐场轻松赚大钱！✨", about_desc2: "本专案由 Gemini AI 协作开发。核心算法参考并移植自 Yuryu 的 PerfectCactpot 逻辑。如有任何建议，欢迎随时写信告诉我～", contact_label: "寄信给 Raraku" },
+            en: { app_title: "FF14-Cactpot Solver", title: "Mini Cactpot Solver", sum: "Sum", payout_title: "Payout Table", close_hint: "Tap background to close", select_num: "Select Number", clear_cell: "Clear", analysis_title: "All Probability", best_pick: "Recommended", tap_view: "Tap for Details 👆", rank: "Rank", guaranteed: "Guaranteed", view_details: "View Details", reset: "Reset Board", payout_btn: "Payouts", mode_on: "Infinite Fill Mode (Active)", mode_off: "Infinite Fill Mode (Locked)", reveal: "Reveal!", row: "Row", col: "Col", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Updated", force_update: "Refresh Page", region: "UTC+8", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "Select Language", install_btn: "Install Guide", share: "Share", ios_title: "iOS Installation", android_title: "Android Installation", ios_step1: "Open in Safari", ios_step2: "Tap [‧‧‧] at bottom", ios_step3: "Tap [Share] icon", ios_step4: "Tap [‧‧‧] More", ios_step5: "Select 'Add to Home Screen'", android_step1: "Open in Chrome", android_step2: "Tap menu [⋮] at top right", android_step3: "Select 'Add to Home screen'", android_step4: "Tap 'Add'", copy_link: "Copy Link", link_copied: "Copied!", android_open_chrome: "Open in Chrome", about_btn: "About Author", about_title: "Hi! I'm Raraku from Taiwan ٩(ˊᗜˋ*)و", about_desc1: "Just a hobby project made with love! Hope this helps all Warriors of Light earn big MGP at the Gold Saucer! ✨", about_desc2: "Co-coded with Gemini AI. Core algorithm logic is based on Yuryu's PerfectCactpot. Feel free to contact me for any suggestions!", contact_label: "Email Raraku" },
+            ja: { app_title: "FF14-くじテンダー計算機", title: "ミニ・くじテンダー計算機", sum: "合計", payout_title: "賞金一覧", close_hint: "背景タップで閉じる", select_num: "数字を選択", clear_cell: "クリア", analysis_title: "全確率分析", best_pick: "推奨", tap_view: "詳細を見る 👆", rank: "順位", guaranteed: "確定", view_details: "詳細を見る", reset: "リセット", payout_btn: "賞金表", mode_on: "無限入力モード (編集中)", mode_off: "無限入力モード (ロック)", reveal: "めくる!", row: "横", col: "縦", diag: "斜め", label_10k: "10k", label_3600: "3.6k", ver_prefix: "最終更新", force_update: "ページ更新", region: "UTC+8", sound_on: "Sound ON", sound_off: "Sound OFF", jackpot: "JACKPOT", lang_select: "言語を選択", install_btn: "アプリ導入法", share: "共有", ios_title: "iOS インストール手順", android_title: "Android インストール手順", ios_step1: "Safariで開く", ios_step2: "下の [‧‧‧] をタップ", ios_step3: "[共有] をタップ", ios_step4: "[‧‧‧] その他をタップ", ios_step5: "[ホーム画面に追加] を選択", android_step1: "Chromeで開く", android_step2: "右上のメニュー [⋮] をタップ", android_step3: "「ホーム画面に追加」を選択", android_step4: "「追加」をタップ", copy_link: "リンクをコピー", link_copied: "コピーしました!", android_open_chrome: "Chromeで開く", about_btn: "作者について", about_title: "Hi! 台湾出身の Raraku です ٩(ˊᗜˋ*)و", about_desc1: "趣味で作った非営利ツールです。光の戦士の皆さんがMGPを稼ぐのにお役に立てば嬉しいです！✨", about_desc2: "Gemini AIと共同開発しました！コアアルゴリズムはYuryu氏のPerfectCactpotを参考にしています。不具合や提案があれば、気軽にメールしてください！", contact_label: "Rarakuにメール" },
+            de: { app_title: "FF14-Glückskaktor Solver", title: "Mini-Glückskaktor Solver", sum: "Summe", payout_title: "Gewinntabelle", close_hint: "Zum Schließen tippen", select_num: "Zahl wählen", clear_cell: "Löschen", analysis_title: "Wahrscheinlichkeit", best_pick: "Empfohlen", tap_view: "Details antippen 👆", rank: "Rang", guaranteed: "Garantiert", view_details: "Details", reset: "Zurücksetzen", payout_btn: "Gewinne", mode_on: "Frei-Eingabe-Modus (Ein)", mode_off: "Frei-Eingabe-Modus (Aus)", reveal: "Aufdecken!", row: "Reihe", col: "Spalte", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Aktualisiert", force_update: "Aktualisieren", region: "UTC+8", sound_on: "Ton AN", sound_off: "Ton AUS", jackpot: "JACKPOT", lang_select: "Sprache wählen", install_btn: "Installationshilfe", share: "Teilen", ios_title: "iOS Installation", android_title: "Android Installation", ios_step1: "In Safari öffnen", ios_step2: "Tippe auf [‧‧‧]", ios_step3: "Tippe auf [Teilen]", ios_step4: "Tippe auf [‧‧‧] Mehr", ios_step5: "Wähle 'Zum Home-Bildschirm'", android_step1: "In Chrome öffnen", android_step2: "Tippe oben rechts auf [⋮]", android_step3: "Wähle 'Zum Startbildschirm'", android_step4: "Tippe auf 'Hinzufügen'", copy_link: "Link kopieren", link_copied: "Kopiert!", android_open_chrome: "In Chrome öffnen", about_btn: "Über den Autor", about_title: "Hallo! Ich bin Raraku aus Taiwan ٩(ˊᗜˋ*)و", about_desc1: "Ein nicht-kommerzielles Hobbyprojekt! Ich hoffe, es hilft allen Kriegern des Lichts, MGP zu verdienen! ✨", about_desc2: "Programmiert mit Gemini AI! Der Kernalgorithmus basiert auf Yuryus PerfectCactpot. Bei Bugs oder Vorschlägen einfach melden!", contact_label: "Email an Raraku" },
+            fr: { app_title: "FF14-Mini Cactpot Solver", title: "Mini Cactpot Solver", sum: "Somme", payout_title: "Tableau des gains", close_hint: "Touchez pour fermer", select_num: "Choisir un nombre", clear_cell: "Effacer", analysis_title: "Probabilités", best_pick: "Recommandé", tap_view: "Voir détails 👆", rank: "Rang", guaranteed: "Garanti", view_details: "Détails", reset: "Réinitialiser", payout_btn: "Gains", mode_on: "Mode Saisie Libre (Actif)", mode_off: "Mode Saisie Libre (Verrou)", reveal: "Révéler!", row: "Rangée", col: "Colonne", diag: "Diag", label_10k: "10k", label_3600: "3.6k", ver_prefix: "Mise à jour", force_update: "Actualiser", region: "UTC+8", sound_on: "Son ON", sound_off: "Son OFF", jackpot: "JACKPOT", lang_select: "Choisir la langue", install_btn: "Guide d'installation", share: "Partager", ios_title: "Installation iOS", android_title: "Installation Android", ios_step1: "Ouvrir dans Safari", ios_step2: "Touchez [‧‧‧]", ios_step3: "Touchez [Partager]", ios_step4: "Touchez [‧‧‧] Plus", ios_step5: "Sélectionnez 'Sur l'écran d'accueil'", android_step1: "Ouvrir dans Chrome", android_step2: "Touchez [⋮] en haut à droite", android_step3: "Sélectionnez 'Ajouter à l'écran d'accueil'", android_step4: "Touchez 'Ajouter'", copy_link: "Copier le lien", link_copied: "Copié!", android_open_chrome: "Ouvrir dans Chrome", about_btn: "À propos de l'auteur", about_title: "Salut ! Je suis Raraku de Taïwan ٩(ˊᗜˋ*)و", about_desc1: "Un projet amateur à but non lucratif ! J'espère que cela aidera les Guerriers de la Lumière à gagner des MGP ! ✨", about_desc2: "Codé avec Gemini AI ! L'algorithme principal est basé sur le PerfectCactpot de Yuryu. Si vous trouvez des bugs, contactez-moi !", contact_label: "Email à Raraku" },
+            ko: { app_title: "FF14-미니 텐더 계산기", title: "미니 텐더 계산기", sum: "합계", payout_title: "당첨금 일람", close_hint: "배경을 눌러 닫기", select_num: "숫자 선택", clear_cell: "지우기", analysis_title: "확률 분석", best_pick: "추천", tap_view: "상세 보기 👆", rank: "순위", guaranteed: "보장", view_details: "상세 정보", reset: "초기화", payout_btn: "당첨금", mode_on: "무한 입력 모드 (켜짐)", mode_off: "무한 입력 모드 (꺼짐)", reveal: "확인!", row: "가로", col: "세로", diag: "대각선", label_10k: "10k", label_3600: "3.6k", ver_prefix: "업데이트", force_update: "새로고침", region: "UTC+8", sound_on: "소리 켜기", sound_off: "소리 끄기", jackpot: "JACKPOT", lang_select: "언어 선택", install_btn: "설치 가이드", share: "공유", ios_title: "iOS 설치 방법", android_title: "Android 설치 방법", ios_step1: "Safari에서 열기", ios_step2: "하단 [‧‧‧] 클릭", ios_step3: "[공유] 아이콘 클릭", ios_step4: "[‧‧‧] 더보기 클릭", ios_step5: "'홈 화면에 추가' 선택", android_step1: "Chrome에서 열기", android_step2: "오른쪽 상단 [⋮] 클릭", android_step3: "'홈 화면에 추가' 선택", android_step4: "'추가' 클릭", copy_link: "링크 복사", link_copied: "복사됨!", android_open_chrome: "Chrome에서 열기", about_btn: "제작자 소개", about_title: "안녕! 대만의 Raraku 입니다 ٩(ˊᗜˋ*)و", about_desc1: "취미로 만든 비영리 도구입니다. 빛의 전사 여러분이 MGP를 버는 데 도움이 되기를 바랍니다! ✨", about_desc2: "Gemini AI와 공동 개발했습니다! 핵심 알고리즘은 Yuryu의 PerfectCactpot을 기반으로 합니다. 버그나 제안 사항이 있으면 메일 주세요!", contact_label: "Raraku에게 메일 보내기" }
         };
 
-        // --- Icons ---
-        const RefreshCw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>;
-        const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
-        const Unlock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>;
-        const Lock = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
-        const BookOpen = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
-        const X = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
-        
-        // ★★★ 修正後的星星 (Sparkles) 圖示：還原為單顆星星 ★★★
-        const Sparkles = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
-
-        const RotateCcw = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
-        const Volume2 = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
-        const VolumeX = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>;
-        const Globe = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
-        const ShareIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>;
-        const Download = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>;
-        const Copy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>;
-        const ExternalLink = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>;
-
-        const ArrowRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
-        const ArrowDown = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>;
-        const ArrowDownRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m7 7 10 10"/><path d="M17 7v10H7"/></svg>;
-        const ArrowDownLeft = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M17 7 7 17"/><path d="M7 7v10h10"/></svg>;
-
-        const getArrowIcon = (lineId) => {
-            if (lineId <= 2) return <ArrowRight />;
-            if (lineId <= 5) return <ArrowDown />;
-            if (lineId === 6) return <ArrowDownRight />;
-            if (lineId === 7) return <ArrowDownLeft />;
-            return null;
-        };
-
-        const PAYOUTS = {
-            6: 10000, 7: 36, 8: 720, 9: 360, 10: 80,
-            11: 252, 12: 108, 13: 72, 14: 54, 15: 180,
-            16: 72, 17: 180, 18: 119, 19: 36, 20: 306,
-            21: 1080, 22: 144, 23: 1800, 24: 3600,
-        };
-
-        const LINES = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8], 
-            [0, 3, 6], [1, 4, 7], [2, 5, 8], 
-            [0, 4, 8], [2, 4, 6], 
-        ];
-
-        function getPermutations(arr) {
-            if (arr.length === 0) return [[]];
-            const firstEl = arr[0];
-            const rest = arr.slice(1);
-            const permsWithoutFirst = getPermutations(rest);
-            const allPermutations = [];
-            permsWithoutFirst.forEach((perm) => {
-                for (let i = 0; i <= perm.length; i++) {
-                allPermutations.push([...perm.slice(0, i), firstEl, ...perm.slice(i)]);
-                }
-            });
-            return allPermutations;
-        }
-
-        const getPrizeStyle = (mgp) => {
-            if (mgp === 10000) return "text-[#fcd34d] border-[#fcd34d]/50 bg-yellow-900/40 shadow-[0_0_10px_rgba(252,211,77,0.3)] font-bold"; 
-            if (mgp === 3600 || mgp === 1800) return "text-fuchsia-300 border-fuchsia-500/40 bg-fuchsia-900/40 font-bold";
-            if (mgp === 1080 || mgp === 720) return "text-cyan-300 border-cyan-500/40 bg-cyan-900/40 font-bold"; 
-            return "text-[#a8a29e] border-[#57534e]/40 bg-[#1c1917]/60";
-        };
+        const Icon = (p) => e("svg", { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", ...p });
+        const RefreshCw = (p) => e(Icon, p, e("path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" }), e("path", { d: "M21 3v5h-5" }), e("path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" }), e("path", { d: "M8 16H3v5" }));
+        const Trophy = (p) => e(Icon, p, e("path", { d: "M6 9H4.5a2.5 2.5 0 0 1 0-5H6" }), e("path", { d: "M18 9h1.5a2.5 2.5 0 0 0 0-5H18" }), e("path", { d: "M4 22h16" }), e("path", { d: "M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" }), e("path", { d: "M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" }), e("path", { d: "M18 2H6v7a6 6 0 0 0 12 0V2Z" }));
+        const Unlock = (p) => e(Icon, p, e("rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2" }), e("path", { d: "M7 11V7a5 5 0 0 1 9.9-1" }));
+        const Lock = (p) => e(Icon, p, e("rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2" }), e("path", { d: "M7 11V7a5 5 0 0 1 10 0v4" }));
+        const BookOpen = (p) => e(Icon, p, e("path", { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }), e("path", { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" }));
+        const X = (p) => e(Icon, p, e("path", { d: "M18 6 6 18" }), e("path", { d: "m6 6 12 12" }));
+        const Sparkles = (p) => e(Icon, p, e("path", { d: "m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" }));
+        const RotateCcw = (p) => e(Icon, p, e("path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" }), e("path", { d: "M3 3v5h5" }));
+        const Volume2 = (p) => e(Icon, p, e("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }), e("path", { d: "M15.54 8.46a5 5 0 0 1 0 7.07" }), e("path", { d: "M19.07 4.93a10 10 0 0 1 0 14.14" }));
+        const VolumeX = (p) => e(Icon, p, e("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }), e("line", { x1: "23", x2: "17", y1: "9", y2: "15" }), e("line", { x1: "17", x2: "23", y1: "9", y2: "15" }));
+        const Globe = (p) => e(Icon, p, e("circle", { cx: "12", cy: "12", r: "10" }), e("line", { x1: "2", x2: "22", y1: "12", y2: "12" }), e("path", { d: "M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" }));
+        const ShareIcon = (p) => e(Icon, p, e("path", { d: "M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" }), e("polyline", { points: "16 6 12 2 8 6" }), e("line", { x1: "12", x2: "12", y1: "2", y2: "15" }));
+        const Download = (p) => e(Icon, p, e("path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }), e("polyline", { points: "7 10 12 15 17 10" }), e("line", { x1: "12", x2: "12", y1: "15", y2: "3" }));
+        const Copy = (p) => e(Icon, p, e("rect", { width: "14", height: "14", x: "8", y: "8", rx: "2", ry: "2" }), e("path", { d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" }));
+        const ExternalLink = (p) => e(Icon, p, e("path", { d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" }), e("polyline", { points: "15 3 21 3 21 9" }), e("line", { x1: "10", x2: "21", y1: "14", y2: "3" }));
+        const ArrowRight = () => e("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round" }, e("path", { d: "M5 12h14" }), e("path", { d: "m12 5 7 7-7 7" }));
+        const ArrowDown = () => e("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round" }, e("path", { d: "M12 5v14" }), e("path", { d: "m19 12-7 7-7-7" }));
+        const ArrowDownRight = () => e("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round" }, e("path", { d: "m7 7 10 10" }), e("path", { d: "M17 7v10H7" }));
+        const ArrowDownLeft = () => e("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round" }, e("path", { d: "M17 7 7 17" }), e("path", { d: "M7 7v10h10" }));
+        const getArrowIcon = (id) => { if(id<=2)return e(ArrowRight); if(id<=5)return e(ArrowDown); if(id===6)return e(ArrowDownRight); if(id===7)return e(ArrowDownLeft); return null; };
+        const PAYOUTS = {6:10000,7:36,8:720,9:360,10:80,11:252,12:108,13:72,14:54,15:180,16:72,17:180,18:119,19:36,20:306,21:1080,22:144,23:1800,24:3600};
+        const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        function getPermutations(arr){if(arr.length===0)return[[]];const f=arr[0],r=arr.slice(1),pw=getPermutations(r),all=[];pw.forEach(p=>{for(let i=0;i<=p.length;i++)all.push([...p.slice(0,i),f,...p.slice(i)])});return all;}
+        const getPrizeStyle = (m) => m===10000?"text-[#fcd34d] border-[#fcd34d]/50 bg-yellow-900/40 shadow-[0_0_10px_rgba(252,211,77,0.3)] font-bold":m===3600||m===1800?"text-fuchsia-300 border-fuchsia-500/40 bg-fuchsia-900/40 font-bold":m===1080||m===720?"text-cyan-300 border-cyan-500/40 bg-cyan-900/40 font-bold":"text-[#a8a29e] border-[#57534e]/40 bg-[#1c1917]/60";
 
         const PayoutTableModal = ({ isOpen, onClose, t, playSound }) => {
             if (!isOpen) return null;
-            const sortedPayouts = Object.entries(PAYOUTS).sort((a,b) => Number(a[0]) - Number(b[0]));
-            const midPoint = Math.ceil(sortedPayouts.length / 2);
-            const leftCol = sortedPayouts.slice(0, midPoint);
-            const rightCol = sortedPayouts.slice(midPoint);
-
-            const RowItem = ({ sum, mgp }) => {
-                let rowBgClass = "bg-white/5 border-white/10";
-                let textClass = "text-zinc-300";
-                let isJackpot = false;
-                if (mgp === 10000) { rowBgClass = "border-[#d4af37] relative overflow-hidden shadow-[0_0_15px_rgba(212,175,55,0.4)]"; textClass = "text-[#fcd34d] font-bold drop-shadow"; isJackpot = true; } 
-                else if (mgp === 3600 || mgp === 1800) { rowBgClass = "bg-gradient-to-r from-fuchsia-600/20 to-fuchsia-900/20 border-fuchsia-500/30"; textClass = "text-fuchsia-300 font-bold"; } 
-                else if (mgp === 1080 || mgp === 720) { rowBgClass = "bg-gradient-to-r from-cyan-600/20 to-cyan-900/20 border-cyan-500/30"; textClass = "text-cyan-300 font-bold"; } 
-                else { rowBgClass = "bg-[#d4af37]/10 border-[#d4af37]/20"; textClass = "text-[#d4af37]/80"; }
-
-                return (
-                    <div className={`flex justify-between items-center px-3 rounded-lg h-9 border ${rowBgClass}`}>
-                        {isJackpot && <div className="absolute inset-0 jackpot-row-bg -z-10 pointer-events-none opacity-80"></div>}
-                        <span className="text-[#d4af37]/70 font-mono text-xs">{t('sum')} <span className="text-white font-bold">{sum}</span></span>
-                        <span className={`text-sm ${textClass}`}>{mgp.toLocaleString()} <span className="text-[10px] opacity-70">MGP</span></span>
-                    </div>
+            const sP = Object.entries(PAYOUTS).sort((a,b)=>Number(a[0])-Number(b[0])), mid = Math.ceil(sP.length/2), left = sP.slice(0,mid), right = sP.slice(mid);
+            const Row = ({sum,mgp}) => {
+                let bg="bg-white/5 border-white/10", txt="text-zinc-300", jack=false;
+                if(mgp===10000){bg="border-[#d4af37] relative overflow-hidden shadow-[0_0_15px_rgba(212,175,55,0.4)]";txt="text-[#fcd34d] font-bold drop-shadow";jack=true;}
+                else if(mgp>=1800){bg="bg-gradient-to-r from-fuchsia-600/20 to-fuchsia-900/20 border-fuchsia-500/30";txt="text-fuchsia-300 font-bold";}
+                else if(mgp>=720){bg="bg-gradient-to-r from-cyan-600/20 to-cyan-900/20 border-cyan-500/30";txt="text-cyan-300 font-bold";}
+                else{bg="bg-[#d4af37]/10 border-[#d4af37]/20";txt="text-[#d4af37]/80";}
+                return e("div", {className:`flex justify-between items-center px-3 rounded-lg h-9 border ${bg}`},
+                    jack && e("div", {className:"absolute inset-0 jackpot-row-bg -z-10 pointer-events-none opacity-80"}),
+                    e("span", {className:"text-[#d4af37]/70 font-mono text-xs"}, t('sum'), " ", e("span", {className:"text-white font-bold"}, sum)),
+                    e("span", {className:`text-sm ${txt}`}, mgp.toLocaleString(), " ", e("span", {className:"text-[10px] opacity-70"}, "MGP"))
                 );
             };
-
-            return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => { playSound('click'); onClose(); }}>
-                    <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden">
-                        <div className="p-4 border-b border-[#d4af37]/30 flex items-center justify-between bg-black/30">
-                            <h3 className="text-gold font-bold text-lg flex items-center gap-2"><Trophy className="w-5 h-5 text-[#d4af37]" /> {t('payout_title')}</h3>
-                            <button onClick={() => { playSound('click'); onClose(); }} className="text-[#d4af37] hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"><X className="w-6 h-6"/></button>
-                        </div>
-                        <div className="p-4">
-                            <div className="flex gap-4">
-                                <div className="flex-1 space-y-2">{leftCol.map(([sum, mgp]) => <RowItem key={sum} sum={sum} mgp={mgp} />)}</div>
-                                <div className="flex-1 space-y-2">{rightCol.map(([sum, mgp]) => <RowItem key={sum} sum={sum} mgp={mgp} />)}</div>
-                            </div>
-                        </div>
-                        <div className="p-3 text-center text-xs text-[#d4af37]/60 border-t border-[#d4af37]/30 bg-black/30">{t('close_hint')}</div>
-                    </div>
-                </div>
+            return e("div", {className:"fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200", onClick:()=>{playSound('click');onClose();}},
+                e("div", {onClick:ev=>ev.stopPropagation(), className:"casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden"},
+                    e("div", {className:"p-4 border-b border-[#d4af37]/30 flex items-center justify-between bg-black/30"},
+                        e("h3", {className:"text-gold font-bold text-lg flex items-center gap-2"}, e(Trophy, {className:"w-5 h-5 text-[#d4af37]"}), t('payout_title')),
+                        e("button", {onClick:()=>{playSound('click');onClose();}, className:"text-[#d4af37] hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"}, e(X, {className:"w-6 h-6"}))
+                    ),
+                    e("div", {className:"p-4"}, e("div", {className:"flex gap-4"}, e("div", {className:"flex-1 space-y-2"}, left.map(([s,m])=>e(Row, {key:s,sum:s,mgp:m}))), e("div", {className:"flex-1 space-y-2"}, right.map(([s,m])=>e(Row, {key:s,sum:s,mgp:m}))))),
+                    e("div", {className:"p-3 text-center text-xs text-[#d4af37]/60 border-t border-[#d4af37]/30 bg-black/30"}, t('close_hint'))
+                )
             );
         };
 
         const LanguageModal = ({ isOpen, onClose, currentLang, setLang, t, playSound }) => {
-            if (!isOpen) return null;
-
-            const languages = [
-                { code: 'zh', label: '繁體中文', native: 'Traditional Chinese' },
-                { code: 'cn', label: '简体中文', native: 'Simplified Chinese' },
-                { code: 'en', label: 'English', native: 'English' },
-                { code: 'ja', label: '日本語', native: 'Japanese' },
-                { code: 'de', label: 'Deutsch', native: 'German' },
-                { code: 'fr', label: 'Français', native: 'French' },
-                { code: 'ko', label: '한국어', native: 'Korean' },
-            ];
-
-            return (
-                 <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => { playSound('click'); onClose(); }}>
-                    <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-2xl w-full max-w-xs flex flex-col relative overflow-hidden">
-                        <div className="p-4 border-b border-[#d4af37]/30 flex items-center justify-between bg-black/30">
-                            <h3 className="text-gold font-bold text-lg flex items-center gap-2"><Globe className="w-5 h-5 text-[#d4af37]" /> {t('lang_select')}</h3>
-                            <button onClick={() => { playSound('click'); onClose(); }} className="text-[#d4af37] hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"><X className="w-6 h-6"/></button>
-                        </div>
-                        <div className="p-4 grid gap-2 max-h-[60vh] overflow-y-auto">
-                            {languages.map(l => (
-                                <button
-                                    key={l.code}
-                                    onClick={() => { setLang(l.code); playSound('click'); onClose(); }}
-                                    className={`
-                                        w-full py-3 px-4 rounded-xl text-left transition-all border
-                                        ${currentLang === l.code 
-                                            ? 'bg-[#d4af37] text-black border-[#fcd34d] font-bold shadow-lg' 
-                                            : 'bg-black/40 text-[#d4af37] border-[#d4af37]/20 hover:bg-[#d4af37]/10 hover:border-[#d4af37]/50'}
-                                    `}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <span>{l.label}</span>
-                                        <span className={`text-xs ${currentLang === l.code ? 'text-black/60' : 'text-[#d4af37]/50'}`}>{l.code.toUpperCase()}</span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+            if(!isOpen) return null;
+            const langs = [{code:'zh',label:'繁體中文'},{code:'cn',label:'简体中文'},{code:'en',label:'English'},{code:'ja',label:'日本語'},{code:'de',label:'Deutsch'},{code:'fr',label:'Français'},{code:'ko',label:'한국어'}];
+            return e("div", {className:"fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200", onClick:()=>{playSound('click');onClose();}},
+                e("div", {onClick:ev=>ev.stopPropagation(), className:"casino-panel rounded-2xl w-full max-w-xs flex flex-col relative overflow-hidden"},
+                    e("div", {className:"p-4 border-b border-[#d4af37]/30 flex items-center justify-between bg-black/30"},
+                        e("h3", {className:"text-gold font-bold text-lg flex items-center gap-2"}, e(Globe, {className:"w-5 h-5 text-[#d4af37]"}), t('lang_select')),
+                        e("button", {onClick:()=>{playSound('click');onClose();}, className:"text-[#d4af37] hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"}, e(X, {className:"w-6 h-6"}))
+                    ),
+                    e("div", {className:"p-4 grid gap-2 max-h-[60vh] overflow-y-auto"}, langs.map(l => 
+                        e("button", {key:l.code, onClick:()=>{setLang(l.code);playSound('click');onClose();}, className:`w-full py-3 px-4 rounded-xl text-left transition-all border ${currentLang===l.code?'bg-[#d4af37] text-black border-[#fcd34d] font-bold shadow-lg':'bg-black/40 text-[#d4af37] border-[#d4af37]/20 hover:bg-[#d4af37]/10 hover:border-[#d4af37]/50'}`},
+                            e("div", {className:"flex items-center justify-between"}, e("span", null, l.label), e("span", {className:`text-xs ${currentLang===l.code?'text-black/60':'text-[#d4af37]/50'}`}, l.code.toUpperCase()))
+                        )
+                    ))
+                )
             );
-        }
+        };
 
         const NumberSelector = ({ isOpen, onSelect, usedNumbers, currentValue, onClose, t, playSound }) => {
-            if (!isOpen) return null;
-            return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => { playSound('click'); onClose(); }}>
-                <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-3xl p-5 w-full max-w-[320px] grid grid-cols-3 gap-3">
-                    <div className="col-span-3 text-center text-gold font-bold mb-3 uppercase tracking-widest text-sm">{t('select_num')}</div>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
-                    const isUsed = usedNumbers.has(num) && num !== currentValue;
-                    return (
-                        <button key={num} disabled={isUsed} onClick={() => { onSelect(num); }} className={`h-16 w-16 rounded-full font-bold text-2xl flex items-center justify-center transition-all btn-3d mx-auto ${num === currentValue ? 'bg-gradient-to-b from-blue-500 to-blue-700 text-white border-2 border-blue-300 ring-2 ring-blue-500/50' : isUsed ? 'bg-zinc-800 text-zinc-600 border-2 border-zinc-700 cursor-not-allowed shadow-none translate-y-[4px]' : 'bg-gradient-to-b from-[#fcd34d] via-[#d4af37] to-[#b45309] text-[#451a03] border-2 border-[#fcd34d] hover:brightness-110'}`}>{num}</button>
-                    );
-                    })}
-                    <button onClick={() => { onSelect(null); }} className="btn-3d col-span-3 h-12 mt-3 font-bold text-white bg-gradient-to-b from-red-600 to-red-900 border-2 border-red-400 rounded-full flex items-center justify-center uppercase tracking-wider transition-transform shadow-lg">{t('clear_cell')}</button>
-                </div>
-                </div>
+            if(!isOpen) return null;
+            return e("div", {className:"fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200", onClick:()=>{playSound('click');onClose();}},
+                e("div", {onClick:ev=>ev.stopPropagation(), className:"casino-panel rounded-3xl p-5 w-full max-w-[320px] grid grid-cols-3 gap-3"},
+                    e("div", {className:"col-span-3 text-center text-gold font-bold mb-3 uppercase tracking-widest text-sm"}, t('select_num')),
+                    [1,2,3,4,5,6,7,8,9].map(num => {
+                        const isUsed = usedNumbers.has(num) && num !== currentValue;
+                        return e("button", {key:num, disabled:isUsed, onClick:()=>{onSelect(num);}, className:`h-16 w-16 rounded-full font-bold text-2xl flex items-center justify-center transition-all btn-3d mx-auto ${num===currentValue?'bg-gradient-to-b from-blue-500 to-blue-700 text-white border-2 border-blue-300 ring-2 ring-blue-500/50':isUsed?'bg-zinc-800 text-zinc-600 border-2 border-zinc-700 cursor-not-allowed shadow-none translate-y-[4px]':'bg-gradient-to-b from-[#fcd34d] via-[#d4af37] to-[#b45309] text-[#451a03] border-2 border-[#fcd34d] hover:brightness-110'}`}, num);
+                    }),
+                    e("button", {onClick:()=>{onSelect(null);}, className:"btn-3d col-span-3 h-12 mt-3 font-bold text-white bg-gradient-to-b from-red-600 to-red-900 border-2 border-red-400 rounded-full flex items-center justify-center uppercase tracking-wider transition-transform shadow-lg"}, t('clear_cell'))
+                )
             );
         };
 
         const InstallModal = ({ isOpen, onClose, t, playSound }) => {
-            if (!isOpen) return null;
-
-            const [activeTab, setActiveTab] = useState(() => {
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                return isIOS ? 'ios' : 'android';
-            });
-
-            const handleCopyLink = async () => {
-                try {
-                    await navigator.clipboard.writeText(window.location.href);
-                    alert(t('link_copied'));
-                } catch (err) {}
-            };
-
-            const handleOpenChrome = () => {
-                const currentUrl = window.location.href.replace('https://', '').replace('http://', '');
-                const intentUrl = `intent://${currentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
-                window.location.href = intentUrl;
-            };
-
-            return (
-                <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => { playSound('click'); onClose(); }}>
-                    <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden">
-                        
-                        <div className="flex border-b border-[#d4af37]/30 bg-black/30">
-                            <button onClick={() => { setActiveTab('ios'); playSound('click'); }} className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'ios' ? 'text-[#fcd34d] bg-[#d4af37]/10 border-b-2 border-[#fcd34d]' : 'text-[#d4af37]/50 hover:text-[#d4af37]'}`}>iOS</button>
-                            <button onClick={() => { setActiveTab('android'); playSound('click'); }} className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'android' ? 'text-[#fcd34d] bg-[#d4af37]/10 border-b-2 border-[#fcd34d]' : 'text-[#d4af37]/50 hover:text-[#d4af37]'}`}>Android</button>
-                            <button onClick={() => { playSound('click'); onClose(); }} className="absolute top-2 right-2 text-[#d4af37]/60 hover:text-white p-1"><X className="w-5 h-5"/></button>
-                        </div>
-
-                        <div className="p-6 min-h-[240px] flex flex-col justify-center">
-                            {activeTab === 'ios' ? (
-                                <div className="space-y-4">
-                                    <h4 className="text-[#fcd34d] font-bold text-center mb-4">{t('ios_title')}</h4>
-                                    <div className="space-y-2 text-sm text-zinc-300">
-                                        <div className="flex flex-col gap-2 p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                            <div className="flex gap-3 items-center">
-                                                <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">1</div>
-                                                <p className="flex-1 font-medium">{t('ios_step1')}</p>
-                                            </div>
-                                            <button onClick={handleCopyLink} className="ml-9 flex items-center gap-1.5 text-[#d4af37] text-[10px] font-bold border border-[#d4af37]/50 px-2 py-1 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 w-fit transition-colors">
-                                                <Copy className="w-3 h-3" /> {t('copy_link')}
-                                            </button>
-                                        </div>
-                                        <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                            <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">2</div>
-                                            <p className="flex-1 font-medium">{t('ios_step2')}</p>
-                                        </div>
-                                        <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                            <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">3</div>
-                                            <p className="flex-1 font-medium">{t('ios_step3')}</p>
-                                        </div>
-                                        <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                            <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">4</div>
-                                            <p className="flex-1 font-medium">{t('ios_step4')}</p>
-                                        </div>
-                                        <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                            <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">5</div>
-                                            <p className="flex-1 font-medium">{t('ios_step5')}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    <h4 className="text-[#fcd34d] font-bold text-center mb-4">{t('android_title')}</h4>
-                                    <div className="space-y-2 text-sm text-zinc-300">
-                                        <div className="flex flex-col gap-2 p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                            <div className="flex gap-3 items-center">
-                                                <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">1</div>
-                                                <p className="flex-1 font-medium">{t('android_step1')}</p>
-                                            </div>
-                                            <div className="ml-9 flex gap-2">
-                                                <button onClick={handleCopyLink} className="flex items-center gap-1.5 text-[#d4af37] text-[10px] font-bold border border-[#d4af37]/50 px-2 py-1 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 w-fit transition-colors">
-                                                    <Copy className="w-3 h-3" /> {t('copy_link')}
-                                                </button>
-                                                <button onClick={handleOpenChrome} className="flex items-center gap-1.5 text-[#d4af37] text-[10px] font-bold border border-[#d4af37]/50 px-2 py-1 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 w-fit transition-colors">
-                                                    <ExternalLink className="w-3 h-3" /> {t('android_open_chrome')}
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                            <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">2</div>
-                                            <p className="flex-1 font-medium">{t('android_step2')}</p>
-                                        </div>
-                                        <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                            <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">3</div>
-                                            <p className="flex-1 font-medium">{t('android_step3')}</p>
-                                        </div>
-                                        <div className="flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20">
-                                            <div className="bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg">4</div>
-                                            <p className="flex-1 font-medium">{t('android_step4')}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
+            if(!isOpen) return null;
+            const [tab, setTab] = useState(()=>(/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream?'ios':'android'));
+            const copyLink = async () => { try{await navigator.clipboard.writeText(window.location.href);alert(t('link_copied'));}catch(e){} };
+            const openChrome = () => { window.location.href=`intent://${window.location.href.replace(/https?:\/\//,'')}#Intent;scheme=https;package=com.android.chrome;end`; };
+            return e("div", {className:"fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200", onClick:()=>{playSound('click');onClose();}},
+                e("div", {onClick:ev=>ev.stopPropagation(), className:"casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden"},
+                    e("div", {className:"flex border-b border-[#d4af37]/30 bg-black/30"},
+                        e("button", {onClick:()=>{setTab('ios');playSound('click');}, className:`flex-1 py-3 text-sm font-bold transition-colors ${tab==='ios'?'text-[#fcd34d] bg-[#d4af37]/10 border-b-2 border-[#fcd34d]':'text-[#d4af37]/50 hover:text-[#d4af37]'}`}, "iOS"),
+                        e("button", {onClick:()=>{setTab('android');playSound('click');}, className:`flex-1 py-3 text-sm font-bold transition-colors ${tab==='android'?'text-[#fcd34d] bg-[#d4af37]/10 border-b-2 border-[#fcd34d]':'text-[#d4af37]/50 hover:text-[#d4af37]'}`}, "Android"),
+                        e("button", {onClick:()=>{playSound('click');onClose();}, className:"absolute top-2 right-2 text-[#d4af37]/60 hover:text-white p-1"}, e(X, {className:"w-5 h-5"}))
+                    ),
+                    e("div", {className:"p-6 min-h-[240px] flex flex-col justify-center"},
+                        tab==='ios' ? e("div", {className:"space-y-4"},
+                            e("h4", {className:"text-[#fcd34d] font-bold text-center mb-4"}, t('ios_title')),
+                            e("div", {className:"space-y-2 text-sm text-zinc-300"},
+                                e("div", {className:"flex flex-col gap-2 p-3 rounded-lg bg-white/5 border border-[#d4af37]/20"},
+                                    e("div", {className:"flex gap-3 items-center"}, e("div", {className:"bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg"}, "1"), e("p", {className:"flex-1 font-medium"}, t('ios_step1'))),
+                                    e("button", {onClick:copyLink, className:"ml-9 flex items-center gap-1.5 text-[#d4af37] text-[10px] font-bold border border-[#d4af37]/50 px-2 py-1 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 w-fit transition-colors"}, e(Copy, {className:"w-3 h-3"}), t('copy_link'))
+                                ),
+                                [2,3,4,5].map(step=>e("div", {key:step, className:"flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20"}, e("div", {className:"bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg"}, step), e("p", {className:"flex-1 font-medium"}, t(`ios_step${step}`))))
+                            )
+                        ) : e("div", {className:"space-y-4"},
+                            e("h4", {className:"text-[#fcd34d] font-bold text-center mb-4"}, t('android_title')),
+                            e("div", {className:"space-y-2 text-sm text-zinc-300"},
+                                e("div", {className:"flex flex-col gap-2 p-3 rounded-lg bg-white/5 border border-[#d4af37]/20"},
+                                    e("div", {className:"flex gap-3 items-center"}, e("div", {className:"bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg"}, "1"), e("p", {className:"flex-1 font-medium"}, t('android_step1'))),
+                                    e("div", {className:"ml-9 flex gap-2"},
+                                        e("button", {onClick:copyLink, className:"flex items-center gap-1.5 text-[#d4af37] text-[10px] font-bold border border-[#d4af37]/50 px-2 py-1 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 w-fit transition-colors"}, e(Copy, {className:"w-3 h-3"}), t('copy_link')),
+                                        e("button", {onClick:openChrome, className:"flex items-center gap-1.5 text-[#d4af37] text-[10px] font-bold border border-[#d4af37]/50 px-2 py-1 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 w-fit transition-colors"}, e(ExternalLink, {className:"w-3 h-3"}), t('android_open_chrome'))
+                                    )
+                                ),
+                                [2,3,4].map(step=>e("div", {key:step, className:"flex gap-3 items-center p-3 rounded-lg bg-white/5 border border-[#d4af37]/20"}, e("div", {className:"bg-[#d4af37] text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-lg"}, step), e("p", {className:"flex-1 font-medium"}, t(`android_step${step}`))))
+                            )
+                        )
+                    )
+                )
             );
         };
 
         const AboutModal = ({ isOpen, onClose, t, playSound }) => {
-            const [copyStatus, setCopyStatus] = useState(null); 
-
-            if (!isOpen) return null;
-
+            const [copyStatus, setCopyStatus] = useState(null);
+            if(!isOpen) return null;
             const handleContact = () => {
-                playSound('click');
-                const email = "yayoi991331@gmail.com";
-                
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(email).then(() => {
-                        setCopyStatus('copied');
-                        setTimeout(() => setCopyStatus(null), 2000); 
-                    }).catch(() => {});
-                }
-                window.location.href = `mailto:${email}`;
+                playSound('click'); const email="yayoi991331@gmail.com";
+                if(navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(email).then(()=>{ setCopyStatus('copied'); setTimeout(()=>setCopyStatus(null),2000); }).catch(()=>{}); }
+                window.location.href=`mailto:${email}`;
             };
-
             const isChinese = t('contact_label').includes('寄信') || t('contact_label').includes('信');
-            const copiedText = isChinese ? "Email 已複製！" : "Email Copied!";
-
-            return (
-                <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => { playSound('click'); onClose(); }}>
-                    <div onClick={(e) => e.stopPropagation()} className="casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden">
-                        <div className="p-4 border-b border-[#d4af37]/30 flex items-center justify-between bg-black/30">
-                            <h3 className="text-gold font-bold text-lg flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#d4af37]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                                {t('about_title')}
-                            </h3>
-                            <button onClick={() => { playSound('click'); onClose(); }} className="text-[#d4af37] hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"><X className="w-6 h-6"/></button>
-                        </div>
-                        <div className="p-6 text-zinc-300 text-sm leading-relaxed space-y-4">
-                            <p>{t('about_desc1')}</p>
-                            <div className="p-3 bg-white/5 rounded-lg border border-[#d4af37]/20 flex gap-3 items-start">
-                                <Sparkles className="w-5 h-5 text-[#fcd34d] shrink-0 mt-0.5" />
-                                <p className="text-xs text-[#d4af37]/90">{t('about_desc2')}</p>
-                            </div>
-                            
-                            <button 
-                               onClick={handleContact}
-                               className={`flex items-center justify-center gap-2 w-full py-3 mt-2 rounded-xl font-bold shadow-lg transition-all active:scale-95 border ${copyStatus === 'copied' ? 'bg-green-600 text-white border-green-400' : 'bg-[#d4af37] text-black border-[#fcd34d] hover:bg-[#fcd34d]'}`}>
-                                {copyStatus === 'copied' ? (
-                                    <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                                        <span>{copiedText}</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>✉️ {t('contact_label')}</span>
-                                    </>
-                                )}
-                            </button>
-                            <div className="text-center text-[10px] text-[#d4af37]/50 font-mono select-all cursor-text">
-                                yayoi991331@gmail.com
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            return e("div", {className:"fixed inset-0 z-[90] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200", onClick:()=>{playSound('click');onClose();}},
+                e("div", {onClick:ev=>ev.stopPropagation(), className:"casino-panel rounded-2xl w-full max-w-sm flex flex-col relative overflow-hidden"},
+                    e("div", {className:"p-4 border-b border-[#d4af37]/30 flex items-center justify-between bg-black/30"},
+                        e("h3", {className:"text-gold font-bold text-lg flex items-center gap-2"}, e(Icon, {className:"w-5 h-5 text-[#d4af37]", d:"M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"}), t('about_title')),
+                        e("button", {onClick:()=>{playSound('click');onClose();}, className:"text-[#d4af37] hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"}, e(X, {className:"w-6 h-6"}))
+                    ),
+                    e("div", {className:"p-6 text-zinc-300 text-sm leading-relaxed space-y-4"},
+                        e("p", null, t('about_desc1')),
+                        e("div", {className:"p-3 bg-white/5 rounded-lg border border-[#d4af37]/20 flex gap-3 items-start"}, e(Sparkles, {className:"w-5 h-5 text-[#fcd34d] shrink-0 mt-0.5"}), e("p", {className:"text-xs text-[#d4af37]/90"}, t('about_desc2'))),
+                        e("button", {onClick:handleContact, className:`flex items-center justify-center gap-2 w-full py-3 mt-2 rounded-xl font-bold shadow-lg transition-all active:scale-95 border ${copyStatus==='copied'?'bg-green-600 text-white border-green-400':'bg-[#d4af37] text-black border-[#fcd34d] hover:bg-[#fcd34d]'}`},
+                            copyStatus==='copied' ? e(React.Fragment,null,e(Icon,{className:"w-5 h-5",d:"M20 6 9 17l-5-5"}),e("span",null,isChinese?"Email 已複製！":"Email Copied!")) : e(React.Fragment,null,e("span",null,"✉️ "+t('contact_label')))
+                        ),
+                        e("div", {className:"text-center text-[10px] text-[#d4af37]/50 font-mono select-all cursor-text"}, "yayoi991331@gmail.com")
+                    )
+                )
             );
         };
 
-        // Main App
         function MiniCactpotSolver() {
-            const [lang, setLang] = useState(() => {
-                try {
-                    const saved = localStorage.getItem('cactpot_lang');
-                    if (saved) return saved;
-                    const browserLang = navigator.language || navigator.userLanguage; 
-                    const code = browserLang.toLowerCase();
-                    if (code.startsWith('ja')) return 'ja';
-                    if (code.startsWith('de')) return 'de';
-                    if (code.startsWith('fr')) return 'fr';
-                    if (code.startsWith('ko')) return 'ko';
-                    if (code.startsWith('zh-cn') || code.startsWith('zh-sg')) return 'cn';
-                    if (code.startsWith('en')) return 'en';
-                    return 'zh';
-                } catch(e) { return 'zh'; }
-            });
-
-            // ★★★ 核心修改：動態切換字型，解決簡體中文顯示不一致的問題 ★★★
-            useEffect(() => { 
-                try { 
-                    localStorage.setItem('cactpot_lang', lang); 
-                } catch(e) {} 
-                
-                const currentTitle = LOCALE[lang]['app_title']; 
-                document.title = currentTitle; 
-                const metaTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]'); 
-                if (metaTitle) metaTitle.setAttribute('content', currentTitle); 
-
-                // 動態設定 HTML lang 屬性與字體
-                document.documentElement.lang = lang === 'cn' ? 'zh-CN' : (lang === 'zh' ? 'zh-TW' : lang);
-                
-                if (lang === 'cn') {
-                    // 簡體中文模式：優先使用微軟雅黑、蘋方
-                    document.body.style.fontFamily = '"Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif';
-                } else {
-                    // 預設模式 (繁體中文等)：優先使用微軟正黑體
-                    document.body.style.fontFamily = '"Segoe UI", "Microsoft JhengHei", sans-serif';
-                }
-            }, [lang]);
+            const [lang, setLang] = useState(() => { try { const s = localStorage.getItem('cactpot_lang'); if(s) return s; const c = (navigator.language || navigator.userLanguage).toLowerCase(); if(c.startsWith('ja'))return 'ja'; if(c.startsWith('de'))return 'de'; if(c.startsWith('fr'))return 'fr'; if(c.startsWith('ko'))return 'ko'; if(c.startsWith('zh-cn')||c.startsWith('zh-sg'))return 'cn'; if(c.startsWith('en'))return 'en'; return 'zh'; } catch(e){return 'zh';} });
+            useEffect(() => { try{localStorage.setItem('cactpot_lang', lang)}catch(e){} const t = LOCALE[lang].app_title; document.title = t; const m = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if(m) m.setAttribute('content', t); document.documentElement.lang = lang==='cn'?'zh-CN':(lang==='zh'?'zh-TW':lang); if(lang==='cn'){document.body.style.fontFamily='"Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif';}else{document.body.style.fontFamily='"Segoe UI", "Microsoft JhengHei", sans-serif';} }, [lang]);
 
             const [board, setBoard] = useState(Array(9).fill(null));
             const [openSelectorIndex, setOpenSelectorIndex] = useState(null);
@@ -901,341 +294,207 @@
             const [showPayouts, setShowPayouts] = useState(false);
             const [showLangMenu, setShowLangMenu] = useState(false);
             const [showInstallModal, setShowInstallModal] = useState(false);
-            const [showAboutModal, setShowAboutModal] = useState(false); 
-            
-            const [isSoundOn, setIsSoundOn] = useState(() => { try { const saved = localStorage.getItem('cactpot_sound'); return saved === null ? true : saved === 'true'; } catch(e) { return true; } });
-            
+            const [showAboutModal, setShowAboutModal] = useState(false);
+            const [isSoundOn, setIsSoundOn] = useState(() => { try{const s=localStorage.getItem('cactpot_sound');return s===null?!0:s==='true'}catch(e){return!0} });
             const sounds = useSound(isSoundOn);
+            const toggleSound = () => setIsSoundOn(p => { const n=!p; try{localStorage.setItem('cactpot_sound',String(n))}catch(e){} return n; });
 
-            const toggleSound = () => { 
-                setIsSoundOn(prev => { 
-                    const newState = !prev; 
-                    try { localStorage.setItem('cactpot_sound', String(newState)); } catch(e) {} 
-                    return newState; 
-                }); 
-            };
-
-            const handleShare = async () => {
-                sounds.click();
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: LOCALE[lang].title,
-                            text: LOCALE[lang].description, 
-                            url: window.location.href,
-                        });
-                    } catch (err) {}
-                } else {
-                    try {
-                        await navigator.clipboard.writeText(window.location.href);
-                        alert(LOCALE[lang].link_copied);
-                    } catch (err) {}
-                }
-            };
-            
             const [solutions, setSolutions] = useState([]);
             const [bestLineIndices, setBestLineIndices] = useState([]);
             const [suggestedCellIndices, setSuggestedCellIndices] = useState([]);
-
-            const t = (key) => LOCALE[lang][key] || key;
-
-            const getLineName = (index) => {
-                if (index <= 2) return `${t('row')} ${index + 1}`;
-                if (index <= 5) return `${t('col')} ${index - 2}`;
-                if (index === 6) return `${t('diag')} 1`; 
-                if (index === 7) return `${t('diag')} 2`;
-                return "";
-            };
-
-            const filledCount = board.filter(n => n !== null).length;
-            const isSelectionPhase = filledCount < 4 || isFullFillMode; 
+            const t = (k) => LOCALE[lang][k] || k;
+            
+            const getLineName = (idx) => { if(idx<=2)return `${t('row')} ${idx+1}`; if(idx<=5)return `${t('col')} ${idx-2}`; if(idx===6)return `${t('diag')} 1`; if(idx===7)return `${t('diag')} 2`; return ""; };
+            const filledCount = board.filter(n => n!==null).length;
+            const isSelectionPhase = filledCount < 4 || isFullFillMode;
             const showAnalysis = !isSelectionPhase || isFullFillMode;
+            
+            const availableNumbers = useMemo(() => { const u = new Set(board.filter(n=>n!==null)); return [1,2,3,4,5,6,7,8,9].filter(n=>!u.has(n)); }, [board]);
+            const usedNumbersSet = useMemo(() => new Set(board.filter(n=>n!==null)), [board]);
 
-            const availableNumbers = useMemo(() => {
-                const used = new Set(board.filter((n) => n !== null));
-                return [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((n) => !used.has(n));
-            }, [board]);
-            const usedNumbersSet = useMemo(() => new Set(board.filter((n) => n !== null)), [board]);
-
-            // ★★★ 重寫後的 useEffect：整合 Golden Logic 核心 ★★★
             useEffect(() => {
-                // 1. 轉換 React 盤面 (null) 為核心邏輯盤面 (0)
-                const solverState = board.map(val => val === null ? 0 : val);
-                const solverRevealedCount = solverState.filter(v => v > 0).length;
-
-                // 2. 準備數據
-                const emptyIndices = board.map((val, idx) => (val === null ? idx : -1)).filter((idx) => idx !== -1);
+                const sState = board.map(v => v===null?0:v);
+                const sRev = sState.filter(v=>v>0).length;
+                const empty = board.map((v,i)=>v===null?i:-1).filter(i=>i!==-1);
                 const perms = getPermutations(availableNumbers);
-                const lineStats = LINES.map(() => ({ totalMGP: 0, chance10k: 0, chance3600: 0, counts: 0, payoutDist: {} }));
-                
-                // 3. 執行排列組合計算 (僅為了生成機率分佈表，如 10k: 30%)
-                // 因為提供的 Core Code 沒有返回分佈細節，所以必須保留這段邏輯以維持 UI 功能
-                perms.forEach((perm) => {
-                    const tempBoard = [...board];
-                    perm.forEach((val, i) => tempBoard[emptyIndices[i]] = val);
-                    LINES.forEach((lineIndices, lineId) => {
-                        const sum = tempBoard[lineIndices[0]] + tempBoard[lineIndices[1]] + tempBoard[lineIndices[2]];
-                        const payout = PAYOUTS[sum] || 0;
-                        lineStats[lineId].totalMGP += payout; lineStats[lineId].counts++; lineStats[lineId].payoutDist[payout] = (lineStats[lineId].payoutDist[payout] || 0) + 1;
-                        if (sum === 6) lineStats[lineId].chance10k++;
-                        if (sum === 24) lineStats[lineId].chance3600++;
+                const lStats = LINES.map(()=>({total:0,c10k:0,c3600:0,cnt:0,dist:{}}));
+                const cImpact = Array(9).fill(0);
+
+                perms.forEach(p => {
+                    const tb = [...board]; p.forEach((v,i)=>tb[empty[i]]=v);
+                    LINES.forEach((idxs,lid) => {
+                        const sum = tb[idxs[0]]+tb[idxs[1]]+tb[idxs[2]];
+                        const pay = PAYOUTS[sum]||0;
+                        lStats[lid].total+=pay; lStats[lid].cnt++; lStats[lid].dist[pay]=(lStats[lid].dist[pay]||0)+1;
+                        if(sum===6)lStats[lid].c10k++; if(sum===24)lStats[lid].c3600++;
+                        if(isSelectionPhase) idxs.forEach(cIdx => { if(board[cIdx]===null) cImpact[cIdx]+=pay; });
                     });
                 });
 
-                // 4. 基礎結果封裝
-                const results = lineStats.map(stat => {
-                    if (stat.counts === 0) return { ev: 0, chance10k: 0, chance3600: 0, allProbs: [] };
-                    const allProbs = Object.entries(stat.payoutDist).map(([mgp, count]) => ({ mgp: parseInt(mgp), percent: (count / stat.counts) * 100 })).filter(p => p.percent > 0).sort((a, b) => b.mgp - a.mgp); 
-                    return { 
-                        ev: Math.floor(stat.totalMGP / stat.counts), // 預設使用遍歷平均值
-                        chance10k: (stat.chance10k / stat.counts) * 100, 
-                        chance3600: (stat.chance3600 / stat.counts) * 100, 
-                        allProbs: allProbs 
-                    };
+                const res = lStats.map(s => {
+                    if(s.cnt===0)return{ev:0,chance10k:0,chance3600:0,allProbs:[]};
+                    const probs = Object.entries(s.dist).map(([m,c])=>({mgp:parseInt(m),percent:(c/s.cnt)*100})).filter(x=>x.percent>0).sort((a,b)=>b.mgp-a.mgp);
+                    return {ev:Math.floor(s.total/s.cnt),chance10k:(s.c10k/s.cnt)*100,chance3600:(s.c3600/s.cnt)*100,allProbs:probs};
                 });
 
-                // 5. 【核心整合】：使用 PerfectCactpot 決定 "最佳推薦格 (Suggestions)"
-                let suggestions = [];
-                if (solverRevealedCount < 4) {
-                    // 使用 PerfectCactpot.solve 取得推薦陣列 [bool, bool, ...]
-                    const recs = PerfectCactpot.solve(solverState);
-                    suggestions = recs.map((isRec, idx) => isRec ? idx : -1).filter(i => i !== -1);
-                }
-                
-                // 6. 【核心整合】：若已揭示 4 格，使用 Solver.solve 計算 "精確期望值 (EV)" 並覆蓋原有結果
-                // 這樣確保數值與核心邏輯 100% 一致
-                if (solverRevealedCount === 4) {
-                     const table = [[0,0,0],[0,0,0],[0,0,0]];
-                     for(let i=0; i<9; i++) table[Math.floor(i/3)][i%3] = solverState[i];
-                     
-                     // 呼叫 Solver 核心
-                     const exactEVs = Solver.solve(table, payout); 
-                     
-                     // 覆蓋 results 中的 ev
-                     exactEVs.forEach((ev, idx) => {
-                         if (results[idx]) results[idx].ev = ev;
-                     });
-                }
+                let suggs = [];
+                if(sRev<4) { const recs=PerfectCactpot.solve(sState); suggs=recs.map((r,i)=>r?i:-1).filter(i=>i!==-1); }
+                if(sRev===4) { const tbl=[[0,0,0],[0,0,0],[0,0,0]]; for(let i=0;i<9;i++)tbl[Math.floor(i/3)][i%3]=sState[i]; const ex=Solver.solve(tbl,payout); ex.forEach((e,i)=>{if(res[i])res[i].ev=e;}); }
 
-                setSolutions(results);
-                
-                // 設定推薦格子 (完全依賴核心)
-                // 修改說明：當 filledCount === 0 時，不顯示推薦，因為遊戲一開始是隨機給一個數字，玩家無法選擇。
-                if (filledCount < 4 && filledCount > 0) {
-                     setSuggestedCellIndices(suggestions);
-                } else {
-                     setSuggestedCellIndices([]);
-                }
+                setSolutions(res);
+                const max = Math.max(...res.map(r=>r.ev));
+                setBestLineIndices(res.map((r,i)=>r.ev===max?i:-1).filter(i=>i!==-1));
 
-                const maxEV = Math.max(...results.map(r => r.ev));
-                setBestLineIndices(results.map((r, i) => r.ev === maxEV ? i : -1).filter(i => i !== -1));
+                if(filledCount<4 && filledCount>0) {
+                   setSuggestedCellIndices(suggs);
+                } else { setSuggestedCellIndices([]); }
+            }, [board, availableNumbers, filledCount, isSelectionPhase, isFullFillMode]);
 
-            }, [board, availableNumbers, filledCount, isFullFillMode]);
+            // 當 React 渲染完成，移除 Loading
+            useEffect(() => { hideLoading(); }, []);
 
             const handleSelect = (val) => {
-                const newBoard = [...board];
-                if (val !== null) { const existingIdx = newBoard.indexOf(val); if (existingIdx !== -1) newBoard[existingIdx] = null; }
-                if (openSelectorIndex !== null) { newBoard[openSelectorIndex] = val; const newFilledCount = newBoard.filter(n => n !== null).length; if (newFilledCount === 4 && filledCount < 4) { sounds.cash(); } }
-                setBoard(newBoard); setOpenSelectorIndex(null);
+                const nb = [...board];
+                if(val!==null){ const ex=nb.indexOf(val); if(ex!==-1)nb[ex]=null; }
+                if(openSelectorIndex!==null){ nb[openSelectorIndex]=val; if(nb.filter(n=>n!==null).length===4 && filledCount<4) sounds.cash(); }
+                setBoard(nb); setOpenSelectorIndex(null);
             };
             const handleReset = () => { setBoard(Array(9).fill(null)); setOpenSelectorIndex(null); sounds.reset(); };
-            const handleForceUpdate = () => { if(confirm("確定要重新整理網頁嗎？")) { window.location.reload(true); } }
+            const handleForceUpdate = () => { if(confirm("確定要重新整理網頁嗎？")){window.location.reload(true);} };
+            const handleShare = async () => { sounds.click(); if(navigator.share){try{await navigator.share({title:LOCALE[lang].title,text:LOCALE[lang].description,url:window.location.href});}catch(e){}}else{try{await navigator.clipboard.writeText(window.location.href);alert(LOCALE[lang].link_copied);}catch(e){}} };
 
-            const Indicator = ({ lineId }) => {
+            const Indicator = ({lineId}) => {
                 const ArrowIcon = getArrowIcon(lineId);
-                if (!solutions[lineId]) return <div className="w-12 h-12"></div>;
-                const { ev, chance10k, chance3600 } = solutions[lineId];
+                if(!solutions[lineId]) return e("div",{className:"w-12 h-12"});
+                const {ev,chance10k,chance3600} = solutions[lineId];
                 const isBest = showAnalysis && bestLineIndices.includes(lineId);
-                const displayEv = ev >= 1000 ? (ev/1000).toFixed(1).replace('.0','') + 'k' : Math.floor(ev);
+                const displayEv = ev>=1000?(ev/1000).toFixed(1).replace('.0','')+'k':ev;
                 let bestInfo = null;
-                if (isBest) {
-                    if (chance10k > 0) bestInfo = (<div className="flex flex-col items-center"><span className="text-[9px] text-yellow-200 leading-none">{t('label_10k')}</span><span className="text-[10px] font-bold text-white leading-none">{Math.round(chance10k)}%</span></div>);
-                    else if (chance3600 > 0) bestInfo = (<div className="flex flex-col items-center"><span className="text-[9px] text-fuchsia-200 leading-none">{t('label_3600')}</span><span className="text-[10px] font-bold text-white leading-none">{Math.round(chance3600)}%</span></div>);
+                if(isBest){
+                    if(chance10k>0) bestInfo = e("div",{className:"flex flex-col items-center"},e("span",{className:"text-[9px] text-yellow-200 leading-none"},t('label_10k')),e("span",{className:"text-[10px] font-bold text-white leading-none"},Math.round(chance10k)+"%"));
+                    else if(chance3600>0) bestInfo = e("div",{className:"flex flex-col items-center"},e("span",{className:"text-[9px] text-fuchsia-200 leading-none"},t('label_3600')),e("span",{className:"text-[10px] font-bold text-white leading-none"},Math.round(chance3600)+"%"));
                 }
-                return (
-                    <div className={`relative flex flex-col items-center justify-center transition-all duration-300 shadow-md border-2 ${isBest ? 'w-14 h-14 rounded-2xl bg-gradient-to-b from-green-600 to-green-900 border-green-400 text-white shadow-[0_0_20px_rgba(0,255,0,0.6)] z-20 scale-110' : 'w-12 h-12 rounded-full bg-black/60 border-[#d4af37]/30 text-[#d4af37]/70'}`}>
-                        {isBest ? (bestInfo ? bestInfo : <span className="text-xs font-bold leading-none">{displayEv}</span>) : (<span className="text-[10px] font-bold leading-none">{displayEv}</span>)}
-                        <div className={`text-sm mt-0.5 ${isBest ? 'text-white animate-pulse drop-shadow' : ''}`}>{ArrowIcon}</div>
-                    </div>
+                return e("div",{className:`relative flex flex-col items-center justify-center transition-all duration-300 shadow-md border-2 ${isBest?'w-14 h-14 rounded-2xl bg-gradient-to-b from-green-600 to-green-900 border-green-400 text-white shadow-[0_0_20px_rgba(0,255,0,0.6)] z-20 scale-110':'w-12 h-12 rounded-full bg-black/60 border-[#d4af37]/30 text-[#d4af37]/70'}`},
+                    isBest?(bestInfo?bestInfo:e("span",{className:"text-xs font-bold leading-none"},displayEv)):e("span",{className:"text-[10px] font-bold leading-none"},displayEv),
+                    e("div",{className:`text-sm mt-0.5 ${isBest?'text-white animate-pulse drop-shadow':''}`},ArrowIcon)
                 );
             };
 
-            const GameCell = ({ idx }) => {
+            const GameCell = ({idx}) => {
                 const cellValue = board[idx];
                 const isSuggested = isSelectionPhase && suggestedCellIndices.includes(idx);
-                const isLocked = !isFullFillMode && (cellValue === null && filledCount >= 4);
-                return (
-                    <button disabled={isLocked} onClick={() => { if (!isLocked) { setOpenSelectorIndex(idx); if (isSuggested && !cellValue) sounds.reveal(); else sounds.click(); } }} className={`circle-cell w-16 h-16 md:w-20 md:h-20 flex flex-col items-center justify-center text-3xl md:text-5xl font-bold transition-all duration-200 group ${cellValue !== null ? 'filled' : ''} ${isLocked ? 'opacity-40 cursor-not-allowed bg-black/40 border-[#4a0404]' : 'hover:scale-105 hover:border-[#fcd34d] active:scale-95'} ${isSuggested && !cellValue ? 'suggested' : ''}`}>
-                        {!cellValue && !isLocked && (<div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxIiBmaWxsPSIjZDRhZjM3Ii8+PC9zdmc+')] bg-center"></div>)}
-                        {cellValue ? (<span className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] font-game">{cellValue}</span>) : (!isLocked && <Sparkles className={`w-5 h-5 md:w-6 md:h-6 ${isSuggested ? 'text-white animate-pulse' : 'text-[#d4af37]/30'}`} />)}
-                        {isSuggested && !cellValue && (<div className="absolute inset-0 flex items-center justify-center pointer-events-none"><div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] animate-bounce border border-white/50 tracking-wider">{t('reveal')}</div></div>)}
-                    </button>
-                );
-            }
-
-            const AnalysisList = () => {
-                if (!showAnalysis || solutions.length === 0) return null;
-                const rankedSolutions = solutions.map((sol, index) => ({ ...sol, originalIndex: index })).sort((a, b) => b.ev - a.ev);
-                const [expandedLine, setExpandedLine] = useState(null);
-                const toggleExpand = (idx) => { sounds.click(); setExpandedLine(expandedLine === idx ? null : idx); };
-                return (
-                    <div className="w-full max-w-[400px] mt-8 animate-in slide-in-from-bottom-4 fade-in duration-500">
-                        <div className="flex items-center gap-2 mb-3 px-2"><h3 className="text-gold font-bold text-base tracking-wider uppercase drop-shadow-sm">{t('analysis_title')}</h3></div>
-                        <div className="casino-panel rounded-2xl overflow-hidden divide-y divide-[#d4af37]/20">
-                            {rankedSolutions.map((sol, rank) => {
-                                const isBest = bestLineIndices.includes(sol.originalIndex);
-                                const name = getLineName(sol.originalIndex);
-                                const ArrowIcon = getArrowIcon(sol.originalIndex);
-                                const isExpanded = expandedLine === sol.originalIndex;
-                                const notablePrizes = sol.allProbs.filter(p => p.mgp >= 720).sort((a, b) => b.mgp - a.mgp);
-                                const displayPrizes = isBest ? notablePrizes.slice(0, 1) : notablePrizes;
-                                const bestPickCenter = isBest ? (<div className="flex-1 flex items-center justify-center animate-pulse mx-2"><span className="text-[#fcd34d] text-sm font-bold tracking-wider whitespace-nowrap drop-shadow-md border-b border-[#fcd34d]/50 pb-0.5">{t('tap_view')}</span></div>) : null;
-                                return (
-                                    <div key={sol.originalIndex} className="flex flex-col">
-                                        <button onClick={() => toggleExpand(sol.originalIndex)} className={`w-full flex items-center justify-between transition-all text-left border-l-4 group relative overflow-hidden ${isBest ? 'py-4 px-3 bg-gradient-to-r from-green-900/60 to-transparent border-green-500 shadow-[inset_0_0_20px_rgba(0,128,0,0.1)] h-24' : 'py-3 px-3 hover:bg-white/5 border-transparent'} ${isExpanded ? 'bg-black/40' : ''}`}>
-                                            <div className="flex items-center gap-3 shrink-0">
-                                                <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm shadow-inner border ${isBest ? 'bg-green-700 border-green-400 text-white shadow-[0_0_10px_rgba(0,255,0,0.3)]' : 'bg-black/40 border-[#d4af37]/20 text-[#d4af37]/60'}`}>{ArrowIcon}</div>
-                                                <div className="flex flex-col"><span className={`text-sm font-bold ${isBest ? 'text-green-400 drop-shadow' : 'text-zinc-300'}`}>{name}</span><span className="text-[10px] text-[#d4af37]/60 uppercase tracking-wider">{isBest ? t('best_pick') : `${t('rank')} #${rank+1}`}</span></div>
-                                            </div>
-                                            {bestPickCenter}
-                                            <div className="flex flex-col items-end justify-center gap-1 shrink-0 h-full">
-                                                <span className={`font-bold font-mono ${isBest ? 'text-xl text-gold drop-shadow-md mb-1' : 'text-base text-zinc-300'}`}>${Math.floor(sol.ev).toLocaleString()}</span>
-                                                <div className="flex flex-wrap justify-end gap-1.5 min-h-[20px]">
-                                                    {displayPrizes.length > 0 ? (displayPrizes.map(p => { const badgeStyle = getPrizeStyle(p.mgp); const textSize = p.mgp >= 10000 ? "text-xs" : "text-[10px]"; const label = p.mgp >= 1000 ? (p.mgp === 10000 ? '10k' : (p.mgp/1000).toString() + 'k') : p.mgp; return (<span key={p.mgp} className={`${textSize} px-1.5 py-0.5 rounded border ${badgeStyle} backdrop-blur-sm flex items-center`}>{label}<span className="opacity-70 text-[9px] ml-0.5">:{p.percent.toFixed(0)}%</span></span>) })) : null}
-                                                </div>
-                                            </div>
-                                        </button>
-                                        {isExpanded && (<div className="bg-black/40 p-3 shadow-inner border-t border-[#d4af37]/20 animate-in slide-in-from-top-2 duration-200"><div className="grid grid-cols-3 gap-2">{sol.allProbs.map((prob) => { const badgeStyle = getPrizeStyle(prob.mgp); return (<div key={prob.mgp} className={`flex flex-col items-center justify-center p-2 rounded-lg border shadow-sm ${badgeStyle} bg-opacity-20`}><span className="text-xs font-bold">{prob.mgp.toLocaleString()}</span><span className="text-[10px] font-mono opacity-80">{prob.percent.toFixed(0)}%</span></div>) })}</div></div>)}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
+                const isLocked = !isFullFillMode && (cellValue===null && filledCount>=4);
+                return e("button",{disabled:isLocked, onClick:()=>{if(!isLocked){setOpenSelectorIndex(idx); if(isSuggested&&!cellValue)sounds.reveal(); else sounds.click();}}, className:`circle-cell w-16 h-16 md:w-20 md:h-20 flex flex-col items-center justify-center text-3xl md:text-5xl font-bold transition-all duration-200 group ${cellValue!==null?'filled':''} ${isLocked?'opacity-40 cursor-not-allowed bg-black/40 border-[#4a0404]':'hover:scale-105 hover:border-[#fcd34d] active:scale-95'} ${isSuggested&&!cellValue?'suggested':''}`},
+                    !cellValue && !isLocked && e("div",{className:"absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxIiBmaWxsPSIjZDRhZjM3Ii8+PC9zdmc+')] bg-center"}),
+                    cellValue ? e("span",{className:"drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] font-game"},cellValue) : (!isLocked && e(Sparkles,{className:`w-5 h-5 md:w-6 md:h-6 ${isSuggested?'text-white animate-pulse':'text-[#d4af37]/30'}`})),
+                    isSuggested && !cellValue && e("div",{className:"absolute inset-0 flex items-center justify-center pointer-events-none"},e("div",{className:"bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] animate-bounce border border-white/50 tracking-wider"},t('reveal')))
                 );
             };
 
-            return (
-                <div className="min-h-screen flex flex-col items-center justify-start pt-5 pb-20 px-4 relative">
-                
-                <AutoUpdateCheck />
+            const AnalysisList = () => {
+                if(!showAnalysis || solutions.length===0) return null;
+                const ranked = solutions.map((s,i)=>({...s,oIdx:i})).sort((a,b)=>b.ev-a.ev);
+                const [exp, setExp] = useState(null);
+                const tog = (id) => { sounds.click(); setExp(exp===id?null:id); };
+                return e("div",{className:"w-full max-w-[400px] mt-8 animate-in slide-in-from-bottom-4 fade-in duration-500"},
+                    e("div",{className:"flex items-center gap-2 mb-3 px-2"},e("h3",{className:"text-gold font-bold text-base tracking-wider uppercase drop-shadow-sm"},t('analysis_title'))),
+                    e("div",{className:"casino-panel rounded-2xl overflow-hidden divide-y divide-[#d4af37]/20"},
+                        ranked.map((sol,rank)=>{
+                            const isBest = bestLineIndices.includes(sol.oIdx);
+                            const name = getLineName(sol.oIdx);
+                            const ArrowIcon = getArrowIcon(sol.oIdx);
+                            const isEx = exp===sol.oIdx;
+                            const prizes = sol.allProbs.filter(p=>p.mgp>=720).sort((a,b)=>b.mgp-a.mgp);
+                            const dispP = isBest ? prizes.slice(0,1) : prizes;
+                            return e("div",{key:sol.oIdx, className:"flex flex-col"},
+                                e("button",{onClick:()=>tog(sol.oIdx), className:`w-full flex items-center justify-between transition-all text-left border-l-4 group relative overflow-hidden ${isBest?'py-4 px-3 bg-gradient-to-r from-green-900/60 to-transparent border-green-500 shadow-[inset_0_0_20px_rgba(0,128,0,0.1)] h-24':'py-3 px-3 hover:bg-white/5 border-transparent'} ${isEx?'bg-black/40':''}`},
+                                    e("div",{className:"flex items-center gap-3 shrink-0"},
+                                        e("div",{className:`w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm shadow-inner border ${isBest?'bg-green-700 border-green-400 text-white shadow-[0_0_10px_rgba(0,255,0,0.3)]':'bg-black/40 border-[#d4af37]/20 text-[#d4af37]/60'}`},ArrowIcon),
+                                        e("div",{className:"flex flex-col"},e("span",{className:`text-sm font-bold ${isBest?'text-green-400 drop-shadow':'text-zinc-300'}`},name),e("span",{className:"text-[10px] text-[#d4af37]/60 uppercase tracking-wider"},isBest?t('best_pick'):`${t('rank')} #${rank+1}`))
+                                    ),
+                                    isBest && e("div",{className:"flex-1 flex items-center justify-center animate-pulse mx-2"},e("span",{className:"text-[#fcd34d] text-sm font-bold tracking-wider whitespace-nowrap drop-shadow-md border-b border-[#fcd34d]/50 pb-0.5"},t('tap_view'))),
+                                    e("div",{className:"flex flex-col items-end justify-center gap-1 shrink-0 h-full"},
+                                        e("span",{className:`font-bold font-mono ${isBest?'text-xl text-gold drop-shadow-md mb-1':'text-base text-zinc-300'}`},Math.floor(sol.ev).toLocaleString()),
+                                        e("div",{className:"flex flex-wrap justify-end gap-1.5 min-h-[20px]"},
+                                            dispP.length>0 && dispP.map(p=>{const bS=getPrizeStyle(p.mgp);const txt=p.mgp>=10000?"text-xs":"text-[10px]";const lb=p.mgp>=1000?(p.mgp===10000?'10k':(p.mgp/1000)+'k'):p.mgp;return e("span",{key:p.mgp, className:`${txt} px-1.5 py-0.5 rounded border ${bS} backdrop-blur-sm flex items-center`},lb,e("span",{className:"opacity-70 text-[9px] ml-0.5"},`:${p.percent.toFixed(0)}%`))})
+                                        )
+                                    )
+                                ),
+                                isEx && e("div",{className:"bg-black/40 p-3 shadow-inner border-t border-[#d4af37]/20 animate-in slide-in-from-top-2 duration-200"},
+                                    e("div",{className:"grid grid-cols-3 gap-2"}, sol.allProbs.map(pr=>{const bS=getPrizeStyle(pr.mgp);return e("div",{key:pr.mgp, className:`flex flex-col items-center justify-center p-2 rounded-lg border shadow-sm ${bS} bg-opacity-20`},e("span",{className:"text-xs font-bold"},pr.mgp.toLocaleString()),e("span",{className:"text-[10px] font-mono opacity-80"},`${pr.percent.toFixed(0)}%`))}))
+                                )
+                            );
+                        })
+                    )
+                );
+            };
 
-                <div className="w-full max-w-md flex justify-between items-center mb-4 px-2 z-40 relative">
-                    <div className="flex gap-2">
-                        <button 
-                            onClick={() => { toggleSound(); setTimeout(() => sounds.toggle(), 0); }}
-                            className="flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37]/60 hover:text-white transition-all active:scale-95"
-                        >
-                            {isSoundOn ? <Volume2 className="w-5 h-5 text-[#d4af37]" /> : <VolumeX className="w-5 h-5 text-zinc-500" />}
-                        </button>
-
-                        <button 
-                             onClick={handleShare}
-                             className="flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
-                        >
-                             <ShareIcon className="w-4 h-4" />
-                        </button>
-                    </div>
-
-                    <div className="flex gap-2">
-                        <button 
-                             onClick={() => { setShowInstallModal(true); sounds.click(); }}
-                             className="flex items-center justify-center gap-1.5 px-3 h-9 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
-                        >
-                             <Download className="w-3 h-3" />
-                             <span className="text-[10px] font-bold uppercase whitespace-nowrap">{t('install_btn')}</span>
-                        </button>
-
-                        <button 
-                             onClick={() => { setShowLangMenu(true); setTimeout(() => sounds.click(), 0); }}
-                             className="flex items-center justify-center gap-1.5 px-3 h-9 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"
-                        >
-                             <Globe className="w-3 h-3" />
-                             <span className="text-[10px] font-bold uppercase whitespace-nowrap">{lang.toUpperCase()}</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div className="w-full max-w-md mb-4 text-center relative shrink-0">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-red-600/30 blur-[80px] rounded-full pointer-events-none mix-blend-screen"></div>
-                    <div className="relative flex flex-col items-center gap-2">
-                        <Trophy className="w-8 h-8 text-[#d4af37] drop-shadow-[0_0_10px_rgba(212,175,55,0.8)]" />
-                        <h1 className="text-gold text-3xl md:text-5xl font-game font-extrabold tracking-widest drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] leading-tight py-1 relative z-10">
-                            {t('title')}
-                        </h1>
-                        <div className="flex items-center gap-2 opacity-80">
-                            <div className="h-[2px] w-16 bg-gradient-to-r from-transparent to-[#d4af37]"></div>
-                            <div className="w-2 h-2 rotated-45 bg-[#d4af37] transform rotate-45"></div>
-                            <div className="h-[2px] w-16 bg-gradient-to-l from-transparent to-[#d4af37]"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mb-6 flex flex-col w-full max-w-[340px] gap-4 shrink-0 relative z-20">
-                    <div className="flex gap-3">
-                        <button onClick={handleReset} className="flex-1 py-4 btn-3d bg-gradient-to-b from-[#7f1d1d] to-[#4a0404] border-2 border-[#991b1b] rounded-2xl text-red-100 font-bold tracking-wider flex items-center justify-center gap-2 shadow-lg group"><RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" /> {t('reset')}</button>
-                        <button onClick={() => { setShowPayouts(true); setTimeout(() => sounds.click(), 0); }} className="flex-1 py-4 btn-3d bg-gradient-to-b from-[#fcd34d] to-[#b45309] border-2 border-[#fcd34d] rounded-2xl text-[#451a03] font-bold tracking-wider flex items-center justify-center gap-2 shadow-lg group"><BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" /> {t('payout_btn')}</button>
-                    </div>
-                </div>
-
-                <div className="w-full max-w-[420px] casino-panel rounded-[40px] p-6 flex flex-col justify-center shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-                    <div className="grid grid-cols-[3rem_1fr_1fr_1fr_3rem] gap-2 items-center justify-items-center w-full">
-                        <Indicator lineId={6} /> <Indicator lineId={3} /> <Indicator lineId={4} /> <Indicator lineId={5} /> <Indicator lineId={7} /> 
-                        <Indicator lineId={0} /> <GameCell idx={0} /> <GameCell idx={1} /> <GameCell idx={2} /> <div />
-                        <Indicator lineId={1} /> <GameCell idx={3} /> <GameCell idx={4} /> <GameCell idx={5} /> <div />
-                        <Indicator lineId={2} /> <GameCell idx={6} /> <GameCell idx={7} /> <GameCell idx={8} /> <div />
-                    </div>
-                </div>
-
-                <div className="w-full max-w-[340px] mt-6 flex justify-center">
-                    <button onClick={() => { setIsFullFillMode(!isFullFillMode); setTimeout(() => sounds.toggle(), 0); }} className={`px-6 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all border ${isFullFillMode ? 'bg-blue-900/50 border-blue-400 text-blue-200 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'bg-transparent border-[#d4af37]/30 text-[#d4af37]/50 hover:bg-[#d4af37]/10 hover:text-[#d4af37]'}`}>
-                        {isFullFillMode ? <span className="flex items-center gap-2"><Unlock className="w-3 h-3"/> {t('mode_on')}</span> : <span className="flex items-center gap-2"><Lock className="w-3 h-3"/> {t('mode_off')}</span>}
-                    </button>
-                </div>
-                
-                <AnalysisList />
-
-                <div className="mt-12 flex flex-col items-center gap-4 pb-12 opacity-80 transition-opacity">
-                    <button onClick={() => { setShowAboutModal(true); sounds.click(); }} className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-[#d4af37]/30 bg-black/20 text-[#d4af37] text-xs font-bold hover:bg-[#d4af37]/10 transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        {t('about_btn')}
-                    </button>
-
-                    <div className="flex flex-col items-center gap-1">
-                        <div className="text-[#d4af37] text-[10px] font-mono opacity-60">{t('ver_prefix')} {BUILD_TIMESTAMP} ({t('region')})</div>
-                        <div className="text-[#d4af37]/30 text-[10px] scale-90 select-none cursor-default">
-                            {lang === 'zh' || lang === 'cn' ? '本站僅使用 GA 進行匿名流量統計，不蒐集個人個資' : 'Anonymous usage data is collected via Google Analytics.'}
-                        </div>
-                    </div>
-                    
-                    <button onClick={handleForceUpdate} className="text-[10px] text-[#d4af37]/50 underline flex items-center gap-1 hover:text-[#d4af37]"><RotateCcw className="w-3 h-3" /> {t('force_update')}</button>
-                </div>
-
-                <NumberSelector isOpen={openSelectorIndex !== null} currentValue={openSelectorIndex !== null ? board[openSelectorIndex] : null} usedNumbers={usedNumbersSet} onSelect={handleSelect} onClose={() => setOpenSelectorIndex(null)} t={t} playSound={val => val === 'select' ? null : (val === 'clear' ? null : sounds.click())} />
-                
-                <PayoutTableModal isOpen={showPayouts} onClose={() => setShowPayouts(false)} t={t} playSound={sounds.click} />
-                
-                <LanguageModal isOpen={showLangMenu} onClose={() => setShowLangMenu(false)} currentLang={lang} setLang={setLang} t={t} playSound={sounds.click} />
-                
-                <InstallModal isOpen={showInstallModal} onClose={() => setShowInstallModal(false)} t={t} playSound={sounds.click} />
-                
-                <AboutModal isOpen={showAboutModal} onClose={() => setShowAboutModal(false)} t={t} playSound={sounds.click} />
-                </div>
+            return e("div", {className:"min-h-screen flex flex-col items-center justify-start pt-5 pb-20 px-4 relative"},
+                e(AutoUpdateCheck),
+                e("div", {className:"w-full max-w-md flex justify-between items-center mb-4 px-2 z-40 relative"},
+                    e("div", {className:"flex gap-2"},
+                        e("button", {onClick:()=>{toggleSound();setTimeout(()=>sounds.toggle(),0);}, className:"flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37]/60 hover:text-white transition-all active:scale-95"}, isSoundOn?e(Volume2,{className:"w-5 h-5 text-[#d4af37]"}):e(VolumeX,{className:"w-5 h-5 text-zinc-500"})),
+                        e("button", {onClick:handleShare, className:"flex items-center justify-center w-10 h-10 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"}, e(ShareIcon, {className:"w-4 h-4"}))
+                    ),
+                    e("div", {className:"flex gap-2"},
+                        e("button", {onClick:()=>{setShowInstallModal(true);sounds.click();}, className:"flex items-center justify-center gap-1.5 px-3 h-9 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"}, e(Download, {className:"w-3 h-3"}), e("span", {className:"text-[10px] font-bold uppercase whitespace-nowrap"}, t('install_btn'))),
+                        e("button", {onClick:()=>{setShowLangMenu(true);setTimeout(()=>sounds.click(),0);}, className:"flex items-center justify-center gap-1.5 px-3 h-9 bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-full shadow-md text-[#d4af37] hover:bg-[#d4af37]/10 transition-all active:scale-95"}, e(Globe, {className:"w-3 h-3"}), e("span", {className:"text-[10px] font-bold uppercase whitespace-nowrap"}, lang.toUpperCase()))
+                    )
+                ),
+                e("div", {className:"w-full max-w-md mb-4 text-center relative shrink-0"},
+                    e("div", {className:"absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-red-600/30 blur-[80px] rounded-full pointer-events-none mix-blend-screen"}),
+                    e("div", {className:"relative flex flex-col items-center gap-2"},
+                        e(Trophy, {className:"w-8 h-8 text-[#d4af37] drop-shadow-[0_0_10px_rgba(212,175,55,0.8)]"}),
+                        e("h1", {className:"text-gold text-3xl md:text-5xl font-game font-extrabold tracking-widest drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] leading-tight py-1 relative z-10"}, t('title')),
+                        e("div", {className:"flex items-center gap-2 opacity-80"}, e("div", {className:"h-[2px] w-16 bg-gradient-to-r from-transparent to-[#d4af37]"}), e("div", {className:"w-2 h-2 rotated-45 bg-[#d4af37] transform rotate-45"}), e("div", {className:"h-[2px] w-16 bg-gradient-to-l from-transparent to-[#d4af37]"}))
+                    )
+                ),
+                e("div", {className:"mb-6 flex flex-col w-full max-w-[340px] gap-4 shrink-0 relative z-20"},
+                    e("div", {className:"flex gap-3"},
+                        e("button", {onClick:handleReset, className:"flex-1 py-4 btn-3d bg-gradient-to-b from-[#7f1d1d] to-[#4a0404] border-2 border-[#991b1b] rounded-2xl text-red-100 font-bold tracking-wider flex items-center justify-center gap-2 shadow-lg group"}, e(RefreshCw, {className:"w-5 h-5 group-hover:rotate-180 transition-transform duration-500"}), t('reset')),
+                        e("button", {onClick:()=>{setShowPayouts(true);setTimeout(()=>sounds.click(),0);}, className:"flex-1 py-4 btn-3d bg-gradient-to-b from-[#fcd34d] to-[#b45309] border-2 border-[#fcd34d] rounded-2xl text-[#451a03] font-bold tracking-wider flex items-center justify-center gap-2 shadow-lg group"}, e(BookOpen, {className:"w-5 h-5 group-hover:scale-110 transition-transform"}), t('payout_btn'))
+                    )
+                ),
+                e("div", {className:"w-full max-w-[420px] casino-panel rounded-[40px] p-6 flex flex-col justify-center shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)]"},
+                    e("div", {className:"grid grid-cols-[3rem_1fr_1fr_1fr_3rem] gap-2 items-center justify-items-center w-full"},
+                        e(Indicator,{lineId:6}),e(Indicator,{lineId:3}),e(Indicator,{lineId:4}),e(Indicator,{lineId:5}),e(Indicator,{lineId:7}),
+                        e(Indicator,{lineId:0}),e(GameCell,{idx:0}),e(GameCell,{idx:1}),e(GameCell,{idx:2}),e("div"),
+                        e(Indicator,{lineId:1}),e(GameCell,{idx:3}),e(GameCell,{idx:4}),e(GameCell,{idx:5}),e("div"),
+                        e(Indicator,{lineId:2}),e(GameCell,{idx:6}),e(GameCell,{idx:7}),e(GameCell,{idx:8}),e("div")
+                    )
+                ),
+                e("div", {className:"w-full max-w-[340px] mt-6 flex justify-center"},
+                    e("button", {onClick:()=>{setIsFullFillMode(!isFullFillMode);setTimeout(()=>sounds.toggle(),0);}, className:`px-6 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all border ${isFullFillMode?'bg-blue-900/50 border-blue-400 text-blue-200 shadow-[0_0_10px_rgba(59,130,246,0.5)]':'bg-transparent border-[#d4af37]/30 text-[#d4af37]/50 hover:bg-[#d4af37]/10 hover:text-[#d4af37]'}`},
+                        isFullFillMode ? e("span",{className:"flex items-center gap-2"},e(Unlock,{className:"w-3 h-3"}),t('mode_on')) : e("span",{className:"flex items-center gap-2"},e(Lock,{className:"w-3 h-3"}),t('mode_off'))
+                    )
+                ),
+                e(AnalysisList),
+                e("div", {className:"mt-12 flex flex-col items-center gap-4 pb-12 opacity-80 transition-opacity"},
+                    e("button", {onClick:()=>{setShowAboutModal(true);sounds.click();}, className:"flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-[#d4af37]/30 bg-black/20 text-[#d4af37] text-xs font-bold hover:bg-[#d4af37]/10 transition-all"},
+                        e("svg",{xmlns:"http://www.w3.org/2000/svg",width:"14",height:"14",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},e("path",{d:"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"}),e("circle",{cx:"12",cy:"7",r:"4"})),
+                        t('about_btn')
+                    ),
+                    e("div", {className:"flex flex-col items-center gap-1"},
+                        e("div", {className:"text-[#d4af37] text-[10px] font-mono opacity-60"}, t('ver_prefix'), " ", BUILD_TIMESTAMP, " (", t('region'), ")"),
+                        e("div", {className:"text-[#d4af37]/30 text-[10px] scale-90 select-none cursor-default"}, lang==='zh'||lang==='cn'?'本站僅使用 GA 進行匿名流量統計，不蒐集個人個資':'Anonymous usage data is collected via Google Analytics.')
+                    ),
+                    e("button", {onClick:handleForceUpdate, className:"text-[10px] text-[#d4af37]/50 underline flex items-center gap-1 hover:text-[#d4af37]"}, e(RotateCcw, {className:"w-3 h-3"}), t('force_update'))
+                ),
+                e(NumberSelector, {isOpen:openSelectorIndex!==null, currentValue:openSelectorIndex!==null?board[openSelectorIndex]:null, usedNumbers:usedNumbersSet, onSelect:handleSelect, onClose:()=>setOpenSelectorIndex(null), t:t, playSound:(v)=>v==='select'?null:(v==='clear'?null:sounds.click())}),
+                e(PayoutTableModal, {isOpen:showPayouts, onClose:()=>setShowPayouts(false), t:t, playSound:sounds.click}),
+                e(LanguageModal, {isOpen:showLangMenu, onClose:()=>setShowLangMenu(false), currentLang:lang, setLang:setLang, t:t, playSound:sounds.click}),
+                e(InstallModal, {isOpen:showInstallModal, onClose:()=>setShowInstallModal(false), t:t, playSound:sounds.click}),
+                e(AboutModal, {isOpen:showAboutModal, onClose:()=>setShowAboutModal(false), t:t, playSound:sounds.click})
             );
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<MiniCactpotSolver />);
+        root.render(e(MiniCactpotSolver));
     </script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful:', registration.scope);
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed:', err);
-                    });
+                navigator.serviceWorker.register('./sw.js').then(r => console.log('SW reg success:', r.scope)).catch(e => console.log('SW reg failed:', e));
             });
         }
     </script>
