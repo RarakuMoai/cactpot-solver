@@ -1,5 +1,5 @@
 // 定義快取名稱與版本 (如果要強制更新，只需修改這裡的版本號)
-const CACHE_NAME = 'ff14-cactpot-v2-5-1-offline';
+const CACHE_NAME = 'ff14-cactpot-v2-5-2-offline';
 
 // 這裡列出所有「必須」存到硬碟的檔案
 // 包含您的 HTML, Manifest, Icon 以及所有原本透過網路讀取的 CDN
