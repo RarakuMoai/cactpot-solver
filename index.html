@@ -385,7 +385,7 @@
 
             const Indicator = ({lineId}) => {
                 const ArrowIcon = getArrowIcon(lineId);
-                if(!solutions[lineId]) return e("div",{className:"w-12 h-12"});
+                if(!solutions[lineId]) return e("div",{className:"w-10 h-10 md:w-12 md:h-12"});
                 const {ev,chance10k,chance3600} = solutions[lineId];
                 const isBest = showAnalysis && bestLineIndices.includes(lineId);
                 const displayEv = ev>=1000?(ev/1000).toFixed(1).replace('.0','')+'k':ev;
@@ -394,7 +394,7 @@
                     if(chance10k>0) bestInfo = e("div",{className:"flex flex-col items-center"},e("span",{className:"text-[9px] text-yellow-200 leading-none"},t('label_10k')),e("span",{className:"text-[10px] font-bold text-white leading-none"},Math.round(chance10k)+"%"));
                     else if(chance3600>0) bestInfo = e("div",{className:"flex flex-col items-center"},e("span",{className:"text-[9px] text-fuchsia-200 leading-none"},t('label_3600')),e("span",{className:"text-[10px] font-bold text-white leading-none"},Math.round(chance3600)+"%"));
                 }
-                return e("div",{className:`relative flex flex-col items-center justify-center transition-all duration-300 shadow-md border-2 ${isBest?'w-14 h-14 rounded-2xl bg-gradient-to-b from-green-600 to-green-900 border-green-400 text-white shadow-[0_0_20px_rgba(0,255,0,0.6)] z-20 scale-110':'w-12 h-12 rounded-full bg-black/60 border-[#d4af37]/30 text-[#d4af37]/70'}`},
+                return e("div",{className:`relative flex flex-col items-center justify-center transition-all duration-300 shadow-md border-2 ${isBest?'w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-b from-green-600 to-green-900 border-green-400 text-white shadow-[0_0_20px_rgba(0,255,0,0.6)] z-20 scale-110':'w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 border-[#d4af37]/30 text-[#d4af37]/70'}`},
                     isBest?(bestInfo?bestInfo:e("span",{className:"text-xs font-bold leading-none"},displayEv)):e("span",{className:"text-[10px] font-bold leading-none"},displayEv),
                     e("div",{className:`text-sm mt-0.5 ${isBest?'text-white animate-pulse drop-shadow':''}`},ArrowIcon)
                 );
@@ -404,7 +404,7 @@
                 const cellValue = board[idx];
                 const isSuggested = isSelectionPhase && suggestedCellIndices.includes(idx);
                 const isLocked = !isFullFillMode && (cellValue===null && filledCount>=4);
-                return e("button",{disabled:isLocked, onClick:()=>{if(!isLocked){setOpenSelectorIndex(idx); if(isSuggested&&!cellValue)sounds.reveal(); else sounds.click();}}, className:`circle-cell w-16 h-16 md:w-20 md:h-20 flex flex-col items-center justify-center text-3xl md:text-5xl font-bold transition-all duration-200 group ${cellValue!==null?'filled':''} ${isLocked?'opacity-40 cursor-not-allowed bg-black/40 border-[#4a0404]':'hover:scale-105 hover:border-[#fcd34d] active:scale-95'} ${isSuggested&&!cellValue?'suggested':''}`},
+                return e("button",{disabled:isLocked, onClick:()=>{if(!isLocked){setOpenSelectorIndex(idx); if(isSuggested&&!cellValue)sounds.reveal(); else sounds.click();}}, className:`circle-cell w-14 h-14 md:w-20 md:h-20 flex flex-col items-center justify-center text-2xl md:text-5xl font-bold transition-all duration-200 group ${cellValue!==null?'filled':''} ${isLocked?'opacity-40 cursor-not-allowed bg-black/40 border-[#4a0404]':'hover:scale-105 hover:border-[#fcd34d] active:scale-95'} ${isSuggested&&!cellValue?'suggested':''}`},
                     !cellValue && !isLocked && e("div",{className:"absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxIiBmaWxsPSIjZDRhZjM3Ii8+PC9zdmc+')] bg-center"}),
                     cellValue ? e("span",{className:"drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] font-game"},cellValue) : (!isLocked && e(Sparkles,{className:`w-5 h-5 md:w-6 md:h-6 ${isSuggested?'text-white animate-pulse':'text-[#d4af37]/30'}`})),
                     isSuggested && !cellValue && e("div",{className:"absolute inset-0 flex items-center justify-center pointer-events-none"},e("div",{className:"bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] animate-bounce border border-white/50 tracking-wider"},t('reveal')))
@@ -476,7 +476,7 @@
                     )
                 ),
                 e("div", {className:"w-full max-w-[420px] casino-panel rounded-[40px] p-6 flex flex-col justify-center shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)]"},
-                    e("div", {className:"grid grid-cols-[3rem_1fr_1fr_1fr_3rem] gap-2 items-center justify-items-center w-full"},
+                    e("div", {className:"grid grid-cols-[2.5rem_1fr_1fr_1fr_2.5rem] md:grid-cols-[3rem_1fr_1fr_1fr_3rem] gap-1 md:gap-2 items-center justify-items-center w-full"},
                         e(Indicator,{lineId:6}),e(Indicator,{lineId:3}),e(Indicator,{lineId:4}),e(Indicator,{lineId:5}),e(Indicator,{lineId:7}),
                         e(Indicator,{lineId:0}),e(GameCell,{idx:0}),e(GameCell,{idx:1}),e(GameCell,{idx:2}),e("div"),
                         e(Indicator,{lineId:1}),e(GameCell,{idx:3}),e(GameCell,{idx:4}),e(GameCell,{idx:5}),e("div"),
